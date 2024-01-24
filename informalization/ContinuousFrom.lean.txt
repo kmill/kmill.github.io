@@ -30,21 +30,3 @@ theorem continuous_of_dense [TopologicalSpace X] [TopologicalSpace Y] [RegularSp
     f z ∈ closure (f '' (V ∩ A)) := limV.mem_closure_image
     _   ⊆ closure V'             := closure_mono hV
     _   = V'                     := V'_closed.closure_eq
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-set_option trace.English true
-#english ∀ X Y [TopologicalSpace X] [TopologicalSpace Y] [RegularSpace' Y]
-{A : Set X},  Dense A → ∀ (f : X → Y),  (∀ x, ContinuousWithinAt' f A x) → Continuous' f
