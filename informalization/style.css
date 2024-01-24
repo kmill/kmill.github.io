@@ -1,0 +1,298 @@
+body {
+  font-family: 'Times New Roman', Times, serif;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+#main {
+  position: fixed;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  overflow: hidden;
+}
+
+div.main_div {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+div.main_doc {
+  /*position: absolute;*/
+/*  top: 0; bottom: 0;
+  left: 0; right: 400px;*/
+  overflow: auto;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+div.main_goal {
+  /*position: absolute;*/
+/*  top: 0; bottom: 0;
+  right: 0; width: 400px;*/
+  overflow: auto;
+  /*border-left: 1px solid black;
+  border-style: ridge;*/
+/*  box-shadow: -3px 0 5px #ccc;*/
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.gutter {
+  /*background-color: #eee;*/
+  box-shadow: 1px 1px 5px #ccc inset;
+
+  background-repeat: no-repeat;
+  background-position: 50%;
+
+  height: 100%;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;
+}
+
+.gutter.gutter-vertical {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+}
+
+div.document {
+  margin: 1rem;
+  max-width: 700px;
+  margin-bottom: 4rem;
+}
+
+div.goal_view {
+  margin: 1rem;
+}
+
+div.controls {
+  position: fixed;
+  left: 0; bottom: 0;
+  background: #ccc;
+  padding: 3px;
+  z-index: 1; /* keeps the controls above MathJax */
+}
+
+.explanation_refinement_button {
+  display: inline-block;
+  user-select: none;
+  cursor: default;
+  color: #ccc;
+}
+
+.explanation_refinement_button:hover {
+  color: #fff;
+  /*background-color: #3d93cd;*/
+}
+
+.highlight .explanation_refinement_button {
+  color: #fff;
+}
+
+.explanation_withTrailer {
+  color: black;
+  text-decoration: underline solid #ccc;
+  /* Smooths out a "pop" in the highlight transition. */
+  transition: color 100ms, text-decoration-color 100ms;
+}
+
+.explanation_withTrailer:hover {
+  color: #fff;
+  text-decoration-color: #fff;
+}
+
+.explanation_withTrailer:active {
+  color: black;
+}
+
+/*
+.explanation_refinement:hover {
+  background-color: #3d93cd50;
+}
+*/
+
+.highlightable {
+  transition: background-color 200ms;
+}
+
+.highlightable.highlight {
+  background-color: #3d93cd;
+  transition: background-color 100ms;
+}
+
+.explanation_indent {
+  padding-left: 0.3em;
+  border-left: 3px solid #ccc;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: 0.3em;
+}
+
+.explanation_indent > .explanation_indent {
+  /*padding-left: 0.25em;*/
+}
+
+span.human {
+  font-style: italic;
+}
+.proof p {
+  margin: 0;
+}
+
+.proof p + p {
+  margin-top: 0.5em;
+}
+
+.proof ul, .proof ol {
+  margin: 0;
+}
+
+.proof ol {
+  padding-left: 2em;
+}
+
+.proof p + ul, .proof p + ol {
+  margin-top: 0.5em;
+}
+
+.proof ul + p, .proof ol + p {
+  margin-top: 0.5em;
+}
+
+td.explanation {
+  padding-left: 3rem;
+}
+
+ul.explanation {
+  margin: 0.5em;
+}
+
+
+
+.theorem_statement {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  clear: both;
+}
+
+.theorem_name {
+  font-weight: bold;
+}
+
+.proof {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.proof_text {
+  font-style: italic;
+}
+
+.qed {
+  float: right;
+}
+
+
+
+.goal_context_case {
+  font-weight: bold;
+}
+
+.goal_context {
+  display: none;
+  position: absolute;
+  bottom: 0; right: 0;
+  border: 1px solid #888;
+  padding: 0.2em 0.6em;
+  margin: 0.5em;
+  background: white;
+  z-index: 1000;
+}
+
+.goal {
+  display: inline-block;
+}
+
+.goal_context_item_aux_decl, .goal_context_item_implementation_detail {
+  display: none
+}
+
+.goal_header {
+  margin-bottom: 0.5em;
+  font-style: italic;
+}
+
+.goal_context_item {
+  margin-top: 0.2em;
+  display: flex;
+  flex-wrap: nowrap;
+  /*justify-content: right;*/
+}
+
+.goal_context_item_text {
+  display: block;
+  flex-grow: 0;
+  flex-basis: max-content;
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+.goal_context_item_provides_holder {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: min-content;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: right;
+}
+
+.goal_context_item_provides {
+  flex-grow: 0;
+  color: #555;
+  font-size: 80%;
+  margin-left: 0.5em;
+  /*float: right;*/
+  white-space: nowrap;
+}
+
+.goal_context_target {
+  margin-top: 0.4em;
+  padding-top: 0.4em;
+  border-top: 2px solid #888;
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+.goal_button {
+  display: inline-block;
+  user-select: none;
+  cursor: default;
+  position: relative;
+  content: '⬭';
+  color: #ccc;
+}
+
+.goal_button:hover::before, .goal_button_active::before {
+  position: absolute;
+  top: 0; left: 0;
+  content: '⬬';
+}
+
+.goal_button.goal_button_active {
+  color: #aaf;
+}
+
+.goal_button.goal_button_active:hover {
+  color: #3d93cd;
+}
