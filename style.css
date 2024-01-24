@@ -1,0 +1,19 @@
+body {
+    font-family: Georgia, serif;
+    margin: 1em 2em;
+    max-width: 800px;
+}
+
+.profile {
+    float: right;
+    margin-left: 1em;
+}
+.profile img {
+    border-radius: 10px;
+}
+
+.hr {
+    clear: both;
+    margin: 0.5em 0;
+    border-top: 1px solid #003c6c;
+}
