@@ -1,0 +1,2201 @@
+<!doctype html>
+<html>
+<head>
+<style>
+html, body {
+    margin: 0; padding: 0;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    overflow: hidden;
+}
+
+#message {
+    position: absolute;
+    padding: 10px;
+    margin: 10px;
+    background: #fefeff;
+    border: 3px solid #66f;
+    border-radius: 5px;
+    
+    display: none;
+}
+
+#error {
+    position: absolute;
+    padding: 10px;
+    margin: 10px;
+    background: #fee;
+    border: 3px solid #f00;
+    border-radius: 5px;
+    
+    display: none;
+}
+</style>
+<script type="text/javascript">
+"use strict";
+
+// Linear algebra stuff.
+
+var Vec2 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(2);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    return v;
+  },
+  sub : function (v, w) {
+    // v <- v + w
+    v[0] -= w[0];
+    v[1] -= w[1];
+    return v;
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec2.dot(v, v));
+    return Vec2.scale(v, 1/len);
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1];
+  },
+  dist : function (v, w) {
+    // computes distance between v and w
+    return Math.sqrt(this.dist2(v, w));
+  },
+  dist2 : function (v, w) {
+    // computes squared distance between v and w
+    var dx = v[0] - w[0], dy = v[1] - w[1];
+    return dx*dx + dy*dy;
+  },
+  line_dist2 : function (a, b, pt, /*opt*/between) {
+    // computes the distance between the pt and the line containing a and b
+    var x0 = b[0] - a[0],
+        x1 = b[1] - a[1],
+        p0 = pt[0] - a[0],
+        p1 = pt[1] - a[1];
+    var t = (x0*p0+x1*p1)/Math.sqrt(x0*x0+x1*x1);
+    if (between) {
+      var s = t / Math.sqrt(x0 * x0 + x1 * x1);
+      if (s < 0 || 1 < s) {
+        return Infinity;
+      }
+    }
+    return p0*p0+p1*p1-t*t;
+  },
+  line_intersect : function (a, b, c, d, /*opt*/between) {
+    // line1 passes through a and b. line2 through c and d.  returns the crossing point.
+    // if between is set, then returns the crossing only if it is between both pairs
+    // of points
+    //
+    // (1-t)a +tb = (1-s)c + sd
+    var det = (b[0]-a[0])*(c[1]-d[1])-(b[1]-a[1])*(c[0]-d[0]);
+    if (det === 0) return null;
+    var t = ((c[1]-d[1])*(c[0]-a[0])+(d[0]-c[0])*(c[1]-a[1]))/det,
+        s = ((a[1]-b[1])*(c[0]-a[0])+(b[0]-a[0])*(c[1]-a[1]))/det;
+    if (between && (t < 0 || t > 1 || s < 0 || s > 1))
+      return null;
+    return {t:t,
+            s:s,
+            pt:[(1-t)*a[0]+t*b[0],
+                (1-t)*a[1]+t*b[1]]};
+  },
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+']';
+  }
+};
+var Vec3 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(3);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  createf : function (a, b, c) {
+    var v = new Float32Array(3);
+    v[0] = a;
+    v[1] = b;
+    v[2] = c;
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1] + v[2]*w[2];
+  },
+  length : function (v) {
+    return Math.sqrt(Vec3.dot(v, v));
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec3.dot(v, v));
+    return Vec3.scale(v, 1/len);
+  },
+/*  crossp : function (v, w) {
+    // return cross product of v and w
+    var u = Vec3.create();
+  },*/
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    v[2] *= c;
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    v[2] += w[2];
+    return v;
+  },
+  scale_copy : function (v, c) {
+    return Vec3.scale(Vec3.create(v), c);
+  },
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+', '+v[2].toPrecision(6)+']';
+  }
+};
+var Vec4 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(4);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  createf : function (a, b, c, d) {
+    var v = new Float32Array(4);
+    v[0] = a;
+    v[1] = b;
+    v[2] = c;
+    v[3] = d;
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    v[2] += w[2];
+    v[3] += w[3];
+    return v;
+  },
+  sub : function (v, w) {
+    // v <- v - w
+    v[0] -= w[0];
+    v[1] -= w[1];
+    v[2] -= w[2];
+    v[3] -= w[3];
+    return v;
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1] + v[2]*w[2] + v[3]*w[3];
+  },
+  length : function (v) {
+    return Math.sqrt(Vec4.dot(v, v));
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec4.dot(v, v));
+    return Vec4.scale(v, 1/len);
+  },
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    v[2] *= c;
+    v[3] *= c;
+    return v;
+  },
+
+
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+', '+v[2].toPrecision(6)+', '+v[3].toPrecision(6)+']';
+  }
+};
+var Mat3 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(9);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mul : function (A, B) {
+    // A <- A * B
+    var a0, a1, a2;
+    a0 = A[0]; a1 = A[3]; a2 = A[6];
+    A[0] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[3] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[6] = a0*B[6] + a1*B[7] + a2*B[8];
+    a0 = A[1]; a1 = A[4]; a2 = A[7];
+    A[1] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[4] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[7] = a0*B[6] + a1*B[7] + a2*B[8];
+    a0 = A[2]; a1 = A[5]; a2 = A[8];
+    A[2] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[5] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[8] = a0*B[6] + a1*B[7] + a2*B[8];
+    return A;
+  },
+  toString : function (A) {
+    return '['+A[0].toPrecision(6)+', '+A[3].toPrecision(6)+', '+A[6].toPrecision(6)+']'+'\n'+'['+A[1].toPrecision(6)+', '+A[4].toPrecision(6)+', '+A[7].toPrecision(6)+']'+'\n'+'['+A[2].toPrecision(6)+', '+A[5].toPrecision(6)+', '+A[8].toPrecision(6)+']';
+  }
+};
+var Mat4 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(16);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mov : function (A, B) {
+    // A <- B
+    A.set(B);
+    return A;
+  },
+  id : function (A) {
+    A.fill(0);
+    A[0] = A[5] = A[10] = A[15] = 1;
+    return A;
+  },
+  zero : function (A) {
+    A.fill(0);
+    return A;
+  },
+  mul : function (A, B) {
+    // A <- A * B
+    var a0, a1, a2, a3;
+    a0 = A[0]; a1 = A[4]; a2 = A[8]; a3 = A[12];
+    A[0] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[4] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[8] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[12] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[1]; a1 = A[5]; a2 = A[9]; a3 = A[13];
+    A[1] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[5] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[9] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[13] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[2]; a1 = A[6]; a2 = A[10]; a3 = A[14];
+    A[2] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[6] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[10] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[14] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[3]; a1 = A[7]; a2 = A[11]; a3 = A[15];
+    A[3] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[7] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[11] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[15] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    return A;
+  },
+  mulvec : function (w, A, v) {
+    // w <- A * v
+    w[0] = A[0]*v[0]+A[4]*v[1]+A[8]*v[2]+A[12]*v[3];
+    w[1] = A[1]*v[0]+A[5]*v[1]+A[9]*v[2]+A[13]*v[3];
+    w[2] = A[2]*v[0]+A[6]*v[1]+A[10]*v[2]+A[14]*v[3];
+    w[3] = A[3]*v[0]+A[7]*v[1]+A[11]*v[2]+A[15]*v[3];
+    return w;
+  },
+  transpose : function (A, B) {
+    // A <- B^T.  A and B may alias.
+    var c;
+    A[0] = B[0];
+    c = B[1]; A[1] = B[4]; A[4] = c;
+    c = B[2]; A[2] = B[8]; A[8] = c;
+    c = B[3]; A[3] = B[12]; A[12] = c;
+    A[5] = B[5];
+    c = B[6]; A[6] = B[9]; A[9] = c;
+    c = B[7]; A[7] = B[13]; A[13] = c;
+    A[10] = B[10];
+    c = B[11]; A[11] = B[14]; A[14] = c;
+    A[15] = B[15];
+    return A;
+  },
+  add : function (A, B) {
+    // A <- A + B
+    A[0] += B[0]; A[1] += B[1]; A[2] += B[2]; A[3] += B[3];
+    A[4] += B[4]; A[5] += B[5]; A[6] += B[6]; A[7] += B[7];
+    A[8] += B[8]; A[9] += B[9]; A[10] += B[10]; A[11] += B[11];
+    A[12] += B[12]; A[13] += B[13]; A[14] += B[14]; A[15] += B[15];
+    return A;
+  },
+  toString : function (A) {
+    return '['+A[0].toPrecision(6)+', '+A[4].toPrecision(6)+', '+A[8].toPrecision(6)+', '+A[12].toPrecision(6)+']'+'\n'+'['+A[1].toPrecision(6)+', '+A[5].toPrecision(6)+', '+A[9].toPrecision(6)+', '+A[13].toPrecision(6)+']'+'\n'+'['+A[2].toPrecision(6)+', '+A[6].toPrecision(6)+', '+A[10].toPrecision(6)+', '+A[14].toPrecision(6)+']'+'\n'+'['+A[3].toPrecision(6)+', '+A[7].toPrecision(6)+', '+A[11].toPrecision(6)+', '+A[15].toPrecision(6)+']';
+  },
+  translate : function (A, v) {
+    // A <- A * translation matrix by v
+    A[12] = A[0]*v[0]+A[4]*v[1]+A[8]*v[2]+A[12];
+    A[13] = A[1]*v[0]+A[5]*v[1]+A[9]*v[2]+A[13];
+    A[14] = A[2]*v[0]+A[6]*v[1]+A[10]*v[2]+A[14];
+    A[15] = A[3]*v[0]+A[7]*v[1]+A[11]*v[2]+A[15];
+    return A;
+  },
+  scale : function (A, v) {
+    // A <- A * scale by v
+    A[0] *= v[0]; A[1] *= v[0]; A[2] *= v[0]; A[3] *= v[0];
+    A[4] *= v[1]; A[5] *= v[1]; A[6] *= v[1]; A[7] *= v[1];
+    A[8] *= v[2]; A[9] *= v[2]; A[10] *= v[2]; A[11] *= v[2];
+    return A;
+  },
+  normalMatrix : function (B, A) {
+    // B <- mat3(A)^(-T).  B is Mat3, A is Mat4
+    var det = (A[0]*(+A[5]*A[10]-A[6]*A[9]) + A[1]*(-A[4]*A[10]+A[6]*A[8])
+               + A[2]*(+A[4]*A[9]-A[5]*A[8]));
+    B[0] = (A[5]*A[10] - A[9]*A[6])/det;
+    B[1] = (A[6]*A[8] - A[10]*A[4])/det;
+    B[2] = (A[4]*A[9] - A[8]*A[5])/det;
+    B[3] = (A[2]*A[9] - A[10]*A[1])/det;
+    B[4] = (A[0]*A[10] - A[8]*A[2])/det;
+    B[5] = (A[1]*A[8] - A[9]*A[0])/det;
+    B[6] = (A[1]*A[6] - A[5]*A[2])/det;
+    B[7] = (A[2]*A[4] - A[6]*A[0])/det;
+    B[8] = (A[0]*A[5] - A[4]*A[1])/det;
+    return B;
+  },
+  rotate : function (A, theta, v) {
+    // A <- A * rotate about v by theta CCW
+    var c = Math.cos(theta), s = Math.sin(theta);
+    var axis = Vec3.normalize(Vec3.create(v));
+    var temp = Vec3.scale_copy(axis, 1 - c);
+
+    if (Mat4.rotate._Rot === void 0) {
+      Mat4.rotate._Rot = Mat4.create();
+    }
+    var Rot = Mat4.zero(Mat4.rotate._Rot); // hooray for no threads
+    Rot[0] = c + temp[0]*axis[0];
+    Rot[1] = 0 + temp[0]*axis[1] + s*axis[2];
+    Rot[2] = 0 + temp[0]*axis[2] - s*axis[1];
+
+    Rot[4] = 0 + temp[1]*axis[0] - s*axis[2];
+    Rot[5] = c + temp[1]*axis[1];
+    Rot[6] = 0 + temp[1]*axis[2] + s*axis[0];
+
+    Rot[8] = 0 + temp[2]*axis[0] + s*axis[1];
+    Rot[9] = 0 + temp[2]*axis[1] - s*axis[0];
+    Rot[10]= c + temp[2]*axis[2];
+
+    Rot[15] = 1;
+
+    return Mat4.mul(A, Rot);
+  },
+  frustum : function (A, w, h, n, f) {
+    A.fill(0);
+    A[0] = 1/w;
+    A[5] = 1/h;
+    A[10] = -2/(f-n);
+    A[14] = (n+f)/(n-f);
+    A[15] = 1;
+    return A;
+  },
+  perspective : function (A, fovy, aspect, zNear, zFar) {
+    A.fill(0);
+    var range = Math.tan((Math.PI * fovy / 180) / 2) * zNear;
+    var width = 2 * range * aspect;
+    var height = 2 * range;
+    A[0] = 2 * zNear / width;
+    A[5] = 2 * zNear / height;
+    A[10] = -(zFar + zNear) / (zFar - zNear);
+    A[11] = -1;
+    A[14] = -(2 * zFar * zNear) / (zFar - zNear);
+    return A;
+  },
+  ortho : function (A, width, height, zNear, zFar) {
+    Mat4.id(A);
+    A[0] = 2 / width;
+    A[5] = 2 / height;
+    A[10] = -2/(zFar - zNear);
+    A[14] = -(zFar + zNear) / (zFar - zNear);
+    return A;
+  },
+  solve : function (A, b) {
+    // solve Ax = b.  Modifies A and b.  Returns solution (stored in b).
+
+    // qr_update
+    for (var j = 1; j <= 4; j++) {
+      for (var i = 4; i >= j+1; i--) {
+        // givens(A[i-2,j-1], A[i-1, j-1])
+        var c, s;
+        (function (a, b) {
+          var tau;
+          if (b === 0) {
+            c = 1; s = 0;
+          } else if (Math.abs(b) > Math.abs(a)) {
+            tau = -a/b; s = 1/Math.sqrt(1+tau*tau); c = s*tau;
+          } else {
+            tau = -b/a; c = 1/Math.sqrt(1+tau*tau); s = c*tau;
+          }
+        })(A[i-2+4*(j-1)], A[i-1+4*(j-1)]);
+        // givens matrix is mat(c, s; -s, c)
+        for (var k = j; k <= 4; k++) {
+          var v0 = A[i-2+4*(k-1)],
+              v1 = A[i-1+4*(k-1)];
+          A[i-2+4*(k-1)] = c*v0-s*v1;
+          A[i-1+4*(k-1)] = s*v0+c*v1;
+        }
+        var b0 = b[i-2],
+            b1 = b[i-1];
+        b[i-2] = c*b0-s*b1;
+        b[i-1] = s*b0+c*b1;
+      }
+    }
+
+    // backsolve
+    b[3] = b[3] / A[3+4*3];
+    for (var i = 3; i >= 1; i--) {
+      var dot = 0.0;
+      for (var j = i; j < 4; j++) {
+        dot += A[i-1+4*j] * b[j];
+      }
+      b[i-1] = (b[i-1] - dot)/A[i-1+4*(i-1)];
+    }
+    return b;
+  },
+};
+
+function MatrixContext(){
+  this.M = Mat4.create();
+  this.Mstack = [];
+  this.V = Mat4.create();
+  this.P = Mat4.create();
+  this.N = Mat3.create();
+  this.temp = Mat4.create();
+  this.reset();
+}
+MatrixContext.prototype.push = function () {
+  this.Mstack.push(this.M.slice());
+};
+MatrixContext.prototype.pop = function () {
+  if (this.Mstack.length === 0) {
+    throw new Error;
+  }
+  this.M = this.Mstack.pop();
+};
+MatrixContext.prototype.withPushed = function (f) {
+  this.push();
+  f();
+  this.pop();
+};
+MatrixContext.prototype.updateN = function () {
+  Mat4.mov(this.temp, this.V);
+  Mat4.mul(this.temp, this.M);
+  return Mat4.normalMatrix(this.N, this.temp);
+};
+MatrixContext.prototype.reset = function () {
+  Mat4.id(this.M);
+  Mat4.id(this.V);
+  Mat4.id(this.P);
+  this.Mstack.length = 0;
+};
+MatrixContext.prototype.debug = function () {
+  console.log("P matrix");
+  console.log(Mat4.toString(this.P));
+  console.log("V matrix");
+  console.log(Mat4.toString(this.V));
+  console.log("M matrix");
+  console.log(Mat4.toString(this.M));
+};
+
+</script>
+<script type="text/javascript">
+"use strict";
+
+// WebGL utilities
+
+function getShader(gl, id) {
+  if (id instanceof WebGLShader) {
+    return id;
+  }
+  if (typeof id !== "string") {
+    throw new Error;
+  }
+  var shaderScript = document.getElementById(id);
+  if (!shaderScript) throw new Error;
+  
+  var source = "";
+  for (var currentChild = shaderScript.firstChild; currentChild; currentChild = currentChild.nextSibling) {
+    if (currentChild.nodeType == currentChild.TEXT_NODE) {
+      source += currentChild.textContent;
+    }
+  }
+  var shader;
+  switch (shaderScript.type) {
+  case "x-shader/x-vertex":
+    shader = gl.createShader(gl.VERTEX_SHADER); break;
+  case "x-shader/x-fragment":
+    shader = gl.createShader(gl.FRAGMENT_SHADER); break;
+  default:
+    throw new Error;
+  }
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error("An error occurred compiling the shader", id);
+    console.error(gl.getShaderInfoLog(shader));
+    throw new Error;
+  }
+  return shader;
+}
+
+function compileProgram(gl, opts) {
+  var shaders = opts.shaders || [];
+  var attributes = opts.attributes || [];
+  var uniforms = opts.uniforms || [];
+  
+  var program = gl.createProgram();
+
+  shaders.forEach(function (shader) {
+    gl.attachShader(program, getShader(gl, shader));
+  });
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error("An error occured linking the program " + shaders.join(' '));
+    console.error(gl.getProgramInfoLog(program));
+    throw new Error;
+  }
+
+  var progobj = {
+    name: "shader("+shaders.map(function (s) { return '"'+s+'"'; }).join(', ')+")",
+    attributes: {},
+    uniforms: {},
+    _in_use: false,
+    use: function (f) {
+      gl.useProgram(program);
+      this._in_use = true;
+      f();
+      gl.useProgram(null);
+      this._in_use = false;
+    },
+    withAttribute: function (attr, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      var loc = this.attributes[attr]();
+      if (loc !== -1) {
+        f(loc);
+      }
+    },
+    withEnabledAttributes: function (attrs, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      attrs.forEach(function (attr) {
+        var loc = this.attributes[attr]();
+        if (loc !== -1) {
+          gl.enableVertexAttribArray(loc);
+        }
+      }, this);
+      f();
+      attrs.forEach(function (attr) {
+        var loc = this.attributes[attr]();
+        if (loc !== -1) {
+          gl.disableVertexAttribArray(loc);
+        }
+      }, this);
+    },
+    withUniform: function (uniform, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      var loc = this.uniforms[uniform]();
+      if (loc !== null) {
+        f(loc);
+      }
+    },
+  };
+
+  attributes.forEach(function (attr) {
+    var loc = gl.getAttribLocation(program, attr);
+    if (loc === -1) {
+      console.log("Warning: no such attribute", attr, "for program", progobj.name);
+    }
+    progobj.attributes[attr] = function () { return loc; };
+  });
+  uniforms.forEach(function (uniform) {
+    var loc = gl.getUniformLocation(program, uniform);
+    if (loc === null) {
+      console.log("Warning: no such uniform", uniform, "for program", progobj.name);
+    }
+    progobj.uniforms[uniform] = function () { return loc; };
+  });
+
+  return progobj;
+}
+
+function makeMesh(gl, data, vertex_usage) {
+  // data has vertices and elements
+  var verts = gl.createBuffer(), elts = gl.createBuffer();
+
+  if (vertex_usage === void 0) {
+    vertex_usage = gl.STATIC_DRAW;
+  }
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, verts);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elts);
+  gl.bufferData(gl.ARRAY_BUFFER, data.vertices, vertex_usage);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.elements, gl.STATIC_DRAW);
+
+  return {
+    bind: function () {
+      gl.bindBuffer(gl.ARRAY_BUFFER, verts);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elts);
+    },
+    drawElements: function(mode) {
+      gl.drawElements(mode, data.elements.length, gl.UNSIGNED_SHORT, 0);
+    }
+  };
+}
+
+
+</script>
+<script type="text/javascript">
+"use strict";
+
+var keys = (function () {
+  var keyCodeMap = [
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', null, null, null, null, null, null,
+    null, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', null, null, null, null, null,
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '+', null, '-', '.', '/',
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, ';', '=', ',', '-', '.', '/',
+    '`', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, '[', '\\', ']', "'", null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+  ];
+
+  var keyShiftCodeMap = [
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', null, null, null, null, null, null,
+    null, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, ':', '+', '<', '_', '>', '?',
+    '~', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, '{', '|', '}', '"', null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+  ];
+
+  var shiftedKey = {"'": '"', '-': '_', ',': '<', '/': '?', '.': '>', '1': '!', '0': ')', '3': '#', '2': '@', '5': '%', '4': '$', '7': '&', '6': '^', '9': '(', '8': '*', ';': ':', '=': '+', '[': '{', ']': '}', '\\': '|', 'a': 'A', '`': '~', 'c': 'C', 'b': 'B', 'e': 'E', 'd': 'D', 'g': 'G', 'f': 'F', 'i': 'I', 'h': 'H', 'k': 'K', 'j': 'J', 'm': 'M', 'l': 'L', 'o': 'O', 'n': 'N', 'q': 'Q', 'p': 'P', 's': 'S', 'r': 'R', 'u': 'U', 't': 'T', 'w': 'W', 'v': 'V', 'y': 'Y', 'x': 'X', 'z': 'Z'};
+
+  keyCodeMap[8] = '<backspace>';
+  keyCodeMap[9] = '<tab>';
+  keyCodeMap[13] = '<return>';
+  keyCodeMap[27] = '<esc>';
+  keyCodeMap[32] = '<space>';
+  keyCodeMap[33] = '<pageup>';
+  keyCodeMap[34] = '<pagedown>';
+  keyCodeMap[35] = '<end>';
+  keyCodeMap[36] = '<home>';
+  keyCodeMap[37] = '<left>';
+  keyCodeMap[38] = '<up>';
+  keyCodeMap[39] = '<right>';
+  keyCodeMap[40] = '<down>';
+  keyCodeMap[45] = '<insert>';
+  keyCodeMap[46] = '<delete>';
+  
+  function translate(e) {
+    if (e.type === "keydown" || e.type === "keyup") {
+      var modifier = [];
+      var key = null;
+      if (e.ctrlKey) { modifier.push("C"); }
+      if (e.altKey || e.metaKey) { modifier.push("M"); }
+      if (e.shiftKey) {
+        key = keyShiftCodeMap[e.keyCode];
+        if (key === null) { modifier.push("S"); }
+      }
+      if (key === null) {
+        key = keyCodeMap[e.keyCode];
+      }
+      if (key !== null) {
+        var chord = modifier.concat(key).join('-');
+        return chord;
+      } else {
+        return null;
+      }
+    } else {
+      throw new Error;
+    }
+  }
+
+  return {
+    translate: translate
+  }
+  
+})();
+
+</script>
+<script type="text/javascript">
+/*global Vec2, Vec3, Vec4, Mat3, Mat4, MatrixContext */
+/*global compileProgram, makeMesh */
+/*global keys*/
+
+// knot.js
+
+"use strict";
+
+var vertexRadius = 0.12;
+var edgeRadius = 0.1;
+var overpassHeight = 0.3;
+
+document.addEventListener("DOMContentLoaded", function () {
+  window.knotviewer = new KnotViewer();
+  window.knotviewer.initialize();
+  window.knotviewer.run();
+}, false);
+
+function error(msg) {
+  var err = document.getElementById("error");
+  while (err.hasChildNodes()) {
+    err.removeChild(err.firstChild);
+  }
+  err.appendChild(document.createTextNode("Error: " + msg));
+  err.style.display = "block";
+}
+
+function message(txt) {
+  var msg = document.getElementById("message");
+  while (msg.hasChildNodes()) {
+    msg.removeChild(msg.firstChild);
+  }
+  msg.appendChild(document.createTextNode(txt));
+  msg.style.display = "block";
+}
+function hideMessage() {
+  document.getElementById("message").style.display = "none";
+}
+
+function KnotViewer() {
+}
+KnotViewer.prototype.initialize = function() {
+  var canvas = this.canvas = document.getElementById("canvas");
+  try {
+    var gl = canvas.getContext("webgl", {stencil:true})
+          || canvas.getContext("experimental-webgl", {stencil:true});
+  } catch (e) {}
+  if (!gl) {
+    error("Unable to initialize WebGL.  Your browser might not support it.");
+    return;
+  }
+
+  this.attachMouse();
+  this.attachKeyboard();
+
+  window.addEventListener("resize", this.resize.bind(this), false);
+  this.resize();
+
+  this.canvas = canvas;
+  this.gl = gl;
+};
+KnotViewer.prototype.run = function () {
+  var canvas = this.canvas,
+      gl = this.gl;
+  
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.enable(gl.CULL_FACE);
+  gl.cullFace(gl.BACK);
+  gl.frontFace(gl.CCW);
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  var flinep = compileProgram(gl, {
+    shaders:["fline.vert","fline.frag"],
+    attributes:["a_pos4"],
+    uniforms:["u_P", "u_V", "u_M", "u_P4"]
+  });
+  var ffacep = compileProgram(gl, {
+    shaders:["fface.vert","fface.frag"],
+    attributes:["a_pos4", "a_tex"],
+    uniforms:["u_P", "u_V", "u_M", "u_P4"]
+  });
+  var ftextp = compileProgram(gl, {
+    shaders:["ftext.vert","ftext.frag"],
+    attributes:["a_pos4", "a_tex", "a_str"],
+    uniforms:["u_P", "u_V", "u_M", "u_P4", "u_px", "u_dpix", "u_texture"]
+  });
+  var hopfp = compileProgram(gl, {
+    shaders:["hopf.vert","hopf.frag"],
+    attributes:["a_pos4", "a_s", "a_sel"],
+    uniforms:["u_P", "u_V", "u_M", "u_P4", "u_perm", "u_t", "u_col"]
+  });
+
+  // var grid = makeMesh(gl, make_grid());
+
+  // var sphere = makeMesh(gl, make_icosahedron(3));
+  // var tube = makeMesh(gl, make_tube(20));
+
+  // var billboard = makeMesh(gl, make_billboard());
+
+  //var shape = makeMesh(gl, make_tesseract());
+  var tfcell = make_24cell();
+  window.tfcell = tfcell;
+  var shape = makeMesh(gl, tfcell.edges);
+  var shapef = makeMesh(gl, tfcell.faces);
+  var hopf = makeMesh(gl, make_hopf());
+
+  var textsheet = make_text_sheet(gl);
+  var labels = makeMesh(gl, tfcell.labels);
+
+  var trans = new MatrixContext();
+  this.trans = trans;
+  this.camera = Mat4.id(Mat4.create());
+  this.normal = Vec4.createf(1, 1, 0, 0);
+
+  Vec4.normalize(this.normal);
+
+  function draw(t) {
+    trans.reset();
+    
+    var ratio = this.canvas.width / this.canvas.height;
+    Mat4.perspective(trans.P, 90, ratio, 0.02, 100.0);
+    //Mat4.ortho(trans.P, ratio*4, 4, 0.1, 100.0);
+
+    Mat4.translate(trans.V, [0, 0, -0.0]);
+    Mat4.mul(trans.V, this.camera);
+
+//    Vec4.mov(this.normal, [Math.cos(t/3000), Math.sin(t/2001), Math.cos(t/4321), 0]);
+//    Vec4.normalize(this.normal);
+
+    var stepsize = 0.01;
+    if (this.downkeys['<up>'] || this.downkeys[','] || this.downkeys['w']) {
+      this.normalStep([0, 0, -stepsize]);
+    }
+    if (this.downkeys['<down>'] || this.downkeys['o'] || this.downkeys['s']) {
+      this.normalStep([0, 0, stepsize]);
+    }
+    if (this.downkeys['<left>'] || this.downkeys['a']) {
+      this.normalStep([-stepsize, 0, 0]);
+    }
+    if (this.downkeys['<right>'] || this.downkeys['e'] || this.downkeys['d']) {
+      this.normalStep([stepsize, 0, 0]);
+    }
+
+    
+    /******* Render main stuff **********/
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.clearColor(1.0, 0.9, 1.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT
+             | gl.STENCIL_BUFFER_BIT);
+
+    var vertexColor = [0.2, 0.2, 0.2, 1.0];
+
+    flinep.use(() => {
+      var x = this.normal[0],
+          y = this.normal[1],
+          z = this.normal[2],
+          w = this.normal[3];
+      flinep.withUniform("u_P", u_P =>
+                         gl.uniformMatrix4fv(u_P, false, trans.P));
+      flinep.withUniform("u_V", u_V =>
+                         gl.uniformMatrix4fv(u_V, false, trans.V));
+      flinep.withUniform("u_P4", u_P4 =>
+                         gl.uniformMatrix4fv(u_P4, false, [
+                           x, -y, -z, -w,
+                           y, x, w, -z,
+                           z, -w, x, y,
+                           w, z, -y, x
+                         ]));
+    });
+    ffacep.use(() => {
+      var x = this.normal[0],
+          y = this.normal[1],
+          z = this.normal[2],
+          w = this.normal[3];
+      ffacep.withUniform("u_P", u_P =>
+                         gl.uniformMatrix4fv(u_P, false, trans.P));
+      ffacep.withUniform("u_V", u_V =>
+                         gl.uniformMatrix4fv(u_V, false, trans.V));
+      ffacep.withUniform("u_P4", u_P4 =>
+                         gl.uniformMatrix4fv(u_P4, false, [
+                           x, -y, -z, -w,
+                           y, x, w, -z,
+                           z, -w, x, y,
+                           w, z, -y, x
+                         ]));
+    });
+    ftextp.use(() => {
+      var x = this.normal[0],
+          y = this.normal[1],
+          z = this.normal[2],
+          w = this.normal[3];
+      ftextp.withUniform("u_P", u_P =>
+                         gl.uniformMatrix4fv(u_P, false, trans.P));
+      ftextp.withUniform("u_V", u_V =>
+                         gl.uniformMatrix4fv(u_V, false, trans.V));
+      ftextp.withUniform("u_P4", u_P4 =>
+                         gl.uniformMatrix4fv(u_P4, false, [
+                           x, -y, -z, -w,
+                           y, x, w, -z,
+                           z, -w, x, y,
+                           w, z, -y, x
+                         ]));
+      ftextp.withUniform("u_px", u_px =>
+                         gl.uniform1f(u_px, textsheet.size));
+      ftextp.withUniform("u_dpix", u_dpix =>
+                         gl.uniform2f(u_dpix, 1/this.canvas.width, 1/this.canvas.height));
+    });
+
+
+    var x = this.normal[0],
+        y = this.normal[1],
+        z = this.normal[2],
+        w = this.normal[3];
+    var P4 = Mat4.create([
+                           x, -y, -z, -w,
+                           y, x, w, -z,
+                           z, -w, x, y,
+                           w, z, -y, x
+    ]);
+
+    hopfp.use(() => {
+      hopfp.withUniform("u_P", u_P =>
+                         gl.uniformMatrix4fv(u_P, false, trans.P));
+      hopfp.withUniform("u_V", u_V =>
+                         gl.uniformMatrix4fv(u_V, false, trans.V));
+      hopfp.withUniform("u_t", u_t =>
+                        gl.uniform1f(u_t, t/1000.0));
+    });
+
+    hopfp.use(function () {
+      hopfp.withUniform("u_M", u_M => {
+        gl.uniformMatrix4fv(u_M, false, trans.M);
+      });
+
+      hopf.bind();
+
+      hopfp.withAttribute("a_pos4", function (a_pos4) {
+        gl.vertexAttribPointer(a_pos4, 4, gl.FLOAT, false, 6*4, 0);
+      });
+      hopfp.withAttribute("a_s", function (a_s) {
+        gl.vertexAttribPointer(a_s, 1, gl.FLOAT, false, 6*4, 4*4);
+      });
+      hopfp.withAttribute("a_sel", function (a_sel) {
+        gl.vertexAttribPointer(a_sel, 1, gl.FLOAT, false, 6*4, 5*4);
+      });
+      hopfp.withUniform("u_P4", u_P4 =>
+                        gl.uniformMatrix4fv(u_P4, false, P4));
+      
+      hopfp.withUniform("u_perm", u_perm =>
+                        gl.uniformMatrix4fv(u_perm, false, [
+                          1, 0, 0, 0,
+                          0, 1, 0, 0,
+                          0, 0, 1, 0,
+                          0, 0, 0, 1
+                        ]));
+      hopfp.withUniform("u_col", u_col => {
+        gl.uniform3f(u_col, 0.0, 1.0, 0.0);
+      });
+      hopfp.withEnabledAttributes(["a_pos4", "a_s", "a_sel"], function () {
+        hopf.drawElements(gl.LINES);
+      });
+/*
+      hopfp.withUniform("u_perm", u_perm => {
+        gl.uniformMatrix4fv(u_perm, false, [
+          0, 0, 0, 1,
+          0, 0, 1, 0,
+          0, -1, 0, 0,
+          -1, 0, 0, 0]);
+      });
+      hopfp.withUniform("u_col", u_col => {
+        gl.uniform3f(u_col, 1.0, 0.0, 0.0);
+      });
+      hopfp.withEnabledAttributes(["a_pos4", "a_s"], function () {
+        hopf.drawElements(gl.LINES);
+      });
+
+      hopfp.withUniform("u_perm", u_perm => {
+        gl.uniformMatrix4fv(u_perm, false, [
+          0, 0, -1, 0,
+          0, 0, 0, 1,
+          1, 0, 0, 0,
+          0, -1, 0, 0]);
+      });
+      hopfp.withUniform("u_col", u_col => {
+        gl.uniform3f(u_col, 0.1, 0.1, 1.0);
+      });
+      hopfp.withEnabledAttributes(["a_pos4", "a_s"], function () {
+        hopf.drawElements(gl.LINES);
+      });*/
+
+
+    });
+
+    if (0) {
+    flinep.use(function () {
+      flinep.withUniform("u_M", u_M => {
+        gl.uniformMatrix4fv(u_M, false, trans.M);
+      });
+
+      shape.bind();
+
+      flinep.withAttribute("a_pos4", function (a_pos4) {
+        gl.vertexAttribPointer(a_pos4, 4, gl.FLOAT, false, 4*4, 0);
+      });
+      flinep.withEnabledAttributes(["a_pos4"], function () {
+        shape.drawElements(gl.LINES);
+      });
+    });
+    }
+
+    if(1) {
+    ftextp.use(function () {
+      ftextp.withUniform("u_M", u_M => {
+        gl.uniformMatrix4fv(u_M, false, trans.M);
+      });
+      ftextp.withUniform("u_texture", u_texture => {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.uniform1i(u_texture, 0);
+      });
+
+      gl.bindTexture(gl.TEXTURE_2D, textsheet.texture);
+      labels.bind();
+      ftextp.withAttribute("a_pos4", function (a_pos4) {
+        gl.vertexAttribPointer(a_pos4, 4, gl.FLOAT, false, 10*4, 0);
+      });
+      ftextp.withAttribute("a_tex", function (a_tex) {
+        gl.vertexAttribPointer(a_tex, 2, gl.FLOAT, false, 10*4, 4*4);
+      });
+      ftextp.withAttribute("a_str", function (a_str) {
+        gl.vertexAttribPointer(a_str, 4, gl.FLOAT, false, 10*4, 6*4);
+      });
+      ftextp.withEnabledAttributes(["a_pos4", "a_tex", "a_str"], function () {
+        labels.drawElements(gl.TRIANGLES);
+      });
+    });
+    }
+
+    if (1) {
+    ffacep.use(function () {
+      ffacep.withUniform("u_M", u_M => {
+        gl.uniformMatrix4fv(u_M, false, trans.M);
+      });
+
+      shapef.bind();
+
+      ffacep.withAttribute("a_pos4", function (a_pos4) {
+        gl.vertexAttribPointer(a_pos4, 4, gl.FLOAT, false, 6*4, 0);
+      });
+      ffacep.withAttribute("a_tex", function (a_pos4) {
+        gl.vertexAttribPointer(a_pos4, 2, gl.FLOAT, false, 6*4, 4*4);
+      });
+      gl.disable(gl.DEPTH_TEST);
+      ffacep.withEnabledAttributes(["a_pos4", "a_tex"], function () {
+        shapef.drawElements(gl.TRIANGLES);
+      });
+      gl.enable(gl.DEPTH_TEST);
+    });
+    }
+    
+    window.requestAnimationFrame(draw.bind(this));
+  }
+
+  window.requestAnimationFrame(draw.bind(this));
+};
+KnotViewer.prototype.resize = function () {
+  var dim = this.canvas.parentElement.getBoundingClientRect();
+  this.canvas.width = dim.width;
+  this.canvas.height = dim.height;
+};
+KnotViewer.prototype.attachMouse = function () {
+  this.canvas.addEventListener("mousedown", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    this.mouse(e.buttons, e.clientX, this.canvas.height-e.clientY-1, 0);
+  });
+  this.canvas.addEventListener("mouseup", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    this.mouse(e.buttons, e.clientX, this.canvas.height-e.clientY-1, 0);
+  });
+  this.canvas.addEventListener("mousemove", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    this.mouse(e.buttons, e.clientX, this.canvas.height-e.clientY-1, 0);
+  });
+  this.canvas.addEventListener("contextmenu", e => {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+  this.canvas.addEventListener("wheel", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    var scroll = e.deltaY;
+    if (e.deltaMode === 1) {
+      scroll *= 16;
+    } else if (e.deltaMode === 2) {
+      scroll *= this.canvas.height;
+    }
+    this.mouse(e.buttons, e.clientX, this.canvas.height-e.clientY-1, scroll);
+  });
+
+  this.mouseState = "none";
+};
+KnotViewer.prototype.attachKeyboard = function () {
+  this.downkeys = {};
+  
+  this.canvas.tabIndex = 1;
+  this.canvas.focus();
+  this.canvas.addEventListener("keydown", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    var code = keys.translate(e);
+    if (code) {
+      this.downkeys[code] = true;
+      this.keyboard(code);
+    }
+  });
+  this.canvas.addEventListener("keyup", e => {
+    var code = keys.translate(e);
+    if (code) {
+      this.downkeys[code] = false;
+    }
+  });
+};
+KnotViewer.prototype.mouseRay = function (x, y) {
+  var temp4 = KnotViewer.prototype._mousePlane_temp4;
+  if (temp4 === void 0) {
+    temp4 = KnotViewer.prototype._mousePlane_temp4 = Mat4.create();
+  }
+  var h = Vec4.createf(2*x/this.canvas.width - 1.0,
+                       2*y/this.canvas.height - 1.0,
+                       -1.0,
+                       1.0);
+  var eye = Mat4.solve(Mat4.mov(temp4, this.trans.P), h);
+  eye[2] = -1.0; eye[3] = 0.0;
+  Mat4.mov(temp4, this.trans.V);
+  Mat4.mul(temp4, this.trans.M);
+  var world4 = Mat4.solve(temp4, eye);
+  var world = Vec3.normalize(world4.slice(0, 3));
+  Mat4.mov(temp4, this.trans.V);
+  Mat4.mul(temp4, this.trans.M);
+  var p = Mat4.solve(temp4, Vec4.createf(0, 0, 0, 1));
+
+  return {eye: p,
+          ray: world};
+};
+KnotViewer.prototype.planeIntersect = function (r) {
+  // choose t so p + t*v on plane
+  // p = -t*v + (c,d)
+  if (r.ray[2] === 0) {
+    return null;
+  }
+  var x = r.eye[0] - r.eye[2] * r.ray[0]/r.ray[2];
+  var y = r.eye[1] - r.eye[2] * r.ray[1]/r.ray[2];
+  return [x,y];
+};
+KnotViewer.prototype.normalStep = function (eps) {
+  var x = this.normal[0],
+      y = this.normal[1],
+      z = this.normal[2],
+      w = this.normal[3];
+  var a = [-y, x, -w, z],
+      b = [-z, w, x, -y],
+      c = [-w, -z, y, x];
+
+  var Vtr = Mat4.transpose(Mat4.create(), this.camera);
+  Vtr[12] = Vtr[13] = Vtr[14] = Vtr[15] = 0;
+  eps = Mat4.mulvec(Vec4.create(), Vtr, [eps[0], eps[1], eps[2], 0]);
+
+  Vec4.mov(this.normal, [
+    x + a[0]*eps[0] + b[0]*eps[1] + c[0]*eps[2],
+    y + a[1]*eps[0] + b[1]*eps[1] + c[1]*eps[2],
+    z + a[2]*eps[0] + b[2]*eps[1] + c[2]*eps[2],
+    w + a[3]*eps[0] + b[3]*eps[1] + c[3]*eps[2],
+  ]);
+  Vec4.normalize(this.normal);
+
+  var x2 = this.normal[0],
+      y2 = this.normal[1],
+      z2 = this.normal[2],
+      w2 = this.normal[3];
+  var a2 = [-y2, x2, -w2, z2],
+      b2 = [-z2, w2, x2, -y2],
+      c2 = [-w2, -z2, y2, x2];
+  function mkcol(v2) {
+    var col = Vec3.normalize(Vec3.createf(Vec4.dot(v2, a), Vec4.dot(v2, b), Vec4.dot(v2, c)));
+    return [col[0], col[1], col[2], 0];
+  }
+  var correction = Mat4.create(
+    [].concat(mkcol(a2)).concat(mkcol(b2)).concat(mkcol(c2))
+      .concat([0, 0, 0, 1]));
+  Mat4.mul(this.camera, correction);
+};
+KnotViewer.prototype.mouse = function (buttons, x, y, scroll) {
+  //console.log("mouse", buttons, x, y);
+
+  switch (this.mouseState) {
+  case "none":
+    if (buttons&2) {
+      var pt = this.planeIntersect(this.mouseRay(x, y));
+
+        this.mouseDownPt = {x:x, y:y};
+        this.mouseState = "translate";
+
+    } else if (buttons&1) {
+      var pt = this.planeIntersect(this.mouseRay(x, y));
+        this.mouseDownPt = {x:x, y:y};
+        this.mouseState = "rotate";
+
+    } else if (scroll != 0) {
+      //console.log(scroll);
+      var factor = Math.pow(2, -scroll/1000);
+      var trans = Mat4.scale(Mat4.id(Mat4.create()),
+                             [factor, factor, factor]);
+      Mat4.mul(trans, this.camera);
+      Mat4.mov(this.camera, trans);
+    } else {
+      var r = this.mouseRay(x, y);
+      var pt = this.planeIntersect(r);
+    }
+    break;
+  case "rotate":
+    if (buttons&1) {
+      var diff = {dx: x-this.mouseDownPt.x,
+                  dy: y-this.mouseDownPt.y};
+      this.mouseDownPt = {x:x, y:y};
+      var len = Math.sqrt(diff.dx*diff.dx+diff.dy*diff.dy);
+      if (len > 0) {
+        var rot = Mat4.rotate(Mat4.id(Mat4.create()),
+                              len/300, [-diff.dy, diff.dx, 0]);
+        Mat4.mul(rot, this.camera);
+        Mat4.mov(this.camera, rot);
+      }
+    } else {
+      this.mouseState = "none";
+    }
+    break;
+  case "translate":
+    if (buttons&2) {
+      var diff = {dx: x-this.mouseDownPt.x,
+                  dy: y-this.mouseDownPt.y};
+      this.mouseDownPt = {x:x, y:y};
+      var trans = Mat4.translate(Mat4.id(Mat4.create()),
+                                 [diff.dx/300, diff.dy/300, 0]);
+      Mat4.mul(trans, this.camera);
+      Mat4.mov(this.camera, trans);
+    } else {
+      this.mouseState = "none";
+    }
+    break;
+  case "move":
+    if (buttons) {
+      var pt = this.planeIntersect(this.mouseRay(x, y));
+        this.mouseState = "none";
+    } else {
+      var pt = this.planeIntersect(this.mouseRay(x, y));
+      this.mouseState = "none";
+    }
+    break;
+  }
+};
+KnotViewer.prototype.keyboard = function (code) {
+
+  if (code === "<home>") {
+    Mat4.id(this.camera);
+  } else {
+   // console.log(code);
+  }
+};
+
+function createTorusKnot(m, n, R, r, usteps, vsteps, w) {
+  // m is longitude, n is meridian
+
+  function f(t) {
+    var vx = Math.cos(2*Math.PI*m*t),
+        vy = Math.sin(2*Math.PI*m*t);
+    var cx = Math.cos(2*Math.PI*n*t),
+        cy = Math.sin(2*Math.PI*n*t);
+    var pt = [(R+r*cx)*vx,
+              (R+r*cx)*vy,
+              r*cy];
+    var tan = Vec3.normalize([-m*(R+r*cx)*vy-n*r*cy*vx,
+                              m*(R+r*cx)*vx-n*r*cy*vy,
+                              n*r*cx]);
+    var out = Vec3.normalize([tan[1], -tan[0], 0]);
+    var up = [out[1]*tan[2],
+              out[0]*tan[2],
+              out[0]*tan[1]-out[1]*tan[0]];
+    return [pt, out, up, tan];
+  }
+
+  var seen_pts = {};
+  var pts = [];
+  var next_idx = 0;
+  function get_pt(pt) {
+    var idx = seen_pts[pt];
+    if (idx !== undefined) {
+      return idx;
+    }
+    idx = next_idx++;
+    seen_pts[pt] = idx;
+    pts.push(pt[0], pt[1], pt[2], pt[3], pt[4], pt[5], pt[6], pt[7], pt[8]);
+    return idx;
+  }
+  var elts = [];
+  function sum3(v, w) {
+    return [v[0]+w[0], v[1]+w[1], v[2]+w[2]];
+  }
+  function scale3(c, v) {
+    return [c*v[0], c*v[1], c*v[2]];
+  }
+  function rpt(fpt, j) {
+    var c = Math.cos(2*Math.PI*j/vsteps), s = Math.sin(2*Math.PI*j/vsteps);
+    var norm = sum3(scale3(c,fpt[1]), scale3(s,fpt[2]));
+    var pt = sum3(fpt[0], scale3(w, norm));
+    return pt.concat(norm).concat(fpt[3]);
+  }
+  for (var i = 0; i < usteps; i++) {
+    var fpt0 = f(i / usteps),
+        fpt1 = f((i+1) % usteps / usteps);
+    for (var j = 0; j < vsteps; j++) {
+      var pt00 = rpt(fpt0,j),
+          pt10 = rpt(fpt0,(j+1)%vsteps),
+          pt01 = rpt(fpt1,j),
+          pt11 = rpt(fpt1,(j+1)%vsteps);
+      var idx00 = get_pt(pt00),
+          idx01 = get_pt(pt01),
+          idx10 = get_pt(pt10),
+          idx11 = get_pt(pt11);
+      elts.push(idx00, idx10, idx11);
+      elts.push(idx00, idx11, idx01);
+    }
+  }
+  return {vertices:new Float32Array(pts),
+          elements:new Uint16Array(elts)};
+}
+
+function make_billboard() {
+  var array = [
+    -1, -1, 0,   1, 0, 0,   0, 0,
+    1, -1, 0,   1, 0, 0,   1, 0,
+    1, 1, 0,   1, 0, 0,   1, 1,
+    -1, 1, 0,   1, 0, 0,  0, 1
+  ];
+  var elts = [
+    0, 1, 2,
+    0, 2, 3
+  ];
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+function make_grid() {
+  var array = [];
+  var elts = [];
+
+  var color = [0, 0, 0];
+  var seen_pts = {};
+  var next_idx = 0;
+  function pt(p) {
+    p = p.concat(color);
+    if (!seen_pts.hasOwnProperty(p)) {
+      var idx = next_idx++;
+      seen_pts[p] = idx;
+      array.push.apply(array, p);
+    }
+    return seen_pts[p];
+  }
+
+  var d = 1;
+  var w = 10;
+
+  color = [0.5, 0.5, 0.5];
+  for (var i = -d*w; i <= d*w; i++) {
+    for (var j = -d*w; j <= d*w; j++) {
+      var p00 = pt([i/d, j/d, 0]),
+          p10 = pt([(i+1)/d, j/d, 0]),
+          p01 = pt([i/d, (j+1)/d, 0]),
+          p11 = pt([(i+1)/d, (j+1)/d, 0]);
+      if (i < d*w && !(j == 0 && 0 <= i && i < d)) {
+        elts.push(p00, p10);
+      }
+      if (j < d*w && !(i == 0 && 0 <= j && j < d)) {
+        elts.push(p00, p01);
+      }
+    }
+  }
+  color = [0.8, 0, 0];
+  elts.push(pt([0, 0, 0]),
+            pt([1, 0, 0]));
+  elts.push(pt([1, 0, 0]),
+            pt([0.85, 0.1, 0]));
+  elts.push(pt([1, 0, 0]),
+            pt([0.85, -0.1, 0]));
+  color = [0, 0.8, 0];
+  elts.push(pt([0, 0, 0]),
+            pt([0, 1, 0]));
+  elts.push(pt([0, 1, 0]),
+            pt([0.1, 0.85, 0]));
+  elts.push(pt([0, 1, 0]),
+            pt([-0.1, 0.85, 0]));
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+function make_icosahedron(subdiv) {
+  subdiv = subdiv|0;
+  if (subdiv < 1) subdiv = 1;
+  
+  var array = [];
+  var elts = [];
+
+  var seen_pts = {};
+  var next_idx = 0;
+  function pt(p) {
+    p = Array.from(Vec3.normalize(Vec3.create(p)));
+    if (!seen_pts.hasOwnProperty(p)) {
+      array.push.apply(array, p);
+      array.push.apply(array, p);
+      seen_pts[p] = next_idx++;
+    }
+    return seen_pts[p];
+  }
+  var t = (1+Math.sqrt(5))/2;
+  var base_pts = [
+    [-1, t, 0],
+    [1, t, 0],
+    [-1, -t, 0],
+    [1, -t, 0],
+    [0,-1,t],
+    [0,1,t],
+    [0,-1,-t],
+    [0,1,-t],
+    [t,0,-1],
+    [t,0,1],
+    [-t,0,-1],
+    [-t,0,1]
+  ];
+  var base_triangles = [
+    [0, 11, 5],
+    [0, 5, 1],
+    [0, 1, 7],
+    [0, 7, 10],
+    [0, 10, 11],
+    [1, 5, 9],
+    [5, 11, 4],
+    [11, 10, 2],
+    [10, 7, 6],
+    [7, 1, 8],
+    [3, 9, 4],
+    [3, 4, 2],
+    [3, 2, 6],
+    [3, 6, 8],
+    [3, 8, 9],
+    [4, 9, 5],
+    [2, 4, 11],
+    [6, 2, 10],
+    [8, 6, 7],
+    [9, 8, 1]
+  ];
+  base_triangles.forEach(triangle => {
+    var p0 = base_pts[triangle[0]],
+        p1 = base_pts[triangle[1]],
+        p2 = base_pts[triangle[2]];
+    function affine(s, t) {
+      var u = 1 - s - t;
+      return [u*p0[0]+s*p1[0]+t*p2[0],
+              u*p0[1]+s*p1[1]+t*p2[1],
+              u*p0[2]+s*p1[2]+t*p2[2]];
+    }
+    for (var i = 0; i < subdiv; i++) {
+      for (var j = 0; i + j < subdiv; j++) {
+        var q0 = affine(i/subdiv, j/subdiv),
+            q1 = affine((i+1)/subdiv, j/subdiv),
+            q2 = affine(i/subdiv, (j+1)/subdiv);
+        elts.push(pt(q0), pt(q1), pt(q2));
+        if (i+1 + j+1 <= subdiv) {
+          q0 = affine((i+1)/subdiv, (j+1)/subdiv);
+          elts.push(pt(q2), pt(q1), pt(q0));
+        }
+      }
+    }
+  });
+  console.log(array.length/6);
+  return {vertices: new Float32Array(array),
+          elements: new Uint16Array(elts)};
+}
+
+function make_tube(subdiv) {
+  // makes a tube of radius one, length one, along the z axis
+  subdiv = subdiv|0;
+  if (subdiv < 3) subdiv = 3;
+
+  var array = [];
+  var elts = [];
+
+  var seen_pts = {};
+  var next_idx = 0;
+  function pt(p) {
+    if (!seen_pts.hasOwnProperty(p)) {
+      array.push.apply(array, p);
+      array.push(p[0], p[1], 0); // norm
+      seen_pts[p] = next_idx++;
+    }
+    return seen_pts[p];
+  }
+
+  for (var i = 0; i < subdiv; i++) {
+    var c0 = Math.cos(2*Math.PI*i/subdiv),
+        s0 = Math.sin(2*Math.PI*i/subdiv),
+        c1 = Math.cos(2*Math.PI*((i+1)%subdiv)/subdiv),
+        s1 = Math.sin(2*Math.PI*((i+1)%subdiv)/subdiv);
+    var p0 = pt([c0, s0, 0]),
+        p1 = pt([c0, s0, 1]),
+        p2 = pt([c1, s1, 0]),
+        p3 = pt([c1, s1, 1]);
+    elts.push(p0, p3, p1);
+    elts.push(p0, p2, p3);
+  }
+  return {vertices: new Float32Array(array),
+          elements: new Uint16Array(elts)};
+}
+
+function make_tesseract() {
+  var array = [];
+  var elts = [];
+  var seen_pts = {};
+  var next_idx = 0;
+  function addpt(i) {
+    var pt = [];
+    for (var j = 0; j < 4; j++) {
+      pt.push(i&1 ? 1 : -1);
+      i = i >>> 1;
+    }
+    if (!seen_pts.hasOwnProperty(pt)) {
+      array.push.apply(array, pt);
+      seen_pts[pt] = next_idx++;
+    }
+    return seen_pts[pt];
+  }
+  for (var i = 0; i < 16; i++) {
+    for (var j = i+1; j < 16; j++) {
+      var diff = ~(i & j);
+      var jdiff = diff & j;
+      if (!(diff & i) && !(jdiff & (jdiff - 1))) {
+        elts.push(addpt(i));
+        elts.push(addpt(j));
+      }
+    }
+  }
+  return {vertices: new Float32Array(array),
+          elements: new Uint16Array(elts)};
+}
+
+function make_24cell() {
+  var array = [];
+  var elts = [];
+  var pts = [];
+
+  for (var i = 0; i < 4; i++) {
+    for (var j = i + 1; j < 4; j++) {
+      for (var k = -1; k <= 1; k+=2) {
+        for (var l = -1; l <= 1; l+=2) {
+          var pt = [0, 0, 0, 0];
+          pt[i] = k;
+          pt[j] = l;
+          pts.push(pt);
+          array.push.apply(array, pt);
+        }
+      }
+    }
+  }
+
+  var textarray = [];
+  var textelts = [];
+  var textvs = 0;
+  
+  for (var i = 0; i < pts.length; i++) {
+    var bs = mk_str_bs(" "+i);
+    textarray.push.apply(textarray, pts[i]);
+    textarray.push(0, 0);
+    textarray.push.apply(textarray, bs);
+    textarray.push.apply(textarray, pts[i]);
+    textarray.push(1, 0);
+    textarray.push.apply(textarray, bs);
+    textarray.push.apply(textarray, pts[i]);
+    textarray.push(1, 1);
+    textarray.push.apply(textarray, bs);
+    textarray.push.apply(textarray, pts[i]);
+    textarray.push(0, 1);
+    textarray.push.apply(textarray, bs);
+
+    var tv1 = textvs++,
+        tv2 = textvs++,
+        tv3 = textvs++,
+        tv4 = textvs++;
+    textelts.push(tv1, tv2, tv3,
+                  tv1, tv3, tv4);
+  }
+  console.log(textarray);
+  console.log(textelts);
+  
+  function sq(x) { return x*x; }
+  function dist2(pt1, pt2) {
+    var len2 = 0.0;
+    for (var k = 0; k < 4; k++) {
+      len2 += sq(pt1[k]-pt2[k]);
+    }
+    return len2;
+  }
+  for (var i = 0; i < pts.length; i++) {
+    for (var j = i+1; j < pts.length; j++) {
+      if (dist2(pts[i], pts[j]) == 2) {
+        elts.push(i, j);
+      }
+    }
+  }
+  var facarr = [];
+  var facelts = [];
+  var arrn = 0;
+  function add_triangle(p1, p2, p3) {
+    facarr.push.apply(facarr, p1);
+    facarr.push(0, 0);
+    facarr.push.apply(facarr, p2);
+    facarr.push(1, 0);
+    facarr.push.apply(facarr, p3);
+    facarr.push(0, 1);
+    var idx1 = arrn++;
+    var idx2 = arrn++;
+    var idx3 = arrn++;
+    facelts.push(idx1, idx2, idx3);
+    facelts.push(idx1, idx3, idx2);
+  }
+  function subdiv_triangle(p1, p2, p3) {
+    var n = 16;
+    var v1 = Vec4.sub(Vec4.create(p2), p1),
+        v2 = Vec4.sub(Vec4.create(p3), p1);
+    function aff(i, j) {
+      return [p1[0] + (i*v1[0]+j*v2[0])/n,
+              p1[1] + (i*v1[1]+j*v2[1])/n,
+              p1[2] + (i*v1[2]+j*v2[2])/n,
+              p1[3] + (i*v1[3]+j*v2[3])/n];
+    }
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; i+j < n; j++) {
+        if (!(i>0 && j >0 && i+j +1<n)) {
+          add_triangle(aff(i, j),
+                       aff(i+1, j),
+                       aff(i, j+1));
+        }
+        if (!(i>0 && j >0 && i+j +2<n) && i+j+1<n) {
+          add_triangle(aff(i+1, j),
+                       aff(i, j+1),
+                       aff(i+1, j+1));
+        }
+      }
+    }
+//    add_triangle(p1, p2, p3);
+  }
+
+  for (var i = 0; i < pts.length; i++) {
+    for (var j = i+1; j < pts.length; j++) {
+      for (var k = j+1; k < pts.length; k++) {
+        if (dist2(pts[i], pts[j]) == 2
+            && dist2(pts[j], pts[k]) == 2
+            && dist2(pts[i], pts[k]) == 2) {
+          subdiv_triangle(pts[i], pts[j], pts[k]);
+        }
+      }
+    }
+  }
+  return {
+    edges: {vertices: new Float32Array(array),
+            elements: new Uint16Array(elts)},
+    faces: {vertices: new Float32Array(facarr),
+            elements: new Uint16Array(facelts)},
+    labels: {vertices: new Float32Array(textarray),
+             elements: new Uint16Array(textelts)}
+  };
+}
+
+function rand_normal() {
+  var x1, x2, w;
+  do {
+    x1 = 2*Math.random()-1;
+    x2 = 2*Math.random()-1;
+    w = x1*x1 + x2*x2;
+  } while (w >= 1.0);
+  w = Math.sqrt(-2*Math.log(w)/w);
+  return x1*w;
+}
+
+function rand_s3_point() {
+  return Vec4.normalize(Vec4.createf(rand_normal(),
+                                     rand_normal(),
+                                     rand_normal(),
+                                     rand_normal()));
+}
+
+function make_hopf() {
+  var n = 5000;
+  var special = n*0.006;
+  var array = [];
+  var elems = [];
+  for (var i = 0; i < n; i++) {
+    var pt = rand_s3_point();
+    array.push.apply(array, pt);
+    array.push(0.0);
+    array.push(i < special ? 1.0 : 0.0);
+    array.push.apply(array, pt);
+    array.push(1.0);
+    array.push(i < special ? 1.0 : 0.0);
+    elems.push(2*i, 2*i+1);
+  }
+  return {vertices: new Float32Array(array),
+          elements: new Uint16Array(elems)};
+}
+
+function make_text_sheet(gl) {
+  var px = 24;
+  var canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 1024;
+  var ctxt = canvas.getContext("2d");
+  ctxt.font = ""+px+"px sans-serif";
+  for (var i = 0x0; i < 255; i++) {
+    var x = 10+(i % 16) * (px*2);
+    var y = 10+(1+Math.floor(i/16)) * (px*2);
+    var s = String.fromCharCode(i);
+    ctxt.fillStyle = "#000";
+    var width = ctxt.measureText(s).width;
+    if (i >= 0x20) {
+      ctxt.fillText(s, x, y);
+    } else {
+      width = 0;
+    }
+
+    ctxt.fillStyle = "rgba("+(Math.ceil(255*width/px))+",0,0,255)";
+    ctxt.fillRect(i, 0, 1, 1);
+  }
+  //document.body.appendChild(canvas);
+
+  var tex = gl.createTexture();
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+
+  return {texture:tex,
+          size:px};
+}
+
+function mk_str_bs(s) {
+  s = ""+s;
+  var n = [0x0, 0x0, 0x0, 0x0];
+  for (var i = 0; i < s.length && i < 4; i++) {
+    n[i] = s.charCodeAt(i);
+  }
+  return n;
+}
+
+</script>
+<script type="x-shader/x-vertex" id="knot.vert">
+#version 100
+
+precision mediump float;
+
+attribute vec3 a_pos;
+attribute vec3 a_norm;
+
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+uniform mat3 u_N;
+
+varying vec3 v_norm;
+varying vec3 v_cpos;
+varying vec3 v_mpos;
+
+void main(void) {
+  vec4 mpos4 = u_M * vec4(a_pos, 1.0);
+  v_mpos = mpos4.xyz / mpos4.w;
+  vec4 pos2 = u_V * mpos4;
+  gl_Position = u_P * pos2;
+  v_cpos = pos2.xyz / pos2.w;
+  
+  v_norm = normalize(u_N * a_norm);
+}
+
+</script>
+<script type="x-shader/x-fragment" id="knot.frag">
+#version 100
+
+precision mediump float;
+
+uniform vec4 u_diffcolor;
+uniform float u_width, u_height;
+
+varying vec3 v_norm;
+varying vec3 v_cpos;
+varying vec3 v_mpos;
+
+void main(void) {
+  vec3 disp = normalize(sin(100.0*v_mpos) + cos(531.0*v_mpos) + sin(314.0*v_mpos.yzx));
+
+  vec3 norm = normalize(v_norm);
+  vec3 dnorm = normalize(v_norm + 0.05*disp);
+  vec3 light = normalize(vec3(2, 3, 1));
+  float cdiff = max(0.0, dot(dnorm, light));
+  float cspec = pow(max(0.0, dot(-vec3(0,0,1), reflect(light, norm))), 10.0);
+
+  vec3 col = u_diffcolor.rgb*cdiff + vec3(1,1,1)*cspec;
+  
+  //float c = dot(norm, -vCPos);
+  //c = step(0.3, c);
+  gl_FragColor = vec4(col, u_diffcolor.a);
+  //gl_FragColor = vec4((1.0+norm)/2.0, 1.0);
+  //gl_FragColor = vec4(0, 0, 0, 1);
+
+}
+
+
+</script>
+<script type="x-shader/x-vertex" id="border.vert">
+#version 100
+
+precision mediump float;
+
+attribute vec3 a_pos;
+attribute vec3 a_norm;
+
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+uniform mat3 u_N;
+uniform float u_offset;
+uniform float u_postoffset;
+
+varying vec3 v_norm;
+
+void main(void) {
+  v_norm = normalize(u_N * a_norm);
+  vec4 wpos = u_V * u_M * vec4(a_pos + u_offset*a_norm, 1.0);
+  wpos += vec4(u_postoffset*v_norm, 0.0);
+  gl_Position = u_P * wpos;
+}
+
+</script>
+<script type="x-shader/x-fragment" id="border.frag">
+#version 100
+
+precision mediump float;
+
+uniform vec3 u_color;
+
+void main(void) {
+  gl_FragColor = vec4(u_color, 1.0);
+}
+
+</script>
+<script type="x-shader/x-fragment" id="border_stipple.frag">
+#version 100
+
+precision mediump float;
+
+uniform vec3 u_color;
+
+void main(void) {
+  if (mod(gl_FragCoord.x + gl_FragCoord.y, 2.0) == 0.0) discard;
+  gl_FragColor = vec4(u_color, 1.0);
+}
+
+</script>
+<script type="x-shader/x-vertex" id="hopf.vert">
+#version 100
+
+#define M_PI 3.1415926535897932384626433832795
+
+precision mediump float;
+
+uniform mat4 u_P4;
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+uniform mat4 u_perm;
+uniform float u_t;
+uniform vec3 u_col;
+
+attribute vec4 a_pos4;
+attribute float a_s;
+attribute float a_sel;
+
+varying vec3 v_col;
+varying float v_s;
+varying float n;
+
+vec2 zmul(vec2 z, vec2 w) {
+  return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+void main(void) {
+  float s = a_s * (1.0+a_sel);
+  float t = 2.0*M_PI*(u_t/20.0 - s/50.0);
+  vec2 z = vec2(cos(t), sin(t));
+  vec4 posr_0 = u_perm * a_pos4;
+  vec4 posr = u_perm * vec4(zmul(z, posr_0.xy), zmul(z, posr_0.zw));
+
+  vec4 pos_proj = u_P4 * posr;
+  vec3 stereo = pos_proj.yzw / (1.0 + pos_proj.x);
+  gl_Position = u_P * u_V * u_M * vec4(stereo, 1.0);
+  n = 1.0;//pos_proj.x;
+
+  v_col = u_col*(1.0-a_sel) + a_sel*vec3(1.0,0.4,0.0);
+  v_s = a_s;
+}
+
+</script>
+<script type="x-shader/x-fragment" id="hopf.frag">
+#version 100
+
+precision mediump float;
+
+varying vec3 v_col;
+varying float v_s;
+varying float n;
+
+void main(void) {
+  //  if (n < 0.0) discard;
+  //gl_FragColor = vec4(v_col * (1.0-v_s), (n < 0.0 ? 0.1 : 1.0)*(1.0-v_s));
+
+  float z = gl_FragCoord.z / gl_FragCoord.w;
+  float fogFactor = 1.0/(1.0+z*z*z);
+  gl_FragColor = vec4(v_col*(1.0-v_s), fogFactor);
+}
+
+</script>
+<script type="x-shader/x-vertex" id="fline.vert">
+#version 100
+
+precision mediump float;
+
+uniform mat4 u_P4;
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+
+attribute vec4 a_pos4;
+
+varying vec4 v_col;
+
+varying float n;
+
+void main(void) {
+  vec4 pos_proj = u_P4 * normalize(a_pos4);
+  /*  if (pos_proj.x < 0.0) {
+    pos_proj.yzw = normalize(pos_proj.yzw) - pos_proj.yzw;
+    }*/
+  vec3 stereo = pos_proj.yzw / (1.0 + pos_proj.x);
+  gl_Position = u_P * u_V * u_M * vec4(stereo, 1.0);
+  n = 1.0;//pos_proj.x;
+  v_col = vec4(0.0, 0.0, 0.0, 1.0);//(1.0+n)/2.0);
+}
+
+</script>
+<script type="x-shader/x-fragment" id="fline.frag">
+#version 100
+
+precision mediump float;
+
+varying vec4 v_col;
+varying float n;
+
+void main(void) {
+  gl_FragColor = vec4(v_col.rgb, 0.3+0.7*smoothstep(-0.02, 0.02, -n));
+}
+
+</script>
+<script type="x-shader/x-vertex" id="fface.vert">
+#version 100
+
+precision mediump float;
+
+uniform mat4 u_P4;
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+
+attribute vec4 a_pos4;
+attribute vec2 a_tex;
+
+varying vec4 v_col;
+varying vec2 v_tex;
+
+varying float n;
+
+void main(void) {
+  vec4 pos_proj = u_P4 * normalize(a_pos4);
+  vec3 stereo = pos_proj.yzw / (1.0 + pos_proj.x);
+  /*  if (pos_proj.x < 0.0) {
+    pos_proj.yzw = normalize(pos_proj.yzw) - pos_proj.yzw;
+    }*/
+  gl_Position = u_P * u_V * u_M * vec4(stereo, 1.0);
+  n = pos_proj.x;
+  v_col = vec4(0.0, 0.0, 1.0, 1.0);//(1.0+n)/2.0);
+
+  v_tex = a_tex;
+}
+
+</script>
+<script type="x-shader/x-fragment" id="fface.frag">
+#version 100
+
+precision mediump float;
+
+varying vec4 v_col;
+varying vec2 v_tex;
+varying float n;
+
+void main(void) {
+  //  if (n < 0.0) discard;
+  float d = 0.05;
+  if (v_tex.x > d && v_tex.y > d && v_tex.x + v_tex.y < 1.0-d) discard;
+  //if (n < 0.0) {
+//    gl_FragColor = vec4(v_col.rgb, 0.04);
+//  } else {
+//  float z = gl_FragCoord.z / gl_FragCoord.w;
+//  float fogFactor = 1.0/(1.0+z*z*z*z);
+    gl_FragColor = vec4(v_col.rgb, n>=0.0?0.4:0.1);
+        //gl_FragColor = vec4(v_col.rgb, 1.0);
+//  }
+  //gl_FragColor = vec4(v_tex, 0.0, 1.0);
+}
+
+</script>
+<script type="x-shader/x-vertex" id="ftext.vert">
+#version 100
+
+precision mediump float;
+
+uniform mat4 u_P4;
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+uniform float u_px;
+uniform vec2 u_dpix;
+
+attribute vec4 a_pos4;
+attribute vec2 a_tex;
+attribute vec4 a_str;
+
+varying vec4 v_col;
+varying vec2 v_tex;
+varying vec4 v_str;
+
+varying float n;
+
+void main(void) {
+  vec4 pos_proj = u_P4 * normalize(a_pos4);
+  vec3 stereo = pos_proj.yzw / (1.0 + pos_proj.x);
+  vec2 bbsize = 2.0*vec2(4.0*u_px, u_px) * u_dpix * a_tex;
+  vec4 proj = u_P * u_V * u_M * vec4(stereo, 1.0);
+  gl_Position = proj/proj.w + vec4(bbsize, 0, 0);
+  n = pos_proj.x;
+  v_col = vec4(1.0, 1.0, 1.0, 1.0);//(1.0+n)/2.0);
+
+  v_tex = a_tex;
+
+  v_str = a_str;
+}
+
+</script>
+<script type="x-shader/x-fragment" id="ftext.frag">
+#version 100
+
+precision mediump float;
+
+uniform sampler2D u_texture;
+uniform float u_px;
+
+varying vec4 v_col;
+varying vec2 v_tex;
+varying float n;
+varying vec4 v_str;
+
+vec4 get(vec2 tex, float ch) {
+  float x = 10.0+mod(ch, 16.0)*(u_px*2.0);
+  float y = 10.0+(1.0+floor(ch/16.0))*(u_px*2.0);
+  vec2 ctex = (vec2(x, 1023.0-y)+tex*u_px)/1024.0;
+  return texture2D(u_texture, vec2(ctex.x, ctex.y));
+}
+
+void main(void) {
+  if (n < 0.0) {
+    //    discard;
+  }
+  vec4 str = floor(0.5 + v_str);
+  vec4 col1;
+  vec4 widths = vec4(texture2D(u_texture, vec2(str.x/1024.0, 1023.0/1024.0)).r,
+                     texture2D(u_texture, vec2(str.y/1024.0, 1023.0/1024.0)).r,
+                     texture2D(u_texture, vec2(str.z/1024.0, 1023.0/1024.0)).r,
+                     texture2D(u_texture, vec2(str.w/1024.0, 1023.0/1024.0)).r);
+  float x = 4.0*v_tex.x;
+
+  if (x < widths.x) {
+    col1 = get(v_tex*vec2(4, 1), str.x);
+  } else if (x < widths.x+widths.y) {
+    col1 = get(v_tex*vec2(4, 1)-vec2(widths.x,0), str.y);
+  } else if (x < widths.x+widths.y+widths.z) {
+    col1 = get(v_tex*vec2(4, 1)-vec2(widths.x+widths.y,0), str.z);
+  } else if (x < widths.x+widths.y+widths.z+widths.w) {
+    col1 = get(v_tex*vec2(4, 1)-vec2(widths.x+widths.y+widths.z,0), str.w);
+  } else {
+    col1 = vec4(0, 0, 0, 0);
+  }
+  //texture2D(u_texture, v_tex);
+  //vec3 col = (1.0-col1.a)*vec3(1.0, 1.0, 1.0)+col1.a*col1.rgb;
+  float s = smoothstep(-0.02, 0.02, n);
+  vec3 col = (s*vec3(0.3, 1.0, 0.3)+(1.0-s)*vec3(0.2, 0.2, 0.2))*col1.a;
+  gl_FragColor = vec4(col.rgb, s*col1.a+(1.0-s)*col1.a/3.0);
+}
+
+</script>
+
+</head>
+<body>
+<div id="message"></div>
+<div id="error"></div>
+<canvas id="canvas" width="300" height="300">This browser doesn't support the <code>canvas</code> element.</canvas>
+</body>
+</html>

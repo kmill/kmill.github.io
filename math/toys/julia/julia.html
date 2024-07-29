@@ -1,0 +1,118 @@
+
+<html>
+  <head>
+    <title>Shimmering</title>
+    <script src="jquery-1.10.2.min.js"></script>
+    <script src="underscore-min.js"></script>
+    <script src="gl-matrix.js"></script>
+<!--    <script src="http://js.leapmotion.com/0.3.0-beta2/leap.min.js"></script>-->
+    <script src="julia.js"></script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+      precision mediump float;
+      uniform float wWidth;
+      uniform float wHeight;
+      uniform float uTime;
+      uniform vec2 uSeed;
+      uniform int uIter;
+      uniform int uMode;
+      uniform float uScale;
+      uniform vec2 uMandelRel;
+      uniform float uRelScale;
+      uniform int uPoint;
+      uniform int uRendMode;
+
+      vec3 hsv2rgb(vec3 c)
+      { // taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        vec3 res = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+        //float sum = res.x + res.y + res.z;
+        return res;// * c.z / sum;
+      }
+
+      void main(void) {
+        float t = uTime/2.0;
+        //float t = 22.0;
+        //float t = 2000.0*uSeed.x;
+        float hue = t / 255.0 / 30.0;
+        float shimmer_angle = t * 0.02 / 30.0;
+
+        float center_x = sin(t / 50000.0);
+        float center_y = 0.8*sin(3.0* t / 50000.0) + 0.2*sin(4.12354* t / 50000.0);
+
+        float xp = uScale * (2.0*gl_FragCoord.x - wWidth) / wHeight;
+        float yp = uScale * (2.0*gl_FragCoord.y - wHeight) / wHeight;
+        float x = uRelScale * (xp - center_x);
+        float y = uRelScale * (yp - center_y);
+
+        float alpha = cos(shimmer_angle / 10.0);
+        float beta = cos(shimmer_angle);
+        float gamma = sin(shimmer_angle);
+
+        float dist = alpha * x * y + beta * x * x + gamma * y * y;
+        hue += dist / 2.5;
+
+        float bright = 1.0;
+
+        int j = 1000;
+        vec2 z = vec2(xp, yp);
+        vec2 c = uRelScale * (vec2(xp, yp) - uMandelRel) + uMandelRel;
+        vec2 seed = uSeed;
+        if (uMode == 2) {
+          beta = cos(uTime * 0.02 / 30.0);
+          seed = (c * (1.0+beta) + uSeed * (1.0-beta))/2.0;
+          z = (seed * (1.0+beta) + z * (1.0-beta))/2.0;
+        } else if (uMode == 1) {
+          seed = c;
+          z = seed;
+        }
+        for (int i = 0; i < 200; i++) {
+          if (i >= uIter) break;
+          //z = vec2(abs(z.x), abs(z.y));
+          z = vec2((z.x * z.x - z.y * z.y) + seed.x,
+                   2.0 * z.x * z.y + seed.y
+                  );
+          if (length(z) > 2.0) { j = i; break; }
+        }
+        bright = j == 1000 ? 1.0 : float(j)/float(uIter);
+
+        float sat = 0.85;
+
+        if (uRendMode == 1) {
+          bright = 1.0 - bright; sat = j == 1000 ? 0.85 : 0.85*float(j)/float(uIter);
+        }
+        //hue = 0.0;
+
+        if (uPoint == 1 && length(c - uSeed) < 0.008 && length(c - uSeed) > 0.003*uRelScale) {
+          bright = 1.0 - bright; sat = 0.05;
+          hue = 0.0;
+        }
+
+        gl_FragColor = vec4(hsv2rgb(vec3(hue, sat, bright)), 1.0);
+
+      }
+    </script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+      attribute vec4 aVertexPosition;
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+
+      void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * aVertexPosition;
+      }
+    </script>
+
+    <style type="text/css">
+      body {
+        margin: 0; padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="glcanvas" width="640" height="480">
+      Your browser doesn't appear to support the canvas element.
+    </canvas>
+  </body>
+</html>

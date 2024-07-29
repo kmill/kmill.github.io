@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>The Lickorish-Wallace theorem (notes)</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>The Lickorish-Wallace theorem (notes)</h1>
+        
+  
+  
+  <P><EM>These are an elaboration of my notes for a pair of talks given
+    for the Low-Dimensional Topology Student Seminar at UC Berkeley,
+    Fall 2018.</EM></P>
+
+<P>This material is a combination of what is in Roflsen<A NAME="ref_footnote_26_1"></A><sup><A HREF="./blog_2018_09_27_lickorish.html#footnote_26_1">[1]</A></sup> Section TODO, Lickorish<A NAME="ref_footnote_26_2"></A><sup><A HREF="./blog_2018_09_27_lickorish.html#footnote_26_2">[2]</A></sup> Section TODO, and things
+  I&rsquo;ve picked up along the way.</P>
+
+<P>What Lickorish and Wallace independently proved in 1960 is that
+  every closed orientable <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold bounds a compact orientable
+  <span class='MathJax_Preview'>4</span><script type='math/tex'>4</script>-manifold&mdash;so the cobordism group of closed oriented
+  <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifolds is trivial.  Lickorish&rsquo;s method is to use a Heegaard
+  splitting of the manifold, decompose the gluing homomorphism into a
+  product of Dehn twists using the Lickorish twist theorem (relative
+  to an <span class='MathJax_Preview'>S^3</span><script type='math/tex'>S^3</script> gluing), then do integral Dehn surgeries in one of the
+  handlebodies to obtain <span class='MathJax_Preview'>S^3</span><script type='math/tex'>S^3</script>.  It then follows that the <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold
+  is the boundary of a <span class='MathJax_Preview'>4</span><script type='math/tex'>4</script>-ball with attached <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script>-handles, one per
+  Dehn surgery.</P>
+
+<P>It&rsquo;s convenient enough to assume we are working in the piecewise
+  linear manifold category.</P>
+
+<H2>1. Heegaard splittings</H2><P>A <EM>handlebody</EM> <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script> is a <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold homeomomorphic to a
+  <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-handle (a <span class='MathJax_Preview'>D^0\times D^3</span><script type='math/tex'>D^0\times D^3</script>) with attached <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-handles
+  (<span class='MathJax_Preview'>D^1\times D^2</span><script type='math/tex'>D^1\times D^2</script>), with the attachments along each
+  <span class='MathJax_Preview'>S^0\times D^2\subset D^1\times D^2</span><script type='math/tex'>S^0\times D^2\subset D^1\times D^2</script>.  The homeomorphism type is
+  characterized in many ways: by the genus of <span class='MathJax_Preview'>\partial X</span><script type='math/tex'>\partial X</script>, by the
+  number of attached handles, or by the maximal number of properly
+  embedded<A NAME="ref_footnote_26_3"></A><sup><A HREF="./blog_2018_09_27_lickorish.html#footnote_26_3">[3]</A></sup> disks such that the complement of a regular
+  neighborhood of the disks is homeomorphic to <span class='MathJax_Preview'>D^3</span><script type='math/tex'>D^3</script>.  All of these
+  are the <EM>genus</EM> of the handlebody.</P>
+
+<CENTER>
+    <IMG TITLE=""SRC="2018_09_27_lickorish_handlebody.png">
+  </CENTER>
+<P>We are going to care about gluing handlebodies together, and it can
+  be difficult to keep the data for the surface homeomorphism
+  straight.  Let <span class='MathJax_Preview'>\Sigma_g</span><script type='math/tex'>\Sigma_g</script> denote some fixed closed genus-<span class='MathJax_Preview'>g</span><script type='math/tex'>g</script>
+  surface.  A <EM>marking</EM> of the boundary of a handlebody <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script> is a
+  homeomorphism <span class='MathJax_Preview'>\Sigma_g\to \partial X</span><script type='math/tex'>\Sigma_g\to \partial X</script> &mdash; this sort of gives a
+  coordinate system for the boundary of the handlebody.  We will show
+  that <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script> can be given, up to homeomorphism, by a collection of <span class='MathJax_Preview'>g</span><script type='math/tex'>g</script>
+  disjoint simple closed curves on <span class='MathJax_Preview'>\Sigma_g</span><script type='math/tex'>\Sigma_g</script>.<A NAME="ref_footnote_26_4"></A><sup><A HREF="./blog_2018_09_27_lickorish.html#footnote_26_4">[4]</A></sup></P>
+
+<P><B>Theorem.</B> <EM>Let <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script>, <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script> be two handlebodies and let
+    <span class='MathJax_Preview'>\mathscr{C}\subset X</span><script type='math/tex'>\mathscr{C}\subset X</script> and <span class='MathJax_Preview'>\mathscr{D}\subset Y</span><script type='math/tex'>\mathscr{D}\subset Y</script> be collections
+    of properly embedded disks such that in each case the complement
+    of a regular neighborhood of the disks is homeomorphic to a ball.
+    If <span class='MathJax_Preview'>h:\partial X\to \partial Y</span><script type='math/tex'>h:\partial X\to \partial Y</script> is a homeomorphism such that
+    <span class='MathJax_Preview'>h(\partial\mathscr{C})=\partial\mathscr{D}</span><script type='math/tex'>h(\partial\mathscr{C})=\partial\mathscr{D}</script>, then <span class='MathJax_Preview'>h</span><script type='math/tex'>h</script> extends to
+    a homeomorphism <span class='MathJax_Preview'>X\to Y</span><script type='math/tex'>X\to Y</script>.</EM></P>
+
+<P><EM>Proof.</EM> Homeomorphisms of circles extend to disks, and one can
+  extend <span class='MathJax_Preview'>h</span><script type='math/tex'>h</script> to a homeomorphism on collar neighborhoods of the
+  disks. The complements are balls, and since homeomorphisms of
+  spheres extend to balls, one can extend <span class='MathJax_Preview'>h</span><script type='math/tex'>h</script> to <span class='MathJax_Preview'>X\to Y</span><script type='math/tex'>X\to Y</script>. &#x220e;</P>
+
+<P>Given a marking of a handlebody, one can take the inverse image in
+  <span class='MathJax_Preview'>\Sigma_g</span><script type='math/tex'>\Sigma_g</script> of the boundaries of the disks from the theorem.  These
+  <span class='MathJax_Preview'>g</span><script type='math/tex'>g</script> disjoint simple closed curves are the <EM>characteristic
+    curves</EM> of the marking, and they specify the homeomorphism type of
+  a marked handlebody (non-uniquely).  Isotopy of the characteristic
+  curves extends to an isotopy of the disks, so characteristic curves
+  need only be considered up to isotopy.</P>
+
+<P><B>Example.</B> These are two genus-<span class='MathJax_Preview'>1</span><script type='math/tex'>1</script> handlebodies with different markings.
+  <CENTER>
+    <IMG TITLE=""SRC="2018_09_27_lickorish_charcurves.png">
+  </CENTER>
+</P>
+
+<P><B>Definition.</B> A <EM>Heegaard splitting</EM> of a closed
+  orientable <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold <span class='MathJax_Preview'>M</span><script type='math/tex'>M</script> is a pair of handlebodies <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script> and <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script>
+  along with a homeomorphism <span class='MathJax_Preview'>h:\partial X\to \partial Y</span><script type='math/tex'>h:\partial X\to \partial Y</script> such that
+  <span class='MathJax_Preview'>M</span><script type='math/tex'>M</script> is homeomorphic to
+  <span class='MathJax_Preview'>X\cup_h Y= X\amalg Y/(x \sim h(x),x\in \partial X)</span><script type='math/tex'>X\cup_h Y= X\amalg Y/(x \sim h(x),x\in \partial X)</script>.
+  Intrinsically, a Heegaard splitting is a closed oriented surface
+  <span class='MathJax_Preview'>S\subset X</span><script type='math/tex'>S\subset X</script> such that the complement of a regular neighborhood of
+  <span class='MathJax_Preview'>S</span><script type='math/tex'>S</script> is the disjoint union of two handlebodies.</P>
+
+<P><B>Definition.</B> A genus-<span class='MathJax_Preview'>g</span><script type='math/tex'>g</script> <EM>Heegaard diagram</EM> is two sets
+  of characteristic curves on <span class='MathJax_Preview'>\Sigma_g</span><script type='math/tex'>\Sigma_g</script>.  That they are
+  characteristic curves means they come from a marked handlebody, so a
+  Heegaard diagram corresponds to a <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold with a particular
+  Heegaard splitting.  Heegaard diagrams tend to be drawn with the two
+  sets of curves in different colors.</P>
+
+<P><B>Example.</B> A Heegaard diagram for <span class='MathJax_Preview'>S^3</span><script type='math/tex'>S^3</script> is simply
+  <span class='MathJax_Preview'>\Sigma_0=S^2</span><script type='math/tex'>\Sigma_0=S^2</script> with no characteristic curves, and Alexander&rsquo;s lemma
+  implies this is the only genus-<span class='MathJax_Preview'>0</span><script type='math/tex'>0</script> Heegaard splitting.  There are
+  diagrams for <span class='MathJax_Preview'>S^3</span><script type='math/tex'>S^3</script> with arbitrary genus.
+  <CENTER>
+    <IMG TITLE=""SRC="2018_09_27_lickorish_sphere.png">
+  </CENTER>
+</P>
+
+<P><span class='MathJax_Preview'>S^2\times S^1</span><script type='math/tex'>S^2\times S^1</script></P>
+
+<P><span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script></P>
+
+<P><span class='MathJax_Preview'>L(p,q)</span><script type='math/tex'>L(p,q)</script></P>
+
+<P><B>Theorem.</B> <EM>Every compact oriented <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold has a Heegaard splitting.</EM></P>
+
+<P><EM>Proof.</EM>  Take a triangulation of a <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold <span class='MathJax_Preview'>M</span><script type='math/tex'>M</script> (exists
+  due to Moise and Bing).  A regular neighborhood of the <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-skeleton
+  (technical detail: neighborhood exists as a subcomplex in the second
+  barycentric subdivision of the triangulation) gives a handlebody <span class='MathJax_Preview'>X</span><script type='math/tex'>X</script>
+  &mdash; the vertices give <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-handles and the edges give <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-handles,
+  and a spanning tree of <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-handles can be contracted into one
+  <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-handle to get a handlebody.  The complement
+  <span class='MathJax_Preview'>Y=\operatorname{cl}(M-X)</span><script type='math/tex'>Y=\operatorname{cl}(M-X)</script> is a handlebody, too.  One way to see
+  this is to view the intersection of each <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-cell with <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script> as a
+  <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-handle and a collar neighborhood of each <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script>-cell in <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script> as a
+  <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-handle.  To appease Michael, one can also say that the
+  intersection of each <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script>-cell with <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script> gives properly embedded disks
+  in <span class='MathJax_Preview'>Y</span><script type='math/tex'>Y</script>, the complement of which is a disjoint union of
+  balls. (Lemma: any compact oriented <span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-manifold with a collection
+  of disjoint properly embedded disks, whose complement is a disjoint
+  union of balls, is a handlebody.)  &#x220e;</P>
+
+<H2>2. Surgery</H2><H3>2.1. Dehn surgery</H3><H2>3. The Lickorish twist theorem</H2><H2>4. The Lickorish-Wallace theorem</H2><P><div class="footnotes"><A NAME="footnote_26_1"></A><div class="footnote">
+<sup><A HREF="./blog_2018_09_27_lickorish.html#ref_footnote_26_1">[1]</A></sup> Dale
+    Rolfsen, <EM>Knots and links</EM>, Publish or Perish, Inc.,
+    Berkeley, Calif., 1976, Mathematics Lecture Series, No. 7. MR
+    0515288</div>
+<A NAME="footnote_26_2"></A><div class="footnote">
+<sup><A HREF="./blog_2018_09_27_lickorish.html#ref_footnote_26_2">[2]</A></sup> W. B. Raymond Lickorish, <EM>An
+      introduction to knot theory</EM>, Graduate Texts in Mathematics,
+    vol. 175, Springer-Verlag, New York, 1997. MR 1472978</div>
+<A NAME="footnote_26_3"></A><div class="footnote">
+<sup><A HREF="./blog_2018_09_27_lickorish.html#ref_footnote_26_3">[3]</A></sup> Here, &ldquo;proper embedding&rdquo; means the boundary maps
+    to the boundary transversely and only the boundary maps to the
+    boundary.</div>
+<A NAME="footnote_26_4"></A><div class="footnote">
+<sup><A HREF="./blog_2018_09_27_lickorish.html#ref_footnote_26_4">[4]</A></sup> One could add
+    the converse that collections of <span class='MathJax_Preview'>g</span><script type='math/tex'>g</script> disjoint essential simple
+    closed curves that are pairwise non-homotopic give handlebodies.</div>
+</div></P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 27 September 2018 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="./index.html">Mathblog</A> > The Lickorish-Wallace theorem (notes)
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

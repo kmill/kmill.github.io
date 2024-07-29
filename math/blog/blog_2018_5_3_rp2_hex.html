@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Hex on the real projective plane</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>Hex on the real projective plane</h1>
+        
+  
+  
+  <P>Some number of years ago while thinking about the games
+  <A HREF="https://en.wikipedia.org/wiki/Y_(game)">Y</A> and
+  <A HREF="https://en.wikipedia.org/wiki/Hex_(board_game)">Hex</A>, I
+  wondered about what such a game would be like on the real projective
+  plane (unaware of
+  <A HREF="https://boardgamegeek.com/boardgame/31805/projex">Projex</A>).</P>
+
+<div class="figure figure_r">
+    <IMG TITLE=""SRC="200_blog_18_5_3_y_board.png">
+  </div><P><B>Setup:</B> the game board is a connected graph
+  embedded on the surface of a sphere, where the graph has antipodal
+  symmetry (so vertices and edges each come in antipodal pairs).  A
+  nice example, which is the basis for the Y board, is a
+  <A HREF="https://en.wikipedia.org/wiki/Geodesic_polyhedron#Examples">subdivided icosahedral
+  graph</A>.</P>
+
+<P><B>Gameplay:</B> players take turns placing two of their stones on
+  antipodal pairs of empty vertices.  The first player to form a path
+  connecting a pair of antipodal points is the winner.  Practically
+  speaking, the game can take place on a board like the one
+  illustrated to the left.  Stones are placed on interior vertices
+  like usual, but on the boundary stones are placed in antipodal
+  pairs.  With this modified setup, the aim of the game is to make a
+  path that connects boundary antipodes.</P>
+
+<P><B>In other words:</B> given a connected graph embedded in
+  <span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script> (with at least one essential cycle),
+  players take turns placing stones on vertices.  The first player to
+  make a path that generates <span class='MathJax_Preview'>H_1(\mathbb{R}\mathrm{P}^2)</span><script type='math/tex'>H_1(\mathbb{R}\mathrm{P}^2)</script> is the
+  winner.  This is similar to to Hex, where each player is aiming to
+  construct a particular generator of <span class='MathJax_Preview'>H_1((S^1)^2)</span><script type='math/tex'>H_1((S^1)^2)</script>.</P>
+
+<P>A nice feature of the game is that one player winning excludes the
+  other player from completing a cycle of their own.  A quick way to
+  see this is that a completed cycle is a simple closed curve on the
+  sphere, separating the sphere into two disks.  The other player
+  would have to construct a path from one disk to the other, which is
+  impossible.  This also has to do with the <span class='MathJax_Preview'>\mathbb{Z}/2\mathbb{Z}</span><script type='math/tex'>\mathbb{Z}/2\mathbb{Z}</script>
+  intersection form on <span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script>.</P>
+
+<P>I got <A HREF="https://math.berkeley.edu/~morganw/">Morgan</A> to play
+  this game at the <A HREF="https://research.franklin.uga.edu/topology/content/2017-georgia-international-topology-conference">2017 Georgia International Topology
+  Conference</A>
+  on a subdivided hemi-icosahedron.  One question I had was whether
+  one of the players must win, or whether it was possible for there to
+  be a draw.  We thought about it for a few minutes and then forgot
+  about the problem as we went to the next talk.</P>
+
+<P>Yesterday, I brought the game up again, and Ian Agol pointed out
+  that if the graph is a triangulation, the kind of argument for Hex
+  should work because one of the components will have to contain a
+  Mobius band.  In this post, I&rsquo;m going to flesh out what I thought he
+  meant.  For now, assume the game board is a triangulation of
+  <span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script>.</P>
+
+<P>Let&rsquo;s say some players have played the game with red and blue
+  stones, and for some reason they kept playing until the entire board
+  was been filled.  By the exclusion property, it&rsquo;s not the case that
+  both the players have completed a cycle, so there is a clear winner
+  if there is one at all.  Let&rsquo;s also say we don&rsquo;t care how many of
+  each color stone there are, since we&rsquo;re not going to use any sort
+  of parity argument.</P>
+
+<P>There are, up to rotation, only four configurations of stones around
+  each triangle, depending purely on how many of each color stone
+  there are.  In the two cases where there are both colors present,
+  there is a well-defined path between midpoints of the triangle&rsquo;s
+  edges that separate the two colors.  By taking all such paths, one
+  gets a collection of loops in <span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script> that
+  intersect the edges of the game graph transversely.  Each region
+  between the loops contains stones only of a single color, and when
+  crossing a loop that color changes (so the loops define a properly
+  <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script>-colored map in <span class='MathJax_Preview'>\mathbb{R}\mathrm{P}^2</span><script type='math/tex'>\mathbb{R}\mathrm{P}^2</script>).</P>
+
+<CENTER>
+    <IMG TITLE=""SRC="650_blog_18_5_3_stone_placements.png">  
+  </CENTER>
+<P>At this point, we could use the Mayer-Vietoris sequence with a
+  decomposition of the projective plane into two regions whose shared
+  boundary is a <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script>-manifold, but I find the following more hands-on
+  normal curve argument interesting.</P>
+
+<P>If there is a loop that bounds a disk, then none of the stones
+  within that disk can possibly contribute to a winning cycle.
+  Furthermore, because of the way the curve is constructed, on just
+  the opposite side from the disk there is a non-winning monochromatic
+  cycle of stones of the opposite color.  If we replace all the stones
+  within the disk with the color of the monochromatic cycle, we do not
+  change the winner or whether the game ended in a draw.  (The fact
+  that the loop has stones of opposite colors on either side means
+  that a regular neighborhood of it is orientable &mdash; and not a
+  M&ouml;bius band.)</P>
+
+<P>So, now we may assume that none of the loops bound disks.  But, all
+  of the loops have to bound disks!  The loop has stones of opposite
+  colors on each side so traces out an orientation-preserving path.
+  Maybe I&rsquo;ll fill in this detail in later, but this means the path is
+  nullhomotopic, and every nullhomotopic simple closed curve a surface
+  bounds a disk.</P>
+
+<P>Therefore, our simplifying assumption implies the game board
+  contains stones of only one color.  This obviously contains a
+  winning cycle, so that player must have been the winner. No draws!</P>
+
+<P>I have another version of this argument on
+  <A HREF="https://math.stackexchange.com/questions/2669005/when-you-divide-the-real-projective-plane-into-two-subsets-does-it-always-have">math.stackexchange.com</A>.</P>
+
+<H2>Game board designs</H2><P>The design for Projex is a subdivided triangle, where I was
+  proposing a subdivided hemi-icosahedron.  With the subdivided
+  triangle, it seems like there will be a more intense battle to
+  control the center of the board, where the hemi-icosahedron&rsquo;s
+  symmetry makes every icosahedral face equally valuable, so early
+  mistakes might not cost the game.  I actually don&rsquo;t know how much
+  this affects gameplay, but maybe I will simulate it someday.</P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 3 May 2018 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="./index.html">Mathblog</A> > Hex on the real projective plane
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

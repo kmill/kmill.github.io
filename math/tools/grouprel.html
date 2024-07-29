@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript" src="grouprel.js"></script>
+<style type="text/css">
+  #relations {
+    min-width: 300px;
+    min-height: 150px;
+  }
+  #printedRelations {
+    background: rgba(0, 0, 255, 0.05);
+    margin: 5px 0;
+    padding: 5px;
+    width: 500px;
+  }
+  #printedDest {
+    background: rgba(0, 0, 255, 0.05);
+    margin: 5px 0;
+    padding: 5px;
+    width: 500px;
+  }
+  #desc {
+    display: none;
+  }
+  span.var {
+    font-style: italic;
+  }
+  .var ~ sup {
+    margin-left: 2px;
+  }
+  .eq {
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+  span.rel {
+    background: rgba(0, 0, 255, 0.05);
+  }
+
+  #stats {
+    margin: 10px 0;
+  }
+
+  .steps {
+    margin-top: 1em;
+  }
+
+  .box {
+      width: 500px;
+  }
+  .box tt {
+      background: rgba(0, 0, 0, 0.05);
+  }
+</style>
+</head>
+<body>
+
+  <div class="box">
+    <p>This program searches for a path from a given element to the
+      identity using a set of relations.  The result is a derivation
+      to the &ldquo;most-simplified&rdquo; word, which is possibly the
+      identity.</p>
+  </div>
+
+  <label for="relations">Relations:</label><br>
+  <textarea id="relations">ij=k; jk=i; ki=j</textarea><!--ij^-1k
+ki^-1j
+jk^-1i--><br>
+  <label>Add inverses: <input type="checkbox" id="addInverses" checked=checked></label>&#x2001;
+  <label>Find order: <input type="checkbox" id="findOrder"></label>
+  <br>
+  <input type="text" id="identity" value="i^4">
+  <input type="button" id="compute" value="Search">
+  <input type="button" id="stop" value="Stop" disabled=disabled>
+
+  <div id="desc">
+    <p>Relations:</p>
+    <div id="printedRelations"></div>
+    <p>Searching for:</p>
+    <div id="printedDest"></div>
+
+    <div id="stats"></div>
+    <div id="derivation"></div>
+  </div>
+
+  <div id="help" class="box">
+    <h1>Help</h1>
+    
+    <p>Relations may be inputted in a number of ways.  Relations may be
+      separated by newlines or semicolons.  A single relation is
+      something which is equal to the identity (such
+      as <tt>ij^-1k</tt>), though for shorthand they may have an
+      equals sign, as in the case of <tt>ij=k; jk=i; ki=j</tt>.
+      Exponents for generators are not parenthesized,
+      so <tt>x^-22y^1</tt> is valid and correct.  The
+      symbol <tt>1</tt> is the identity element.</p>
+
+    <p>The &ldquo;Add inverses&rdquo; option lets the search use the
+      inverses of the relations as well.  Disable it for dealing with
+      monoids rather than groups. Note, however, that since the search
+      starts from the given element, you will need to use the inverses
+      of the monoid generators.</p>
+
+    <p>The &ldquo;Find order&rdquo; option searches for the identity
+    from all powers of the given element.</p>
+  </div>
+</body>
+</html>

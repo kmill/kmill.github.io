@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Fibering of the trefoil knot complement</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>Fibering of the trefoil knot complement</h1>
+        
+  
+  
+  <P>I&rsquo;ve found myself re-calculating the fibration of the trefoil knot complement again, so I thought I&rsquo;d write a short note this time to record it.
+  The main technique is the <EM>elastic cord criterion</EM> from</P>
+
+<BLOCKQUOTE><P>
+    Sebastian Baader and Christian Graf, <EM>Fibred links in <span class='MathJax_Preview'>S^3</span><script type='math/tex'>S^3</script></EM>, Expo.
+    Math. <B>34</B> (2016), no. 4, 423&ndash;435. <A HREF="https://doi.org/10.1016/j.exmath.2016.06.006">doi:10.1016/j.exmath.2016.06.006</A> <A HREF="http://www.ams.org/mathscinet-getitem?mr=3578006">MR 3578006</A>
+  </BLOCKQUOTE>
+</P>
+
+<H2>What is a fibered knot?</H2><P>
+  An oriented knot (or link) <span class='MathJax_Preview'>K\subset S^3</span><script type='math/tex'>K\subset S^3</script> is called a <EM>fibered</EM> knot if the knot complement <span class='MathJax_Preview'>S^3-K</span><script type='math/tex'>S^3-K</script> can be given the structure of a fibration over <span class='MathJax_Preview'>S^1</span><script type='math/tex'>S^1</script> such that the closure of each leaf is a compact oriented surface whose boundary is <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script> with the correct induced orientation.
+  In other words, there is a smooth map <span class='MathJax_Preview'>f:S^3-K\to S^1</span><script type='math/tex'>f:S^3-K\to S^1</script> with no critical points such that the closure of <span class='MathJax_Preview'>f^{-1}(\theta)</span><script type='math/tex'>f^{-1}(\theta)</script> is a Seifert surface for <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script> for each <span class='MathJax_Preview'>\theta\in S^1</span><script type='math/tex'>\theta\in S^1</script>.
+  Letting <span class='MathJax_Preview'>\Sigma=f^{-1}(0)</span><script type='math/tex'>\Sigma=f^{-1}(0)</script> be one of the fibers, circle-valued functions like this generate a smooth map <span class='MathJax_Preview'>\mu:\Sigma\to\Sigma</span><script type='math/tex'>\mu:\Sigma\to\Sigma</script> called the <EM>monodromy</EM>, which is obtained through gradient flow: we can use <span class='MathJax_Preview'>df</span><script type='math/tex'>df</script> to pull <span class='MathJax_Preview'>d\theta</span><script type='math/tex'>d\theta</script> back to <span class='MathJax_Preview'>S^3-K</span><script type='math/tex'>S^3-K</script> then use the metric to form a non-vanishing vector field, and then <span class='MathJax_Preview'>\mu(x)</span><script type='math/tex'>\mu(x)</script> is given by an integral curve starting at <span class='MathJax_Preview'>x</span><script type='math/tex'>x</script> then seeing where it ends up at time <span class='MathJax_Preview'>t=2\pi</span><script type='math/tex'>t=2\pi</script>.
+  The monodromy lets us regard <span class='MathJax_Preview'>S^3-K</span><script type='math/tex'>S^3-K</script> as a mapping cylinder of <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script>:
+  <div class='MathJax_Preview'><pre>\begin{align*}
+    S^3-K \approx (\Sigma\times [0,1])/({(\mu(x),0)\sim (x,1)})
+  \end{align*}</pre></div><script type='math/tex; mode=display'>\begin{align*}
+    S^3-K \approx (\Sigma\times [0,1])/({(\mu(x),0)\sim (x,1)})
+  \end{align*}</script>
+  As a smooth oriented manifold, this only depends on the isotopy class of <span class='MathJax_Preview'>\mu</span><script type='math/tex'>\mu</script>.</P>
+
+<P>The knot exterior (the complement of a tubular neighborhood of <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script>) is given by the same mapping cylinder construction but with a compact oriented surface.
+  In the above construction, one can arrange for the monodromy to be the identity in a neighborhood of <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script> since, near <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script>, the flow of a point in <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> gives a meridian loop:
+  <CENTER>
+    <IMG TITLE=""SRC="200_blog-2020-11-13-monodromy_meridian.png">
+  </CENTER>
+</P>
+
+<P>The main takeaway of all this is that &ldquo;calculating the fibering&rdquo; amounts to giving the following data: (1) a compact oriented surface <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> and (2) a smooth map <span class='MathJax_Preview'>\mu:\Sigma\to\Sigma</span><script type='math/tex'>\mu:\Sigma\to\Sigma</script> that is the identity when restricted to the boundary.</P>
+
+<P>Since it&rsquo;s the identity on the boundary, the map extends to a smooth map of a closed oriented surface obtained by collapsing each boundary curve to a point.
+  From this point of view, the data is (1) a closed oriented surface <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> with a finite collection of points and (2) a smooth map <span class='MathJax_Preview'>\mu:\Sigma\to\Sigma</span><script type='math/tex'>\mu:\Sigma\to\Sigma</script> that fixes each point in the collection.
+  Incidentally, this gives a fibering of the <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-surgery of the knot or link.</P>
+
+<H2>What is the elastic cord criterion?</H2><P>
+  Let&rsquo;s consider the case of a knot exterior, so <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> is compact.  An observation for a fibration is that if you find a cut set of arcs for <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script>, you can flow the arcs themselves from <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> to <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script>, giving properly embedded squares <span class='MathJax_Preview'>[0,1]\times[0,1]</span><script type='math/tex'>[0,1]\times[0,1]</script> in <span class='MathJax_Preview'>\Sigma\times[0,1]</span><script type='math/tex'>\Sigma\times[0,1]</script> such that <span class='MathJax_Preview'>{0,1}\times[0,1]</span><script type='math/tex'>{0,1}\times[0,1]</script> is embedded &ldquo;vertically&rdquo;, and the complement of the squares in <span class='MathJax_Preview'>\Sigma\times[0,1]</span><script type='math/tex'>\Sigma\times[0,1]</script> is a disjoint union of open balls.</P>
+
+<P>Conversely, given a (connected<A NAME="ref_footnote_24_1"></A><sup><A HREF="./blog_2020_11_13_fibered.html#footnote_24_1">[1]</A></sup>) Seifert surface <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> for an oriented knot (or link) <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script>, if one can find a cut set of arcs for <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> along with disjoint properly embedded squares in <span class='MathJax_Preview'>S^3-\nu(K)</span><script type='math/tex'>S^3-\nu(K)</script> whose &ldquo;vertical&rdquo; boundaries are meridians for <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script>, then because knot complements are irreducible the complement of the union of <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> and the squares is a disjoint union of open balls, and hence <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script> is fibered.</P>
+
+<P>It turns out that you don&rsquo;t need to actually worry about the disks themselves.
+  The <EM>elastic cord criterion</EM> is that a knot (or link) <span class='MathJax_Preview'>K</span><script type='math/tex'>K</script> is fibered if and only if there is a Seifert surface with a cut set such that, with the arcs being thought of as &ldquo;elastic cords&rdquo; attached to the boundary on one side of the surface, they can be dragged to the other side.
+  The monodromy is determined by where the cords end up.
+  (Also, if there is any arc that, as an elastic cord, cannot be dragged to the other side, the knot is not fibered.)</P>
+
+<P>Here&rsquo;s an attempt at illustrating an elastic cord (blue thick line) being dragged in the direction of the green arrows to the other side of the surface (dashed blue thick line), with a portion of the square it is dragged through:
+  <CENTER>
+    <IMG TITLE=""SRC="300_blog-2020-11-13-cord.png">
+  </CENTER>
+</P>
+
+<H2>The trefoil knot</H2><P>
+  The (right-handed) trefoil knot has a genus-<span class='MathJax_Preview'>1</span><script type='math/tex'>1</script> Seifert surface from taking one of the two checkerboard surfaces from a standard diagram.
+  Here&rsquo;s an illustration of the Seifert surface (yellow is the front side, gray is the back), a cut set of arcs given by the blue and green curves, and the the result of taking the arcs as elastic cords and dragging them to the other side of the surface:
+  <CENTER>
+    <IMG TITLE=""SRC="500_blog-2020-11-13-cut-monodromy.png">
+  </CENTER>
+
+  Since this could be done, we see the trefoil knot is be a fibered knot by the elastic cord criterion.
+  I want to get this into a good position to understand the monodromy, so as a first step we&rsquo;ll cut along the cut set and twist the surface to lay it out flat:
+  <CENTER>
+    <IMG TITLE=""SRC="500_blog-2020-11-13-cut-monodromy-2.png">
+  </CENTER>
+
+  Then I&rsquo;ll un-distort the second diagram:
+  <CENTER>
+    <IMG TITLE=""SRC="300_blog-2020-11-13-cut-monodromy-3.png">
+  </CENTER>
+
+  This gives a monodromy, but I want to get to a really nice description of it.
+  One thing we can do is turn this into an ideal triangulation, essentially by gluing a disk into the boundary.
+  When it&rsquo;s an ideal triangulation, it&rsquo;s more obvious that the image of the green arc is isotopic to the blue arc with reversed orientation:
+  <CENTER>
+    <IMG TITLE=""SRC="300_blog-2020-11-13-cut-monodromy-4.png">
+  </CENTER>
+
+  Now, we&rsquo;ll draw this on the universal cover of the torus:
+  <CENTER>
+    <IMG TITLE=""SRC="500_blog-2020-11-13-cover.png">
+  </CENTER>
+
+  The doubled arrows represent what the monodromy does to the blue and green arcs, and the dotted blue arc is sent to the green arc by the monodromy.
+  As we can see, on this universal cover, the monodromy is a rotation by <span class='MathJax_Preview'>60</span><script type='math/tex'>60</script> degrees clockwise about any of the lifts of the ideal point!</P>
+
+<P>The lattice of lifts of the ideal point can be described as <span class='MathJax_Preview'>\Z[\omega]\subset\C</span><script type='math/tex'>\Z[\omega]\subset\C</script> with <span class='MathJax_Preview'>\omega=e^{\pi i/3}</span><script type='math/tex'>\omega=e^{\pi i/3}</script>, and then the covering map is given by <span class='MathJax_Preview'>\C</span><script type='math/tex'>\C</script> modulo <span class='MathJax_Preview'>\Z[\omega]</span><script type='math/tex'>\Z[\omega]</script> as abelian groups.
+  The action of <span class='MathJax_Preview'>\omega^{-1}</span><script type='math/tex'>\omega^{-1}</script> on <span class='MathJax_Preview'>\C</span><script type='math/tex'>\C</script> by multiplication descends to the quotient, which is a torus.
+  The image of <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script> is fixed by the action and corresponds to the ideal point.</P>
+
+<P>Using the <span class='MathJax_Preview'>\{1,\omega\}</span><script type='math/tex'>\{1,\omega\}</script> coordinate system, the matrix of the <span class='MathJax_Preview'>\omega^{-1}</span><script type='math/tex'>\omega^{-1}</script> action is
+  <div class='MathJax_Preview'><pre>\begin{align*}
+    \begin{bmatrix}
+      1 &amp; 1 \\
+      -1 &amp; 0 \\
+    \end{bmatrix}
+  \end{align*}</pre></div><script type='math/tex; mode=display'>\begin{align*}
+    \begin{bmatrix}
+      1 & 1 \\
+      -1 & 0 \\
+    \end{bmatrix}
+  \end{align*}</script>
+  This can be used as the matrix for the induced action of the monodromy on <span class='MathJax_Preview'>H_1(\Sigma)</span><script type='math/tex'>H_1(\Sigma)</script> for <span class='MathJax_Preview'>\Sigma</span><script type='math/tex'>\Sigma</script> the fiber surface (this is by the duality between <span class='MathJax_Preview'>H_1(\Sigma,\partial\Sigma)</span><script type='math/tex'>H_1(\Sigma,\partial\Sigma)</script> for arcs in the cut set and <span class='MathJax_Preview'>H_1(\Sigma)</span><script type='math/tex'>H_1(\Sigma)</script> via the intersection form).
+  The Alexander polynomial of a fibered knot can be calculated from the characteristic polynomial of the induced action on <span class='MathJax_Preview'>H_1(\Sigma)</span><script type='math/tex'>H_1(\Sigma)</script>, which in this case is the expected <span class='MathJax_Preview'>1-t+t^2</span><script type='math/tex'>1-t+t^2</script>.</P>
+
+<P>The left-handed trefoil knot is similar, but instead the monodromy corresponds to a <span class='MathJax_Preview'>60</span><script type='math/tex'>60</script> degrees counterclockwise rotation.</P>
+
+<P><div class="footnotes"><A NAME="footnote_24_1"></A><div class="footnote">
+<sup><A HREF="./blog_2020_11_13_fibered.html#ref_footnote_24_1">[1]</A></sup> Seifert surfaces are connected by definition.</div>
+</div></P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 13 Nov 2020 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="./index.html">Mathblog</A> > Fibering of the trefoil knot complement
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

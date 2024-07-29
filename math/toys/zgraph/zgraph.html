@@ -1,0 +1,2734 @@
+<!doctype html>
+<html>
+<head>
+<style>
+html, body {
+    margin: 0; padding: 0;
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    overflow: hidden;
+}
+
+#message {
+    position: absolute;
+    padding: 10px;
+    margin: 10px;
+    background: #fefeff;
+    border: 3px solid #66f;
+    border-radius: 5px;
+    
+    display: none;
+    top: 50px;
+    z-index: 999;
+
+}
+
+#error {
+    position: absolute;
+    padding: 10px;
+    margin: 10px;
+    background: #fee;
+    border: 3px solid #f00;
+    border-radius: 5px;
+    
+    display: none;
+    top: 50px;
+    z-index: 999;
+}
+
+  #eqs {
+      position: absolute;
+      top: 3px; right: 2px; left: 2px;
+      height: 45px;
+      width:calc(100% - 4px);
+      font-family: "helvetica neue", "helvetica", "arial", "sans-serif";
+      font-size: 16px;
+      resize: none;
+      box-sizing: border-box;
+      padding-left: 10px;
+  }
+
+  #buttons {
+      position: absolute;
+      right:10px;
+      top: 12px;
+  }
+
+  #eqlist {
+      position: absolute;
+      top: 35px;
+      right: 4px;
+      background: #fff;
+      border: 1px solid #bbb;
+      box-shadow: 2px 0 3px #666;
+      width: 450px;
+      height: 400px;
+      overflow: scroll;
+      z-index: 22;
+  }
+  #mask {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 21;
+  }
+
+    #canvasarea {
+    position: absolute;
+    top: 50px; right: 0; bottom: 0; left: 0;
+    overflow: hidden;
+    cursor: default;
+  }
+  #equations {
+      position: absolute;
+      top: 0; right: 0; height: 50px; left: 0;
+      background: #ddd;
+      background-image: linear-gradient(to bottom, #ddd, #ccc);
+      box-shadow: 2px 0 3px #666;
+      font-family: "helvetica neue", "helvetica", "arial", "sans-serif";
+      font-size: 12px;
+      border-style: solid;
+      border-width: 0 0 1px 0;
+      border-color: #bbb;
+      z-index: 1;
+      overflow: hidden;
+  }
+
+  #controls {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      overflow: hidden;
+  }
+
+</style>
+<script type="text/javascript">
+"use strict";
+
+// Linear algebra stuff.
+
+var Vec2 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(2);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    return v;
+  },
+  sub : function (v, w) {
+    // v <- v + w
+    v[0] -= w[0];
+    v[1] -= w[1];
+    return v;
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec2.dot(v, v));
+    return Vec2.scale(v, 1/len);
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1];
+  },
+  length : function (v) {
+    return Math.sqrt(Vec2.dot(v, v));
+  },
+  dist : function (v, w) {
+    // computes distance between v and w
+    return Math.sqrt(this.dist2(v, w));
+  },
+  dist2 : function (v, w) {
+    // computes squared distance between v and w
+    var dx = v[0] - w[0], dy = v[1] - w[1];
+    return dx*dx + dy*dy;
+  },
+  line_dist2 : function (a, b, pt, /*opt*/between) {
+    // computes the distance between the pt and the line containing a and b
+    var x0 = b[0] - a[0],
+        x1 = b[1] - a[1],
+        p0 = pt[0] - a[0],
+        p1 = pt[1] - a[1];
+    var t = (x0*p0+x1*p1)/Math.sqrt(x0*x0+x1*x1);
+    if (between) {
+      var s = t / Math.sqrt(x0 * x0 + x1 * x1);
+      if (s < 0 || 1 < s) {
+        return Infinity;
+      }
+    }
+    return p0*p0+p1*p1-t*t;
+  },
+  line_intersect : function (a, b, c, d, /*opt*/between) {
+    // line1 passes through a and b. line2 through c and d.  returns the crossing point.
+    // if between is set, then returns the crossing only if it is between both pairs
+    // of points
+    //
+    // (1-t)a +tb = (1-s)c + sd
+    var det = (b[0]-a[0])*(c[1]-d[1])-(b[1]-a[1])*(c[0]-d[0]);
+    if (det === 0) return null;
+    var t = ((c[1]-d[1])*(c[0]-a[0])+(d[0]-c[0])*(c[1]-a[1]))/det,
+        s = ((a[1]-b[1])*(c[0]-a[0])+(b[0]-a[0])*(c[1]-a[1]))/det;
+    if (between && (t < 0 || t > 1 || s < 0 || s > 1))
+      return null;
+    return {t:t,
+            s:s,
+            pt:[(1-t)*a[0]+t*b[0],
+                (1-t)*a[1]+t*b[1]]};
+  },
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+']';
+  }
+};
+var Vec3 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(3);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  createf : function (a, b, c) {
+    var v = new Float32Array(3);
+    v[0] = a;
+    v[1] = b;
+    v[2] = c;
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1] + v[2]*w[2];
+  },
+  length : function (v) {
+    return Math.sqrt(Vec3.dot(v, v));
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec3.dot(v, v));
+    return Vec3.scale(v, 1/len);
+  },
+/*  crossp : function (v, w) {
+    // return cross product of v and w
+    var u = Vec3.create();
+  },*/
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    v[2] *= c;
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    v[2] += w[2];
+    return v;
+  },
+  scale_copy : function (v, c) {
+    return Vec3.scale(Vec3.create(v), c);
+  },
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+', '+v[2].toPrecision(6)+']';
+  }
+};
+var Vec4 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(4);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  createf : function (a, b, c, d) {
+    var v = new Float32Array(4);
+    v[0] = a;
+    v[1] = b;
+    v[2] = c;
+    v[3] = d;
+    return v;
+  },
+  mov : function (v, w) {
+    // v <- w
+    v.set(w);
+    return v;
+  },
+  add : function (v, w) {
+    // v <- v + w
+    v[0] += w[0];
+    v[1] += w[1];
+    v[2] += w[2];
+    v[3] += w[3];
+    return v;
+  },
+  sub : function (v, w) {
+    // v <- v - w
+    v[0] -= w[0];
+    v[1] -= w[1];
+    v[2] -= w[2];
+    v[3] -= w[3];
+    return v;
+  },
+  dot : function (v, w) {
+    return v[0]*w[0] + v[1]*w[1] + v[2]*w[2] + v[3]*w[3];
+  },
+  length : function (v) {
+    return Math.sqrt(Vec4.dot(v, v));
+  },
+  normalize : function (v) {
+    // v <- normalize(v)
+    var len = Math.sqrt(Vec4.dot(v, v));
+    return Vec4.scale(v, 1/len);
+  },
+  scale : function (v, c) {
+    v[0] *= c;
+    v[1] *= c;
+    v[2] *= c;
+    v[3] *= c;
+    return v;
+  },
+
+
+  toString : function (v) {
+    return '['+v[0].toPrecision(6)+', '+v[1].toPrecision(6)+', '+v[2].toPrecision(6)+', '+v[3].toPrecision(6)+']';
+  }
+};
+var Mat3 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(9);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mul : function (A, B) {
+    // A <- A * B
+    var a0, a1, a2;
+    a0 = A[0]; a1 = A[3]; a2 = A[6];
+    A[0] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[3] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[6] = a0*B[6] + a1*B[7] + a2*B[8];
+    a0 = A[1]; a1 = A[4]; a2 = A[7];
+    A[1] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[4] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[7] = a0*B[6] + a1*B[7] + a2*B[8];
+    a0 = A[2]; a1 = A[5]; a2 = A[8];
+    A[2] = a0*B[0] + a1*B[1] + a2*B[2];
+    A[5] = a0*B[3] + a1*B[4] + a2*B[5];
+    A[8] = a0*B[6] + a1*B[7] + a2*B[8];
+    return A;
+  },
+  mulvec : function (w, A, v) {
+    // w <- A * v
+    w[0] = A[0]*v[0]+A[3]*v[1]+A[6]*v[2];
+    w[1] = A[1]*v[0]+A[4]*v[1]+A[7]*v[2];
+    w[2] = A[2]*v[0]+A[5]*v[1]+A[8]*v[2];
+    return w;
+  },
+  toString : function (A) {
+    return '['+A[0].toPrecision(6)+', '+A[3].toPrecision(6)+', '+A[6].toPrecision(6)+']'+'\n'+'['+A[1].toPrecision(6)+', '+A[4].toPrecision(6)+', '+A[7].toPrecision(6)+']'+'\n'+'['+A[2].toPrecision(6)+', '+A[5].toPrecision(6)+', '+A[8].toPrecision(6)+']';
+  }
+};
+var Mat4 = {
+  create : function (/*opt*/src) {
+    var v = new Float32Array(16);
+    if (src !== void 0) {
+      v.set(src);
+    }
+    return v;
+  },
+  mov : function (A, B) {
+    // A <- B
+    A.set(B);
+    return A;
+  },
+  id : function (A) {
+    A.fill(0);
+    A[0] = A[5] = A[10] = A[15] = 1;
+    return A;
+  },
+  zero : function (A) {
+    A.fill(0);
+    return A;
+  },
+  mul : function (A, B) {
+    // A <- A * B
+    var a0, a1, a2, a3;
+    a0 = A[0]; a1 = A[4]; a2 = A[8]; a3 = A[12];
+    A[0] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[4] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[8] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[12] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[1]; a1 = A[5]; a2 = A[9]; a3 = A[13];
+    A[1] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[5] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[9] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[13] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[2]; a1 = A[6]; a2 = A[10]; a3 = A[14];
+    A[2] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[6] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[10] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[14] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    a0 = A[3]; a1 = A[7]; a2 = A[11]; a3 = A[15];
+    A[3] = a0*B[0] + a1*B[1] + a2*B[2] + a3*B[3];
+    A[7] = a0*B[4] + a1*B[5] + a2*B[6] + a3*B[7];
+    A[11] = a0*B[8] + a1*B[9] + a2*B[10] + a3*B[11];
+    A[15] = a0*B[12] + a1*B[13] + a2*B[14] + a3*B[15];
+    return A;
+  },
+  mulvec : function (w, A, v) {
+    // w <- A * v
+    w[0] = A[0]*v[0]+A[4]*v[1]+A[8]*v[2]+A[12]*v[3];
+    w[1] = A[1]*v[0]+A[5]*v[1]+A[9]*v[2]+A[13]*v[3];
+    w[2] = A[2]*v[0]+A[6]*v[1]+A[10]*v[2]+A[14]*v[3];
+    w[3] = A[3]*v[0]+A[7]*v[1]+A[11]*v[2]+A[15]*v[3];
+    return w;
+  },
+  transpose : function (A, B) {
+    // A <- B^T.  A and B may alias.
+    var c;
+    A[0] = B[0];
+    c = B[1]; A[1] = B[4]; A[4] = c;
+    c = B[2]; A[2] = B[8]; A[8] = c;
+    c = B[3]; A[3] = B[12]; A[12] = c;
+    A[5] = B[5];
+    c = B[6]; A[6] = B[9]; A[9] = c;
+    c = B[7]; A[7] = B[13]; A[13] = c;
+    A[10] = B[10];
+    c = B[11]; A[11] = B[14]; A[14] = c;
+    A[15] = B[15];
+    return A;
+  },
+  add : function (A, B) {
+    // A <- A + B
+    A[0] += B[0]; A[1] += B[1]; A[2] += B[2]; A[3] += B[3];
+    A[4] += B[4]; A[5] += B[5]; A[6] += B[6]; A[7] += B[7];
+    A[8] += B[8]; A[9] += B[9]; A[10] += B[10]; A[11] += B[11];
+    A[12] += B[12]; A[13] += B[13]; A[14] += B[14]; A[15] += B[15];
+    return A;
+  },
+  toString : function (A) {
+    return '['+A[0].toPrecision(6)+', '+A[4].toPrecision(6)+', '+A[8].toPrecision(6)+', '+A[12].toPrecision(6)+']'+'\n'+'['+A[1].toPrecision(6)+', '+A[5].toPrecision(6)+', '+A[9].toPrecision(6)+', '+A[13].toPrecision(6)+']'+'\n'+'['+A[2].toPrecision(6)+', '+A[6].toPrecision(6)+', '+A[10].toPrecision(6)+', '+A[14].toPrecision(6)+']'+'\n'+'['+A[3].toPrecision(6)+', '+A[7].toPrecision(6)+', '+A[11].toPrecision(6)+', '+A[15].toPrecision(6)+']';
+  },
+  translate : function (A, v) {
+    // A <- A * translation matrix by v
+    A[12] = A[0]*v[0]+A[4]*v[1]+A[8]*v[2]+A[12];
+    A[13] = A[1]*v[0]+A[5]*v[1]+A[9]*v[2]+A[13];
+    A[14] = A[2]*v[0]+A[6]*v[1]+A[10]*v[2]+A[14];
+    A[15] = A[3]*v[0]+A[7]*v[1]+A[11]*v[2]+A[15];
+    return A;
+  },
+  scale : function (A, v) {
+    // A <- A * scale by v
+    A[0] *= v[0]; A[1] *= v[0]; A[2] *= v[0]; A[3] *= v[0];
+    A[4] *= v[1]; A[5] *= v[1]; A[6] *= v[1]; A[7] *= v[1];
+    A[8] *= v[2]; A[9] *= v[2]; A[10] *= v[2]; A[11] *= v[2];
+    return A;
+  },
+  normalMatrix : function (B, A) {
+    // B <- mat3(A)^(-T).  B is Mat3, A is Mat4
+    var det = (A[0]*(+A[5]*A[10]-A[6]*A[9]) + A[1]*(-A[4]*A[10]+A[6]*A[8])
+               + A[2]*(+A[4]*A[9]-A[5]*A[8]));
+    B[0] = (A[5]*A[10] - A[9]*A[6])/det;
+    B[1] = (A[6]*A[8] - A[10]*A[4])/det;
+    B[2] = (A[4]*A[9] - A[8]*A[5])/det;
+    B[3] = (A[2]*A[9] - A[10]*A[1])/det;
+    B[4] = (A[0]*A[10] - A[8]*A[2])/det;
+    B[5] = (A[1]*A[8] - A[9]*A[0])/det;
+    B[6] = (A[1]*A[6] - A[5]*A[2])/det;
+    B[7] = (A[2]*A[4] - A[6]*A[0])/det;
+    B[8] = (A[0]*A[5] - A[4]*A[1])/det;
+    return B;
+  },
+  rotate : function (A, theta, v) {
+    // A <- A * rotate about v by theta CCW
+    var c = Math.cos(theta), s = Math.sin(theta);
+    var axis = Vec3.normalize(Vec3.create(v));
+    var temp = Vec3.scale_copy(axis, 1 - c);
+
+    if (Mat4.rotate._Rot === void 0) {
+      Mat4.rotate._Rot = Mat4.create();
+    }
+    var Rot = Mat4.zero(Mat4.rotate._Rot); // hooray for no threads
+    Rot[0] = c + temp[0]*axis[0];
+    Rot[1] = 0 + temp[0]*axis[1] + s*axis[2];
+    Rot[2] = 0 + temp[0]*axis[2] - s*axis[1];
+
+    Rot[4] = 0 + temp[1]*axis[0] - s*axis[2];
+    Rot[5] = c + temp[1]*axis[1];
+    Rot[6] = 0 + temp[1]*axis[2] + s*axis[0];
+
+    Rot[8] = 0 + temp[2]*axis[0] + s*axis[1];
+    Rot[9] = 0 + temp[2]*axis[1] - s*axis[0];
+    Rot[10]= c + temp[2]*axis[2];
+
+    Rot[15] = 1;
+
+    return Mat4.mul(A, Rot);
+  },
+  frustum : function (A, w, h, n, f) {
+    A.fill(0);
+    A[0] = 1/w;
+    A[5] = 1/h;
+    A[10] = -2/(f-n);
+    A[14] = (n+f)/(n-f);
+    A[15] = 1;
+    return A;
+  },
+  perspective : function (A, fovy, aspect, zNear, zFar) {
+    A.fill(0);
+    var range = Math.tan((Math.PI * fovy / 180) / 2) * zNear;
+    var width = 2 * range * aspect;
+    var height = 2 * range;
+    A[0] = 2 * zNear / width;
+    A[5] = 2 * zNear / height;
+    A[10] = -(zFar + zNear) / (zFar - zNear);
+    A[11] = -1;
+    A[14] = -(2 * zFar * zNear) / (zFar - zNear);
+    return A;
+  },
+  ortho : function (A, width, height, zNear, zFar) {
+    Mat4.id(A);
+    A[0] = 2 / width;
+    A[5] = 2 / height;
+    A[10] = -2/(zFar - zNear);
+    A[14] = -(zFar + zNear) / (zFar - zNear);
+    return A;
+  },
+  solve : function (A, b) {
+    // solve Ax = b.  Modifies A and b.  Returns solution (stored in b).
+
+    // qr_update
+    for (var j = 1; j <= 4; j++) {
+      for (var i = 4; i >= j+1; i--) {
+        // givens(A[i-2,j-1], A[i-1, j-1])
+        var c, s;
+        (function (a, b) {
+          var tau;
+          if (b === 0) {
+            c = 1; s = 0;
+          } else if (Math.abs(b) > Math.abs(a)) {
+            tau = -a/b; s = 1/Math.sqrt(1+tau*tau); c = s*tau;
+          } else {
+            tau = -b/a; c = 1/Math.sqrt(1+tau*tau); s = c*tau;
+          }
+        })(A[i-2+4*(j-1)], A[i-1+4*(j-1)]);
+        // givens matrix is mat(c, s; -s, c)
+        for (var k = j; k <= 4; k++) {
+          var v0 = A[i-2+4*(k-1)],
+              v1 = A[i-1+4*(k-1)];
+          A[i-2+4*(k-1)] = c*v0-s*v1;
+          A[i-1+4*(k-1)] = s*v0+c*v1;
+        }
+        var b0 = b[i-2],
+            b1 = b[i-1];
+        b[i-2] = c*b0-s*b1;
+        b[i-1] = s*b0+c*b1;
+      }
+    }
+
+    // backsolve
+    b[3] = b[3] / A[3+4*3];
+    for (var i = 3; i >= 1; i--) {
+      var dot = 0.0;
+      for (var j = i; j < 4; j++) {
+        dot += A[i-1+4*j] * b[j];
+      }
+      b[i-1] = (b[i-1] - dot)/A[i-1+4*(i-1)];
+    }
+    return b;
+  },
+};
+
+function MatrixContext(){
+  this.M = Mat4.create();
+  this.Mstack = [];
+  this.V = Mat4.create();
+  this.P = Mat4.create();
+  this.N = Mat3.create();
+  this.temp = Mat4.create();
+  this.reset();
+}
+MatrixContext.prototype.push = function () {
+  this.Mstack.push(this.M.slice());
+};
+MatrixContext.prototype.pop = function () {
+  if (this.Mstack.length === 0) {
+    throw new Error;
+  }
+  this.M = this.Mstack.pop();
+};
+MatrixContext.prototype.withPushed = function (f) {
+  this.push();
+  f();
+  this.pop();
+};
+MatrixContext.prototype.updateN = function () {
+  Mat4.mov(this.temp, this.V);
+  Mat4.mul(this.temp, this.M);
+  return Mat4.normalMatrix(this.N, this.temp);
+};
+MatrixContext.prototype.reset = function () {
+  Mat4.id(this.M);
+  Mat4.id(this.V);
+  Mat4.id(this.P);
+  this.Mstack.length = 0;
+};
+MatrixContext.prototype.debug = function () {
+  console.log("P matrix");
+  console.log(Mat4.toString(this.P));
+  console.log("V matrix");
+  console.log(Mat4.toString(this.V));
+  console.log("M matrix");
+  console.log(Mat4.toString(this.M));
+};
+
+</script>
+<script type="text/javascript">
+"use strict";
+
+// WebGL utilities
+
+function getShader(gl, id) {
+  if (id instanceof WebGLShader) {
+    return id;
+  }
+  if (typeof id !== "string") {
+    throw new Error;
+  }
+  var shaderScript = document.getElementById(id);
+  if (!shaderScript) throw new Error;
+  
+  var source = "";
+  for (var currentChild = shaderScript.firstChild; currentChild; currentChild = currentChild.nextSibling) {
+    if (currentChild.nodeType == currentChild.TEXT_NODE) {
+      source += currentChild.textContent;
+    }
+  }
+  var shader;
+  switch (shaderScript.type) {
+  case "x-shader/x-vertex":
+    shader = gl.createShader(gl.VERTEX_SHADER); break;
+  case "x-shader/x-fragment":
+    shader = gl.createShader(gl.FRAGMENT_SHADER); break;
+  default:
+    throw new Error;
+  }
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error("An error occurred compiling the shader", id);
+    console.error(gl.getShaderInfoLog(shader));
+    throw new Error;
+  }
+  return shader;
+}
+
+function compileProgram(gl, opts) {
+  var shaders = opts.shaders || [];
+  var attributes = opts.attributes || [];
+  var uniforms = opts.uniforms || [];
+  
+  var program = gl.createProgram();
+
+  shaders.forEach(function (shader) {
+    gl.attachShader(program, getShader(gl, shader));
+  });
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error("An error occured linking the program " + shaders.join(' '));
+    console.error(gl.getProgramInfoLog(program));
+    throw new Error;
+  }
+
+  var progobj = {
+    name: "shader("+shaders.map(function (s) { return '"'+s+'"'; }).join(', ')+")",
+    attributes: {},
+    uniforms: {},
+    _in_use: false,
+    use: function (f) {
+      gl.useProgram(program);
+      this._in_use = true;
+      f();
+      gl.useProgram(null);
+      this._in_use = false;
+    },
+    withAttribute: function (attr, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      var loc = this.attributes[attr]();
+      if (loc !== -1) {
+        f(loc);
+      }
+    },
+    withEnabledAttributes: function (attrs, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      attrs.forEach(function (attr) {
+        var loc = this.attributes[attr]();
+        if (loc !== -1) {
+          gl.enableVertexAttribArray(loc);
+        }
+      }, this);
+      f();
+      attrs.forEach(function (attr) {
+        var loc = this.attributes[attr]();
+        if (loc !== -1) {
+          gl.disableVertexAttribArray(loc);
+        }
+      }, this);
+    },
+    withUniform: function (uniform, f) {
+      if (!this._in_use) {
+        throw new Error;
+      }
+      var loc = this.uniforms[uniform]();
+      if (loc !== null) {
+        f(loc);
+      }
+    },
+  };
+
+  attributes.forEach(function (attr) {
+    var loc = gl.getAttribLocation(program, attr);
+    if (loc === -1) {
+      console.log("Warning: no such attribute", attr, "for program", progobj.name);
+    }
+    progobj.attributes[attr] = function () { return loc; };
+  });
+  uniforms.forEach(function (uniform) {
+    var loc = gl.getUniformLocation(program, uniform);
+    if (loc === null) {
+      console.log("Warning: no such uniform", uniform, "for program", progobj.name);
+    }
+    progobj.uniforms[uniform] = function () { return loc; };
+  });
+
+  return progobj;
+}
+
+function makeMesh(gl, data, vertex_usage) {
+  // data has vertices and elements
+  var verts = gl.createBuffer(), elts = gl.createBuffer();
+
+  if (vertex_usage === void 0) {
+    vertex_usage = gl.STATIC_DRAW;
+  }
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, verts);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elts);
+  gl.bufferData(gl.ARRAY_BUFFER, data.vertices, vertex_usage);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.elements, gl.STATIC_DRAW);
+
+  return {
+    bind: function () {
+      gl.bindBuffer(gl.ARRAY_BUFFER, verts);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elts);
+    },
+    drawElements: function(mode) {
+      gl.drawElements(mode, data.elements.length, gl.UNSIGNED_SHORT, 0);
+    }
+  };
+}
+
+
+</script>
+<script type="text/javascript">
+"use strict";
+
+var keys = (function () {
+  var keyCodeMap = [
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', null, null, null, null, null, null,
+    null, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', null, null, null, null, null,
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '+', null, '-', '.', '/',
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, ';', '=', ',', '-', '.', '/',
+    '`', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, '[', '\\', ']', "'", null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+  ];
+
+  var keyShiftCodeMap = [
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', null, null, null, null, null, null,
+    null, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, ':', '+', '<', '_', '>', '?',
+    '~', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, '{', '|', '}', '"', null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+  ];
+
+  var shiftedKey = {"'": '"', '-': '_', ',': '<', '/': '?', '.': '>', '1': '!', '0': ')', '3': '#', '2': '@', '5': '%', '4': '$', '7': '&', '6': '^', '9': '(', '8': '*', ';': ':', '=': '+', '[': '{', ']': '}', '\\': '|', 'a': 'A', '`': '~', 'c': 'C', 'b': 'B', 'e': 'E', 'd': 'D', 'g': 'G', 'f': 'F', 'i': 'I', 'h': 'H', 'k': 'K', 'j': 'J', 'm': 'M', 'l': 'L', 'o': 'O', 'n': 'N', 'q': 'Q', 'p': 'P', 's': 'S', 'r': 'R', 'u': 'U', 't': 'T', 'w': 'W', 'v': 'V', 'y': 'Y', 'x': 'X', 'z': 'Z'};
+
+  keyCodeMap[8] = '<backspace>';
+  keyCodeMap[9] = '<tab>';
+  keyCodeMap[13] = '<return>';
+  keyCodeMap[27] = '<esc>';
+  keyCodeMap[32] = '<space>';
+  keyCodeMap[33] = '<pageup>';
+  keyCodeMap[34] = '<pagedown>';
+  keyCodeMap[35] = '<end>';
+  keyCodeMap[36] = '<home>';
+  keyCodeMap[37] = '<left>';
+  keyCodeMap[38] = '<up>';
+  keyCodeMap[39] = '<right>';
+  keyCodeMap[40] = '<down>';
+  keyCodeMap[45] = '<insert>';
+  keyCodeMap[46] = '<delete>';
+  
+  function translate(e) {
+    if (e.type === "keydown" || e.type === "keyup") {
+      var modifier = [];
+      var key = null;
+      if (e.ctrlKey) { modifier.push("C"); }
+      if (e.altKey || e.metaKey) { modifier.push("M"); }
+      if (e.shiftKey) {
+        key = keyShiftCodeMap[e.keyCode];
+        if (key === null) { modifier.push("S"); }
+      }
+      if (key === null) {
+        key = keyCodeMap[e.keyCode];
+      }
+      if (key !== null) {
+        var chord = modifier.concat(key).join('-');
+        return chord;
+      } else {
+        return null;
+      }
+    } else {
+      throw new Error;
+    }
+  }
+
+  return {
+    translate: translate
+  }
+  
+})();
+
+</script>
+<script type="text/javascript">
+// kq.js - KyleQuery
+
+var Q = (function () {
+
+  function Q(node) {
+    if (node instanceof Q) {
+      return node;
+    } else if (typeof node === "string") {
+      return Q.query(node);
+    } else if (this === window) {
+      return new Q(node);
+    } else if (arguments.length === 0) {
+      this.length = 0;
+    } else if (node === null) {
+      this.length = 0;
+    } else if (node instanceof Element || node === window) {
+      this[0] = node;
+      this.length = 1;
+    } else if (node instanceof NodeList) {
+      this.length = node.length;
+      for (var i = 0; i < node.length; i++) {
+        this[i] = node[i];
+      }
+    } else if (node instanceof Array) {
+      this.length = 0;
+      for (var i = 0; i < node.length; i++) {
+        if (node[i] instanceof Q) {
+          for (var j = 0; j < node[i].length; j++) {
+            this[this.length++] = node[i][j];
+          }
+        } else {
+          this[this.length++] = node[i];
+        }
+      }
+    } else if (typeof node === "function") {
+      this[0] = window;
+      this.length = 1;
+      this.on('load', node);
+    } else {
+      throw new Error("Invalid argument to Q");
+    }
+  }
+  Q.create = function (tagname) {
+    return Q(document.createElement(tagname));
+  };
+  Q.textNode = function (s) {
+    return Q(document.createTextNode(s));
+  };
+  Q.withId = function (id) {
+    return Q(document.getElementById(id));
+  };
+  Q.query = function (q) {
+    return Q(document.querySelectorAll(q));
+  };
+  Q.prototype.append = function (node) {
+    if (node instanceof Q) {
+      node.appendTo(this);
+    } else if (node instanceof Element) {
+      this[0].appendChild(node);
+    } else {
+      this[0].appendChild(document.createTextNode('' + node));
+    }
+    return this;
+  };
+  Q.prototype.appendTo = function (node) {
+    if (node instanceof Q) {
+      node = node[0];
+    }
+    for (var i = 0; i < this.length; i++) {
+      node.appendChild(this[i]);
+    }
+    return this;
+  };
+  Q.prototype.addClass = function (cls) {
+    for (var i = 0; i < this.length; i++) {
+      this[i].classList.add(cls);
+    }
+    return this;
+  };
+  Q.prototype.removeClass = function (cls) {
+    for (var i = 0; i < this.length; i++) {
+      this[i].classList.remove(cls);
+    }
+    return this;
+  };
+  Q.prototype.toggleClass = function (cls, /*opt*/toggle) {
+    for (var i = 0; i < this.length; i++) {
+      if (arguments.length >= 2) {
+        this[i].classList.toggle(cls, toggle);
+      } else {
+        this[i].classList.toggle(cls);
+      }
+    }
+    return this;
+  };
+  Q.prototype.on = function (event, handler, useCapture) {
+    var events = event.split(' ');
+    for (var j = 0; j < events.length; j++) {
+      if (events[j] !== '') {
+        for (var i = 0; i < this.length; i++) {
+          this[i].addEventListener(events[j], handler, !!useCapture);
+        }
+      }
+    }
+    return this;
+  };
+  Q.prototype.off = function (event, handler) {
+    var events = event.split(' ');
+    for (var j = 0; j < events.length; j++) {
+      if (events[j] !== '') {
+        for (var i = 0; i < this.length; i++) {
+          this[i].removeEventListener(events[j], handler);
+        }
+      }
+    }
+    return this;    
+  };
+  Q.prototype.empty = function () {
+    for (var i = 0; i < this.length; i++) {
+      var node = this[i];
+      while (node.firstChild) {
+        node.removeChild(node.firstChild);
+      }
+    }
+    return this;
+  };
+  Q.prototype.prop = function (k, /*opt*/v) {
+    if (arguments.length === 1) {
+      return this[0][k];
+    } else {
+      for (var i = 0; i < this.length; i++) {
+        this[i][k] = v;
+      }
+      return this;
+    }
+  };
+  Q.prototype.value = function (/*opt*/v) {
+    if (arguments.length === 0) {
+      return this[0].value;
+    } else {
+      for (var i = 0; i < this.length; i++) {
+        this[i].value = v;
+      }
+      return this;
+    }
+  };
+  Q.prototype.css = function (k, /*opt*/v) {
+    if (arguments.length === 1) {
+      return this[0].style[k];
+    } else {
+      for (var i = 0; i < this.length; i++) {
+        this[i].style[k] = v;
+      }
+      return this;
+    }
+  };
+
+  function tag(tagname) {
+    Q[tagname] = function () {
+      var t = Q.create(tagname);
+      if (arguments.length > 0) {
+        for (var i = 0; i < arguments.length; i++) {
+          t.append(arguments[i]);
+        }
+      }
+      return t;
+    };
+  }
+
+  tag('div'); tag('span');
+  tag('p');
+  tag('ol'); tag('ul'); tag('li');
+  tag('sup');
+  tag('a');
+
+  return Q;
+})();
+
+</script>
+<script type="text/javascript">
+/*global Vec2, Vec3, Vec4, Mat3, Mat4, MatrixContext */
+/*global compileProgram, makeMesh */
+/*global keys*/
+
+"use strict";
+
+var save_url = "https://math.berkeley.edu/~kmill/cgi/zgraph_save.php"; // eqn
+var load_url = "https://math.berkeley.edu/~kmill/cgi/zgraph_equations.txt";
+
+var eqn_list = [
+  "1-z^6",
+  "sin(sin(sin(sin(sin(sin(sin(sin(z))))))))",
+  "(1-z^6)/(e^(i t) - z^5)",
+];
+
+var shader_template = "\n\
+#version 100\n\
+precision mediump float;\n\
+varying vec2 v_uv;\n\
+uniform float u_t;\n\
+uniform float u_s;\n\
+uniform float u_vt;\n\
+uniform float u_vs;\n\
+uniform float u_zoom;\n\
+\n\
+const float pi = 3.141592653589793;\n\
+vec3 hsv2rgb(vec3 c)\n\
+{ // taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl\n\
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n\
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n\
+  vec3 res = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n\
+  //float sum = res.x + res.y + res.z;\n\
+  return res;// * c.z / sum;\n\
+}\n\
+\n\
+void main(void) {\n\
+  vec2 z = v_uv*u_zoom;\n\
+\n\
+  $GENERATED_CODE\n\
+\n\
+  float theta = atan(res.y, res.x) - u_t;\n\
+  float mag = mod(2.0*log(length(res))+0.5-u_s, 1.0)-0.5;\n\
+  //float mag = mod(length(res), 1.0)-0.5;\n\
+  float mags = smoothstep(0.02, 0.05, abs(mag));\n\
+\n\
+  gl_FragColor = vec4(hsv2rgb(vec3(theta / (2.0 * pi) , 1.0, 0.7+0.3*mags)), 1.0);\n\
+  //gl_FragColor = vec4(v_uv.x, v_uv.y, 1.0, 1.0);\n\
+}\n\
+";
+
+var sphere_template = "\n\
+#version 100\n\
+precision mediump float;\n\
+varying vec3 v_norm;\n\
+varying vec3 v_cpos;\n\
+varying vec3 v_mpos;\n\
+varying vec3 v_pos;\n\
+uniform float u_t;\n\
+uniform float u_s;\n\
+uniform float u_vt;\n\
+uniform float u_vs;\n\
+\n\
+const float pi = 3.141592653589793;\n\
+vec3 hsv2rgb(vec3 c)\n\
+{ // taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl\n\
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n\
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n\
+  vec3 res = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n\
+  //float sum = res.x + res.y + res.z;\n\
+  return res;// * c.z / sum;\n\
+}\n\
+\n\
+void main(void) {\n\
+  vec3 pos = normalize(v_pos);\n\
+  vec2 z = pos.xy / (1.0+pos.z);\n\
+\n\
+  $GENERATED_CODE\n\
+\n\
+  float theta = atan(res.y, res.x) - u_t;\n\
+  float mag = mod(2.0*log(length(res))+0.5-u_s, 1.0)-0.5;\n\
+  //float mag = mod(length(res), 1.0)-0.5;\n\
+  float mags = smoothstep(0.02, 0.05, abs(mag));\n\
+\n\
+  float spec = pow(max(0.0, dot(normalize(v_norm), normalize(vec3(1.0,2.0,2.0)))), 26.0);\n\
+  gl_FragColor = vec4(hsv2rgb(vec3(theta / (2.0 * pi) , 1.0*(1.0-spec), 0.7+0.3*mags)), 1.0);\n\
+  //gl_FragColor = vec4(v_uv.x, v_uv.y, 1.0, 1.0);\n\
+}\n\
+";
+
+document.addEventListener("DOMContentLoaded", function () {
+  window.main = new Main();
+  window.main.run();
+}, false);
+
+function error(msg) {
+  var err = document.getElementById("error");
+  while (err.hasChildNodes()) {
+    err.removeChild(err.firstChild);
+  }
+  err.appendChild(document.createTextNode("Error: " + msg));
+  err.style.display = "block";
+}
+
+function message(txt) {
+  var msg = document.getElementById("message");
+  while (msg.hasChildNodes()) {
+    msg.removeChild(msg.firstChild);
+  }
+  msg.appendChild(document.createTextNode(txt));
+  msg.style.display = "block";
+}
+function hideMessage() {
+  document.getElementById("message").style.display = "none";
+}
+function hideError() {
+  document.getElementById("error").style.display = "none";
+}
+
+function Main() {
+  this.zoomLevel = 4;
+}
+Main.prototype.initialize = function () {
+  var canvas = this.canvas = document.getElementById("canvas");
+  try {
+    var gl = canvas.getContext("webgl", {stencil:true})
+          || canvas.getContext("experimental-webgl", {stencil:true});
+  } catch (e) {}
+  if (!gl) {
+    error("Unable to initialize WebGL.  Your browser might not support it.");
+    return;
+  }
+
+  this.attachMouse();
+  this.attachKeyboard();
+
+  window.addEventListener("resize", this.resize.bind(this), false);
+  this.resize();
+
+  this.zoomFactor = 1.1;
+  document.getElementById("minus").addEventListener("click", (e) => {
+    this.zoom(this.zoomFactor);
+  }, false);
+  document.getElementById("plus").addEventListener("click", (e) => {
+    this.zoom(1/this.zoomFactor);
+  }, false);
+
+  document.getElementById("eqs").addEventListener("change", (e) => {
+    eq_update();
+  }, false);
+  function eq_update() {
+    hideError();
+    var s = Q("#eqs").value();
+    parse(Q("#eqs").value());
+  }
+
+  document.getElementById("mask").style.display = "none";
+  document.getElementById("eqlist").style.display = "none";
+  document.getElementById("loadbutton").addEventListener("click", (e) => {
+    document.getElementById("mask").style.display = "block";
+    document.getElementById("eqlist").style.display = "block";
+    var req = new XMLHttpRequest();
+    req.addEventListener("load", function () {
+      var _eqns = this.responseText.split("\n");
+      var eqns = [];
+      _eqns.forEach(eqn => {
+        eqn = eqn.trim();
+        if (eqn !== "") {
+          if (eqns.indexOf(eqn) === -1) {
+            eqns.push(eqn);
+          }
+        }
+      });
+      console.log(eqns);
+      var $list = Q("#eqlist");
+      $list.empty();
+      var $ul = Q.ul().appendTo($list);
+      eqns.forEach(eqn => {
+        var $entry = Q.a(eqn).prop("href", "#").appendTo(Q.li().appendTo($ul));
+        $entry.on("click", (e) => {
+          e.preventDefault();
+          Q("#eqs").value(eqn);
+          eq_update();
+        });
+      });
+    });
+    req.open("GET", load_url + "?blah="+(new Date()).getTime());
+    req.send();
+  }, false);
+  document.getElementById("mask").addEventListener("click", (e) => {
+    document.getElementById("mask").style.display = "none";
+    document.getElementById("eqlist").style.display = "none";
+  }, false);
+
+  document.getElementById("savebutton").addEventListener("click", (e) => {
+    var req = new XMLHttpRequest();
+    req.open("POST", save_url, true);
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    req.send("eqn="+encodeURIComponent(document.getElementById("eqs").value));
+  }, false);
+
+  var parse = (s) => {
+    try {
+      var code = expr_compile(expr_parse(s));
+      var codef = shader_template.replace("$GENERATED_CODE", code.join("\n  "));
+      var codesph = sphere_template.replace("$GENERATED_CODE", code.join("\n  "));
+      console.log(codef);
+
+      var fshader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fshader, codef);
+      gl.compileShader(fshader);
+      if (!gl.getShaderParameter(fshader, gl.COMPILE_STATUS)) {
+        console.error("An error occurred compiling the shader");
+        console.error(gl.getShaderInfoLog(fshader));
+        throw new Error("An error occurred compiling the shader");
+      }
+
+      var sph_shader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(sph_shader, codesph);
+      gl.compileShader(sph_shader);
+      if (!gl.getShaderParameter(sph_shader, gl.COMPILE_STATUS)) {
+        console.error("An error occurred compiling the shader");
+        console.error(gl.getShaderInfoLog(sph_shader));
+        throw new Error("An error occurred compiling the shader");
+      }
+      
+      this.fshader = fshader;
+      this.sph_shader = sph_shader;
+      this.fshader_dirty = true;
+    } catch (x) {
+      error(""+x);
+      throw x;
+    }
+  };
+  eq_update();
+
+  this.canvas = canvas;
+  this.gl = gl;
+};
+
+Main.prototype.run = function () {
+  this.initialize();
+
+  var canvas = this.canvas,
+      gl = this.gl;
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+//  gl.enable(gl.CULL_FACE);
+//  gl.cullFace(gl.BACK);
+  //  gl.frontFace(gl.CCW);
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  var polyp = compileProgram(gl, {
+    shaders:["billboard.vert","poly.frag"],
+    attributes:["a_pos", "a_uv"],
+    uniforms:["u_P", "u_M", "u_c", "u_t", "u_s", "u_zoom"]
+  });
+  var funp = null;
+  var sphp = null;
+  var diskp = compileProgram(gl, {
+    shaders:["billboard.vert","line.frag"],
+    attributes:["a_pos"],
+    uniforms:["u_P", "u_M", "u_color"]
+  });
+  var linep = compileProgram(gl, {
+    shaders:["line.vert","line.frag"],
+    attributes:["a_pos"],
+    uniforms:["u_P", "u_M", "u_color"]
+  });
+  var circlep = compileProgram(gl, {
+    shaders:["circle.vert","line.frag"],
+    attributes:["a_theta"],
+    uniforms:["u_P", "u_M", "u_c", "u_r", "u_color", "u_zoom"]
+  });
+
+  var billboard = makeMesh(gl, make_billboard());
+  var circle = makeMesh(gl, make_circle());
+  var disk = makeMesh(gl, make_disk());
+  var sphere = makeMesh(gl, make_icosahedron(6));
+
+  var trans = new MatrixContext();
+  this.trans = trans;
+
+  this.camera = Mat4.id(Mat4.create());
+  this.camera_tmp = Mat4.id(Mat4.create());
+
+  this.circ_rad = 1.0;
+  this.mousePt = [1.0, 0.0];
+
+  var last_t = null;
+  this.t = 0;
+  this.s = 0;
+  this.vt = 0;
+  this.vs = 0;
+  this.dt = 0.000;
+  this.ds = 0.000;
+  this.dvt = 0.000;
+  this.dvs = 0.000;
+
+  function draw(t) {
+
+    if (last_t === null) {
+      last_t = t;
+    }
+    this.t += this.dt * (t - last_t);
+    this.s += this.ds * (t - last_t);
+    this.vt += this.dvt * (t - last_t);
+    this.vs += this.dvs * (t - last_t);
+    last_t = t;
+
+    if (this.fshader_dirty) {
+      funp = compileProgram(gl, {
+        shaders:["billboard.vert", this.fshader],
+        attributes:["a_pos", "a_uv"],
+        uniforms:["u_P", "u_M", "u_t", "u_s", "u_zoom", "u_vt", "u_vs"]
+      });
+      sphp = compileProgram(gl, {
+        shaders:["sphere.vert", this.sph_shader],
+        attributes:["a_pos", "a_norm"],
+        uniforms:["u_P", "u_V", "u_M", "u_N", "u_t", "u_s", "u_vt", "u_vs"]
+      });
+      this.fshader_dirty = false;
+      this.vt = 0;
+      this.vs = 0;
+
+    }
+    
+    trans.reset();
+
+    var ratio = this.canvas.width / this.canvas.height;
+    Mat4.ortho(trans.P, ratio*2, 2, -1.0, 1.0);
+    Mat4.translate(trans.P, [-ratio, -1, 0]);
+    Mat4.id(trans.M);
+
+    /******* Render main stuff **********/
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.clearColor(1.0, 0.9, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    trans.withPushed(() => {
+/*      Mat4.translate(trans.M, [0,2-ratio,0]);
+      Mat4.scale(trans.M, [ratio/2,ratio/2,1]);
+      Mat4.translate(trans.M, [1,1,0]);*/
+
+      Mat4.translate(trans.M, [1,1,0]);
+
+      this.mouseCplx = (x, y) => {
+        var xc = x/this.canvas.width,
+            yc = 1.0-y/this.canvas.height;
+        var x0 = xc*2,
+            y0 = yc*2/ratio;
+        return [8*(x0-0.5),
+                -8*(y0-0.5)];
+      };
+
+      gl.enable(gl.STENCIL_TEST);
+      gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+      gl.stencilMask(0xFF);
+      gl.clear(gl.STENCIL_BUFFER_BIT);
+
+      funp.use(() => {
+        funp.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+        funp.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+        funp.withUniform("u_t", u_t => gl.uniform1f(u_t, this.t));
+        funp.withUniform("u_s", u_s => gl.uniform1f(u_s, this.s));
+        funp.withUniform("u_vt", u_vt => gl.uniform1f(u_vt, this.vt));
+        funp.withUniform("u_vs", u_vs => gl.uniform1f(u_vs, this.vs));
+        funp.withUniform("u_zoom", u_zoom => gl.uniform1f(u_zoom, this.zoomLevel));
+        billboard.bind();
+        funp.withAttribute("a_pos", a_pos =>
+                            gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, 5*4, 0));
+        funp.withAttribute("a_uv", a_uv =>
+                            gl.vertexAttribPointer(a_uv, 2, gl.FLOAT, false, 5*4, 3*4));
+        funp.withEnabledAttributes(["a_pos", "a_uv"], () =>
+                                    billboard.drawElements(gl.TRIANGLES));
+      });
+
+      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+      gl.stencilMask(0x00);
+
+/*      circlep.use(() => {
+        circlep.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+        circlep.withUniform("u_c", u_c => gl.uniform2fv(u_c, idpoly));
+        circlep.withUniform("u_color", u_color => gl.uniform4f(u_color, 0, 0, 0, 1));
+        circlep.withUniform("u_r", u_r => gl.uniform1f(u_r, this.circ_rad));
+        circlep.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+        circlep.withUniform("u_zoom", u_zoom => gl.uniform1f(u_zoom, 4.0));
+        circle.bind();
+        circlep.withAttribute("a_theta", a_theta =>
+                              gl.vertexAttribPointer(a_theta, 1, gl.FLOAT, false, 1*4, 0));
+        circlep.withEnabledAttributes(["a_theta"], () =>
+                                      circle.drawElements(gl.LINE_LOOP));
+      });*/
+
+/*      trans.withPushed(() => {
+        Mat4.scale(trans.M, [0.25, 0.25, 1.0]);
+        Mat4.translate(trans.M, [this.mousePt[0], this.mousePt[1], 0]);
+        Mat4.scale(trans.M, [0.1, 0.1, 1.0]);
+        diskp.use(() => {
+          diskp.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+          diskp.withUniform("u_color", u_color => gl.uniform4f(u_color, 0, 0, 0, 1));
+          diskp.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+          disk.bind();
+          diskp.withAttribute("a_pos", a_pos =>
+                              gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, 3*4, 0));
+          diskp.withEnabledAttributes(["a_pos"], () =>
+                                      disk.drawElements(gl.TRIANGLES));
+        });
+      });*/
+
+      gl.disable(gl.STENCIL_TEST);
+
+    });
+
+    if (this.mouseState === "rotate") {
+      Mat4.id(this.camera_tmp);
+      Mat4.rotate(this.camera_tmp, 0.0001 * (this.mousePt[0] - this.mouseStart[0]), [0, 1, 0]);
+      Mat4.rotate(this.camera_tmp, 0.0001 * (this.mousePt[1] - this.mouseStart[1]), [-1, 0, 0]);
+      Mat4.mul(this.camera_tmp, this.camera);
+      Mat4.mov(this.camera, this.camera_tmp);
+    }
+
+    trans.withPushed(() => {
+      Mat4.translate(trans.M, [ratio,2-ratio,0]);
+      Mat4.scale(trans.M, [ratio/2,ratio/2,1]);
+      Mat4.translate(trans.M, [1,1,0]);
+      Mat4.scale(trans.M, [0.9, 0.9, 0.9]);
+
+      Mat4.mul(trans.M, this.camera);
+
+      gl.enable(gl.STENCIL_TEST);
+      gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
+      gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+      gl.stencilMask(0xFF);
+      gl.clear(gl.STENCIL_BUFFER_BIT);
+
+      sphp.use(() => {
+        sphp.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+        sphp.withUniform("u_V", u_V => gl.uniformMatrix4fv(u_V, false, trans.V));
+        sphp.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+        sphp.withUniform("u_N", u_N => gl.uniformMatrix3fv(u_N, false, trans.updateN()));
+
+        sphp.withUniform("u_t", u_t => gl.uniform1f(u_t, this.t));
+        sphp.withUniform("u_s", u_s => gl.uniform1f(u_s, this.s));
+        sphp.withUniform("u_vt", u_vt => gl.uniform1f(u_vt, this.vt));
+        sphp.withUniform("u_vs", u_vs => gl.uniform1f(u_vs, this.vs));
+        sphere.bind();
+        sphp.withAttribute("a_pos", a_pos =>
+                            gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, 6*4, 0));
+        sphp.withAttribute("a_norm", a_norm =>
+                            gl.vertexAttribPointer(a_norm, 3, gl.FLOAT, false, 6*4, 3*4));
+        sphp.withEnabledAttributes(["a_pos", "a_norm"], () =>
+                                    sphere.drawElements(gl.TRIANGLES));
+      });
+
+
+/*      polyp.use(() => {
+        polyp.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+        polyp.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+        polyp.withUniform("u_c", u_c => gl.uniform2fv(u_c, idpoly));
+        polyp.withUniform("u_t", u_t => gl.uniform1f(u_t, this.t));
+        polyp.withUniform("u_s", u_s => gl.uniform1f(u_s, this.s));
+        polyp.withUniform("u_zoom", u_zoom => gl.uniform1f(u_zoom, this.zoomLevel));
+        billboard.bind();
+        polyp.withAttribute("a_pos", a_pos =>
+                            gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, 5*4, 0));
+        polyp.withAttribute("a_uv", a_uv =>
+                            gl.vertexAttribPointer(a_uv, 2, gl.FLOAT, false, 5*4, 3*4));
+        polyp.withEnabledAttributes(["a_pos", "a_uv"], () =>
+                                    billboard.drawElements(gl.TRIANGLES));
+      });*/
+
+      gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+      gl.stencilMask(0x00);
+
+/*      circlep.use(() => {
+        circlep.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+        circlep.withUniform("u_c", u_c => gl.uniform2fv(u_c, poly));
+        circlep.withUniform("u_color", u_color => gl.uniform4f(u_color, 0, 0, 0, 1));
+        circlep.withUniform("u_r", u_r => gl.uniform1f(u_r, this.circ_rad));
+        circlep.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+        circlep.withUniform("u_zoom", u_zoom => gl.uniform1f(u_zoom, this.zoomLevel));
+        circle.bind();
+        circlep.withAttribute("a_theta", a_theta =>
+                              gl.vertexAttribPointer(a_theta, 1, gl.FLOAT, false, 1*4, 0));
+        circlep.withEnabledAttributes(["a_theta"], () =>
+                                      circle.drawElements(gl.LINE_LOOP));
+      });*/
+
+/*      trans.withPushed(() => {
+
+        var px = 0.0, py = 0.0;
+        var zx = this.mousePt[0], zy = this.mousePt[1];
+        for (var i = poly.length - 2; i >= 0; i-=2) {
+          var px2 = poly[i] + px*zx - py*zy,
+              py2 = poly[i+1] + px*zy + py*zx;
+          px = px2;
+          py = py2;
+        }
+
+        Mat4.scale(trans.M, [1/this.zoomLevel, 1/this.zoomLevel, 1.0]);
+        Mat4.translate(trans.M, [px, py, 0]);
+        Mat4.scale(trans.M, [0.1*this.zoomLevel/4, 0.1*this.zoomLevel/4, 1.0]);
+        diskp.use(() => {
+          diskp.withUniform("u_P", u_P => gl.uniformMatrix4fv(u_P, false, trans.P));
+          diskp.withUniform("u_color", u_color => gl.uniform4f(u_color, 0, 0, 0, 1));
+          diskp.withUniform("u_M", u_M => gl.uniformMatrix4fv(u_M, false, trans.M));
+          disk.bind();
+          diskp.withAttribute("a_pos", a_pos =>
+                              gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, 3*4, 0));
+          diskp.withEnabledAttributes(["a_pos"], () =>
+                                      disk.drawElements(gl.TRIANGLES));
+        });
+      });*/
+
+      gl.disable(gl.STENCIL_TEST);
+
+    });
+
+    window.requestAnimationFrame(draw_bound);
+  }
+  var draw_bound = draw.bind(this);
+  window.requestAnimationFrame(draw_bound);
+};
+
+Main.prototype.resize = function () {
+  var dim = this.canvas.parentElement.getBoundingClientRect();
+  this.canvas.width = dim.width;
+  this.canvas.height = dim.height;
+};
+Main.prototype.attachMouse = function () {
+  this.canvas.addEventListener("mousedown", e => {
+    this.canvas.focus();
+    e.stopPropagation();
+    e.preventDefault();
+    var rect = this.canvas.getBoundingClientRect();
+    this.mouse(e.buttons, e.pageX - rect.left, this.canvas.height-(e.pageY - rect.top), 0);
+  });
+  this.canvas.addEventListener("mouseup", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    var rect = this.canvas.getBoundingClientRect();
+    this.mouse(e.buttons, e.pageX - rect.left, this.canvas.height-(e.pageY - rect.top), 0);
+  });
+  this.canvas.addEventListener("mousemove", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    var rect = this.canvas.getBoundingClientRect();
+    this.mouse(e.buttons, e.pageX - rect.left, this.canvas.height-(e.pageY - rect.top), 0);
+  });
+  this.canvas.addEventListener("contextmenu", e => {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+  this.canvas.addEventListener("wheel", e => {
+    this.canvas.focus();
+    e.stopPropagation();
+    e.preventDefault();
+    var scroll = e.deltaY;
+    if (e.deltaMode === 1) {
+      scroll *= 16;
+    } else if (e.deltaMode === 2) {
+      scroll *= this.canvas.height;
+    }
+    var rect = this.canvas.getBoundingClientRect();
+    this.mouse(e.buttons, e.pageX - rect.left, this.canvas.height-(e.pageY - rect.top), scroll);
+  });
+
+  this.mouseState = "none";
+};
+Main.prototype.attachKeyboard = function () {
+  this.downkeys = {};
+  
+  this.canvas.tabIndex = 1;
+  this.canvas.focus();
+  this.canvas.addEventListener("keydown", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    var code = keys.translate(e);
+    if (code) {
+      this.downkeys[code] = true;
+      this.keyboard(code);
+    }
+  });
+  this.canvas.addEventListener("keyup", e => {
+    var code = keys.translate(e);
+    if (code) {
+      this.downkeys[code] = false;
+    }
+  });
+};
+
+Main.prototype.mouse = function (buttons, x, y, scroll) {
+  //console.log("mouse", buttons, x, y);
+  if (buttons & 1) {
+    if (this.mouseState === "rotate") {
+      this.mousePt = [x, y];
+    } else {
+      this.mouseState = "rotate";
+      this.mousePt = this.mouseStart = [x, y];
+    }
+  } else {
+    this.mouseState = "none";
+  }
+};
+
+Main.prototype.keyboard = function (code) {
+  if (code === "<right>") {
+    this.dt += 0.0002;
+  }
+  if (code === "<left>") {
+    this.dt -= 0.0002;
+  }
+  if (code === "<up>") {
+    this.ds += 0.0002;
+  }
+  if (code === "<down>") {
+    this.ds -= 0.0002;
+  }
+  if (code === "S-<right>") {
+    this.dvt += 0.0002;
+  }
+  if (code === "S-<left>") {
+    this.dvt -= 0.0002;
+  }
+  if (code === "S-<up>") {
+    this.dvs += 0.0002;
+  }
+  if (code === "S-<down>") {
+    this.dvs -= 0.0002;
+  }
+};
+
+Main.prototype.zoom = function (factor) {
+  this.zoomLevel *= factor;
+};
+
+function make_billboard() {
+  var array = [
+    -1, -1, 0,   -1, -1,
+    1, -1, 0,   1, -1,
+    1, 1, 0,   1, 1,
+    -1, 1, 0,  -1, 1
+  ];
+  var elts = [
+    0, 1, 2,
+    0, 2, 3
+  ];
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+function make_circle() {
+  var array = [];
+  var elts = [];
+  var steps = 1024;
+  for (var i = 0; i < steps; i++) {
+    var theta = 2 * Math.PI * i / steps;
+    array.push(theta);
+    elts.push(i);
+  }
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+function make_disk() {
+  var array = [];
+  var elts = [];
+  var steps = 32;
+  array.push(0, 0, 0);
+  for (var i = 0; i < steps; i++) {
+    var theta = 2*Math.PI*i/steps;
+    array.push(Math.cos(theta), Math.sin(theta), 0);
+    elts.push(0, i+1, i+1 === steps ? 1 : i+2);
+  }
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+function make_grid() {
+  var array = [];
+  var elts = [];
+
+  var color = [0, 0, 0];
+  var seen_pts = {};
+  var next_idx = 0;
+  function pt(p) {
+    p = p.concat(color);
+    if (!seen_pts.hasOwnProperty(p)) {
+      var idx = next_idx++;
+      seen_pts[p] = idx;
+      array.push.apply(array, p);
+    }
+    return seen_pts[p];
+  }
+
+  var d = 1;
+  var w = 10;
+
+  color = [0.5, 0.5, 0.5];
+  for (var i = -d*w; i <= d*w; i++) {
+    for (var j = -d*w; j <= d*w; j++) {
+      var p00 = pt([i/d, j/d, 0]),
+          p10 = pt([(i+1)/d, j/d, 0]),
+          p01 = pt([i/d, (j+1)/d, 0]),
+          p11 = pt([(i+1)/d, (j+1)/d, 0]);
+      if (i < d*w && !(j == 0 && 0 <= i && i < d)) {
+        elts.push(p00, p10);
+      }
+      if (j < d*w && !(i == 0 && 0 <= j && j < d)) {
+        elts.push(p00, p01);
+      }
+    }
+  }
+  color = [0.8, 0, 0];
+  elts.push(pt([0, 0, 0]),
+            pt([1, 0, 0]));
+  elts.push(pt([1, 0, 0]),
+            pt([0.85, 0.1, 0]));
+  elts.push(pt([1, 0, 0]),
+            pt([0.85, -0.1, 0]));
+  color = [0, 0.8, 0];
+  elts.push(pt([0, 0, 0]),
+            pt([0, 1, 0]));
+  elts.push(pt([0, 1, 0]),
+            pt([0.1, 0.85, 0]));
+  elts.push(pt([0, 1, 0]),
+            pt([-0.1, 0.85, 0]));
+  return {vertices:new Float32Array(array),
+          elements:new Uint16Array(elts)};
+}
+
+
+function make_text_sheet(gl) {
+  var px = 24;
+  var canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 1024;
+  var ctxt = canvas.getContext("2d");
+  ctxt.font = ""+px+"px sans-serif";
+  for (var i = 0x0; i < 255; i++) {
+    var x = 10+(i % 16) * (px*2);
+    var y = 10+(1+Math.floor(i/16)) * (px*2);
+    var s = String.fromCharCode(i);
+    ctxt.fillStyle = "#000";
+    var width = ctxt.measureText(s).width;
+    if (i >= 0x20) {
+      ctxt.fillText(s, x, y);
+    } else {
+      width = 0;
+    }
+
+    ctxt.fillStyle = "rgba("+(Math.ceil(255*width/px))+",0,0,255)";
+    ctxt.fillRect(i, 0, 1, 1);
+  }
+  //document.body.appendChild(canvas);
+
+  var tex = gl.createTexture();
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+
+  return {texture:tex,
+          size:px};
+}
+
+function mk_str_bs(s) {
+  s = ""+s;
+  var n = [0x0, 0x0, 0x0, 0x0];
+  for (var i = 0; i < s.length && i < 4; i++) {
+    n[i] = s.charCodeAt(i);
+  }
+  return n;
+}
+
+function expr_tokenize(text) {
+  var i = 0;
+  var tokens = [];
+  while (i < text.length) {
+    var c = text.charCodeAt(i);
+    if (c <= 32) {
+      i++;
+    } else if (text[i] === '*') {
+      if (text[i+1] === '*') {
+        tokens.push({type:"**"});
+        i+=2;
+      } else {
+        tokens.push({type:"*"});
+        i++;
+      }
+    } else if (text[i] === '('
+               || text[i] === ')'
+               || text[i] === '+'
+               || text[i] === '-'
+               || text[i] === '^'
+               || text[i] === '/'
+               || text[i] === ',') {
+      tokens.push({type:text[i]});
+      i++;
+    } else if (0x41 <= c && c <= 0x5A || 0x61 <= c && c <= 0x7A) {
+      var s = text[i++];
+      while (i < text.length) {
+        c = text.charCodeAt(i);
+        if ((0x41 <= c && c <= 0x5A) || (0x61 <= c && c <= 0x7A)) {
+          s += text[i++];
+        } else {
+          break;
+        }
+      }
+      if (s === "then") {
+        tokens.push({type:"then"});
+      } else if (s === "iterate") {
+        tokens.push({type:"iterate"});
+      } else if (s === "iterateprod") {
+        tokens.push({type:"iterateprod"});
+      } else if (s === "iteratesum") {
+        tokens.push({type:"iteratesum"});
+      } else {
+        tokens.push({type:"id",value:s});
+      }
+    } else if (48 <= c && c <= 57 || c === 46) {
+      var s = text[i++];
+      while (i < text.length) {
+        c = text.charCodeAt(i);
+        if (48 <= c && c <= 57 || c === 46) {
+          s += text[i++];
+        } else {
+          break;
+        }
+      }
+      if (+s !== parseFloat(s)) {
+        throw new Error("Invalid number '" + s + "'");
+      }
+      tokens.push({type:"num",value:+s});
+    } else {
+      throw new Error("Unexpected character " + text[i]);
+    }
+  }
+  return tokens;
+}
+
+function mk_const(r, i) {
+  return {
+    type:"const",
+    r:r, i:i
+  };
+}
+function cneg(c) {
+  if (!c.type === "const") throw new Error;
+  return mk_const(-c.r, -c.i);
+}
+function csum(a, b) {
+  if (!a.type === "const" || !b.type === "const") throw new Error;
+  return mk_const(a.r+b.r, a.i+b.i);
+}
+function cprod(a, b) {
+  if (!a.type === "const" || !b.type === "const") throw new Error;
+  return mk_const(a.r*b.r-a.i*b.i, a.r*b.i+a.i*b.r);
+}
+function mk_sign(pos, x) {
+  if (pos) {
+    return x;
+  } else {
+    switch (x.type) {
+    case "const": return cneg(x);
+    default: return {type:"neg", x:x};
+    }
+  }
+}
+function mk_op2(op, a, b) {
+  var m;
+  if (a.type === "const" && b.type === "const") {
+    switch (op) {
+    case "+": return csum(a, b);
+    case "-": return csum(a, cneg(b));
+    case "*": return cprod(a, b);
+    case "/":
+      m = b.r*b.r + b.i*b.i;
+      return cprod(a, mk_const(b.r/m, -b.i/m));
+    case "^":
+      m = cprod(mk_const(Math.log(a.r*a.r + a.i*a.i)/2, Math.atan2(a.i, a.r)), b);
+      return mk_const(Math.exp(m.r)*Math.cos(m.i), Math.exp(m.r)*Math.sin(m.i));
+    default: throw new Error;
+    }
+  } else if (op === "+") {
+    return {type:"+", x:a, y:b};
+  } else if (op === "-") {
+    return {type:"-", x:a, y:b};
+  } else if (op === "*") {
+    return {type:"*", x:a, y:b};
+  } else if (op === "/") {
+    return {type:"/", x:a, y:b};
+  } else if (op === "^") {
+    if (a.type === "const") {
+      m = mk_op2("*", mk_const(Math.log(a.r*a.r + a.i*a.i)/2, Math.atan2(a.i, a.r)), b);
+      return {type:"exp", x:m};
+    } else if (b.type === "const" && Math.floor(b.r) === b.r && b.i === 0) {
+      return {type:"npow", x:a, n:b.r};
+    } else {
+      return mk_fun("exp", [mk_op2("*", mk_fun("ln", [a]), b)]);
+    }
+  } else throw new Error;
+}
+
+function is_fun(s) {
+  return ["exp", "sin", "cos", "tan", "ln", "conj", "re", "im", "abs", "arg"].indexOf(s) !== -1;
+}
+function mk_fun(fun, args) {
+  var x, y;
+  switch (fun) {
+  case "exp":
+    if (args.length !== 1) throw new Error("exp expecting exactly one argument");
+    x = args[0];
+    if (x.type === "const") {
+      return mk_const(Math.exp(x.r)*Math.cos(x.i), Math.exp(x.r)*Math.sin(x.i));
+    } else {
+      return {type:"exp", x:x};
+    }
+  case "ln":
+    if (args.length !== 1) throw new Error("exp expecting exactly one argument");
+    x = args[0];
+    if (x.type === "const") {
+      return mk_const(Math.log(x.r*x.r + x.i*x.i)/2, Math.atan2(x.i, x.r));
+    } else {
+      return {type:"ln", x:x};
+    }
+  case "sin":
+    if (args.length !== 1) throw new Error("sin expecting exactly one argument");
+    x = args[0];
+    return mk_op2("*", mk_op2("+", mk_fun("exp", [mk_op2("*", x, mk_const(0, 1))]),
+                              mk_sign(false, mk_fun("exp", [mk_op2("*", x, mk_const(0, -1))]))),
+                  mk_const(0, -1/2));
+  case "cos":
+    if (args.length !== 1) throw new Error("cos expecting exactly one argument");
+    x = args[0];
+    return mk_op2("*", mk_op2("+", mk_fun("exp", [mk_op2("*", x, mk_const(0, 1))]),
+                              mk_fun("exp", [mk_op2("*", x, mk_const(0, -1))])),
+                  mk_const(1/2, 0));
+  case "tan":
+    return mk_op2("/", mk_fun("sin", args), mk_fun("cos", args));
+  case "conj":
+  case "re":
+  case "im":
+  case "abs":
+  case "arg":
+    if (args.length !== 1) throw new Error(fun + " expecting exactly one argument");
+    x = args[0];
+    if (x.type === "const") {
+      switch (fun) {
+      case "conj":
+        return mk_const(x.r, -x.i);
+      case "re":
+        return mk_const(x.r, 0);
+      case "im":
+        return mk_const(x.i, 0);
+      case "abs":
+        return mk_const(Math.sqrt(x.r*x.r + x.i*x.i), 0);
+      case "arg":
+        return mk_const(Math.atan2(x.i, x.r), 0);
+      default: throw new Error;
+      }
+    } else {
+      return {type:fun, x:x};
+    }
+  default: throw new Error;
+  }
+}
+
+function expr_parse(s) {
+  var toks = expr_tokenize(s);
+  var i = 0;
+  function tok(type) {
+    return i < toks.length && toks[i].type === type;
+  }
+
+  function compose() {
+    var s = iterate();
+    while (tok("then")) {
+      i++;
+      s = {type:"compose", a:s, b:iterate()};
+    }
+    return s;
+  }
+
+  function iterate() {
+    var s = sum();
+    while (tok("iterate") || tok("iterateprod") || tok("iteratesum")) {
+      let type = toks[i].type;
+      i++;
+      if (!tok("num")) throw new Error("Expecting number after 'iterate'");
+      var v = toks[i].value;
+      i++;
+      if (Math.floor(v) !== v || v < 0) throw new Error("Expecting positive integer after 'iterate'");
+      if (v > 500) throw new Error("Having more than 500 iterations is probably a mistake!");
+      var it = {type:"var", var:"z"};
+      var its = [];
+      for (var j = 0; j < v; j++) {
+        it = {type:"compose", a:it, b:s};
+        its.push(it);
+      }
+      if (type === "iterateprod") {
+        let v = mk_const(1, 0);
+        its.forEach(w => {
+          v = mk_op2("*", v, w);
+        });
+        s = v;
+      } else if (type === "iteratesum") {
+        let v = mk_const(0, 0);
+        its.forEach(w => {
+          v = mk_op2("+", v, w);
+        });
+        s = v;
+      } else {
+        s = it;
+      }
+    }
+    return s;
+  }
+
+  function sum() {
+    var pos = true;
+    if (tok("+") || tok("-")) {
+      pos = tok("+");
+      i++;
+    }
+    var p = mk_sign(pos, prod());
+    while (tok("+") || tok("-")) {
+      pos = tok("+");
+      i++;
+      p = mk_op2("+", p, mk_sign(pos, prod()));
+    }
+    return p;
+  }
+  function prod() {
+    var p = exp();
+    while (tok("*") || tok("/") || tok("num") || tok("(") || tok("id")) {
+      if (tok("/")) {
+        i++;
+        p = mk_op2("/", p, exp());
+      } else {
+        if (tok("*")) {
+          i++;
+        }
+        p = mk_op2("*", p, exp());
+      }
+    }
+    return p;
+  }
+  function exp() {
+    var ps = [term()];
+    while (tok("^") || tok("**")) {
+      i++;
+      var pos = true;
+      if (tok("+") || tok("-")) {
+        pos = tok("+");
+        i++;
+      }
+      ps.push(mk_sign(pos, term()));
+    }
+    var p = ps.pop();
+    while (ps.length > 0) {
+      p = mk_op2("^", ps.pop(), p);
+    }
+    return p;
+  }
+  function term() {
+    if (tok("id")) {
+      var val = toks[i].value;
+      if (is_fun(val)) {
+        i++;
+        if(!tok("(")) {
+          throw new Error("Expecting '(' after elementary function '"+val+"'");
+        }
+        i++;
+        var args = [compose()];
+        while (tok(",")) {
+          i++;
+          args.push(compose());
+        }
+        if (!tok(")")) {
+          throw new Error("Expecting ')' after elementary function '"+val+"'");
+        }
+        i++;
+        return mk_fun(val, args);
+      } else if (val === "i") {
+        i++;
+        return mk_const(0, 1);
+      } else if (val === "pi") {
+        i++;
+        return mk_const(Math.PI, 0);
+      } else if (val === "e") {
+        i++;
+        return mk_const(Math.E, 0);
+      } else if (val === "z" || val === "t" || val === "s" || val === "c") {
+        i++;
+        return {type:"var", var:val};
+      } else {
+        throw new Error("Unexpected identifier '"+val+"'");
+      }
+    }
+    if (tok("(")) {
+      i++;
+      var p = compose();
+      if (!tok(")")) {
+        throw new Error("Expecting ')'");
+      }
+      i++;
+      return p;
+    } else if (tok("num")) {
+      var v = toks[i].value;
+      i++;
+      return mk_const(v, 0);
+    } else {
+      throw new Error("Expecting term");
+    }
+  }
+  try {
+    var p = compose();
+    if (i < toks.length) {
+      throw new Error("Unexpected '" + toks[i].type + "'");
+    }
+  } catch (x) {
+    console.log(i);
+    throw x;
+  }
+  console.log(p);
+  return p;
+}
+
+// sum = ["+"|"-"] prod {("+"|"-") prod}.
+// prod = exp {["*"|"/"] exp}.
+// exp = term {("^"|"**") ["+"|"-"] term}.
+// term = fun | "(" sum ")" | "num" | "z" | "const".
+// fun = "elem" "(" sum {"," sum} ")".
+
+// exp, sin, cos, tan
+// ln (branchcut)
+
+function expr_compile(x) {
+  var instrs = [];
+
+  function instr_eq(inst1, inst2) {
+    if (inst1.length !== inst2.length) return false;
+    for (var i = 0; i < inst1.length; i++) {
+      if (inst1[i] !== inst2[i]) return false;
+    }
+    return true;
+  }
+  function add_inst(inst) {
+    for (var i = 0; i < instrs.length; i++) {
+      if (instr_eq(instrs[i], inst)) {
+        return i;
+      }
+    }
+    return instrs.push(inst)-1;
+  }
+  function add_const(r, i) {
+    return [add_inst(["const", r]), add_inst(["const", i])];
+  }
+  function is_const(i, v) {
+    if (instrs[i][0] !== "const")
+      return null;
+    else
+      return instrs[i][1];
+  }
+  function add_op1(op, a) {
+    // a is real
+    if (op === "neg") {
+      if (is_const(a) !== null) return add_inst(["const", -is_const(a)]);
+      return add_inst(["neg", a]);
+    } else if (op === "exp") {
+      if (is_const(a) !== null) return add_inst(["const", Math.exp(is_const(a))]);
+      return add_inst(["exp", a]);
+    } else if (op === "log") {
+      if (is_const(a) !== null) return add_inst(["const", Math.log(is_const(a))]);
+      return add_inst(["log", a]);
+    } else if (op === "cos") {
+      if (is_const(a) !== null) return add_inst(["const", Math.cos(is_const(a))]);
+      return add_inst(["cos", a]);
+    } else if (op === "sin") {
+      if (is_const(a) !== null) return add_inst(["const", Math.sin(is_const(a))]);
+      return add_inst(["sin", a]);
+    } else throw new Error;
+  }
+  function add_op2(op, a, b) {
+    // a and b are real
+    if (op === "+") {
+      if (is_const(a) === 0) return b;
+      if (is_const(b) === 0) return a;
+      if (a === b) {
+        return add_op2("*", add_inst(["const", 2]), a);
+      } else if (a < b) {
+        return add_inst(["+", a, b]);
+      } else {
+        return add_inst(["+", b, a]);
+      }
+    } else if (op === "-") {
+      if (is_const(a) === 0) return add_op1("neg", b);
+      if (is_const(b) === 0) return a;
+      return add_inst(["-", a, b]);
+    } else if (op === "*") {
+      if (is_const(a) === 0) return a;
+      if (is_const(b) === 0) return b;
+      if (is_const(a) === 1) return b;
+      if (is_const(b) === 1) return a;
+      if (a <= b) {
+        return add_inst(["*", a, b]);
+      } else {
+        return add_inst(["*", b, a]);
+      }
+    } else if (op === "/") {
+      if (is_const(a) === 0) return a;
+      if (is_const(b) === 1) return a;
+      return add_inst(["/", a, b]);
+    } else if (op === "atan") {
+      return add_inst(["atan2", a, b]);
+    } else throw new Error(op);
+  }
+
+  function add_cop1(op, a) {
+    if (op === "exp") {
+      var r = add_op1("exp", a[0]);
+      var c = add_op1("cos", a[1]);
+      var s = add_op1("sin", a[1]);
+      return [add_op2("*", r, c), add_op2("*", r, s)];
+    } else if (op === "ln") {
+      var r = add_op2("/", add_op1("log", add_op2("+",
+                                                  add_op2("*", a[0], a[0]),
+                                                  add_op2("*", a[1], a[1]))),
+                      add_inst(["const", 2]));
+      var i = add_op2("atan", a[1], a[0]);
+      return [r, i];
+    } else if (op === "conj") {
+      return [a[0], add_op1("neg", a[1])];
+    } else if (op === "re") {
+      return [a[0], add_inst(["const", 0])];
+    } else if (op === "im") {
+      return [a[1], add_inst(["const", 0])];
+    } else if (op === "abs") {
+      return [add_inst(["sqrt", add_op2("+",
+                                        add_op2("*", a[0], a[0]),
+                                        add_op2("*", a[1], a[1]))]),
+              add_inst(["const", 0])];
+    } else if (op === "arg") {
+      return [add_op2("atan", a[1], a[0]), add_inst(["const", 0])];
+    } else throw new Error(op);
+  }
+
+  function add_cop2(op, a, b) {
+    // a and b are varpairs
+    if (op === "+") {
+      return [add_op2("+", a[0], b[0]),
+              add_op2("+", a[1], b[1])];
+    } else if (op === "-") {
+      return [add_op2("-", a[0], b[0]),
+              add_op2("-", a[1], b[1])];
+    } else if (op === "*") {
+      return [add_op2("-",
+                      add_op2("*", a[0], b[0]),
+                      add_op2("*", a[1], b[1])),
+              add_op2("+",
+                      add_op2("*", a[0], b[1]),
+                      add_op2("*", a[1], b[0]))];
+    } else if (op === "/") {
+      var m = add_op2("+",
+                      add_op2("*", b[0], b[0]),
+                      add_op2("*", b[1], b[1]));
+      return [add_op2("/",
+                      add_op2("+",
+                              add_op2("*", a[0], b[0]),
+                              add_op2("*", a[1], b[1])),
+                      m),
+              add_op2("/",
+                      add_op2("-",
+                              add_op2("*", a[1], b[0]),
+                              add_op2("*", a[0], b[1])),
+                      m)];
+    } else throw new Error(op);
+  }
+
+  // When adding function composition, it was easier to hack in some dynamic variables.
+  var zx = add_inst(["var", "z.x"]);
+  var zy = add_inst(["var", "z.y"]);
+  var cx = zx, cy = zy;
+
+  function comp(x) {
+    var a, b, r, i;
+    if (x.type === "var") {
+      if (x.var === "z") {
+        return [zx, zy];
+      } else if (x.var === "t") {
+        return [add_inst(["var", "u_vt"]),
+                add_inst(["const", 0])];
+      } else if (x.var === "s") {
+        return [add_inst(["var", "u_vs"]),
+                add_inst(["const", 0])];
+      } else if (x.var === "c") {
+        return [cx, cy];
+      } else throw new Error(x.var);
+    } else if (x.type === "compose") {
+      var ozx = zx;
+      var ozy = zy;
+      var f1 = comp(x.a);
+      zx = f1[0];
+      zy = f1[1];
+      var f2 = comp(x.b);
+      zx = ozx;
+      zy = ozy;
+      return f2;
+    } else if (x.type === "const") {
+      return add_const(x.r, x.i);
+    } else if (x.type === "neg") {
+      a = comp(x.x);
+      return [add_op1("neg", a[0]),
+              add_op1("neg", a[1])];
+    } else if (x.type === "+") {
+      return add_cop2("+", comp(x.x), comp(x.y));
+    } else if (x.type === "-") {
+      return add_cop2("-", comp(x.x), comp(x.y));
+    } else if (x.type === "*") {
+      return add_cop2("*", comp(x.x), comp(x.y));
+    } else if (x.type === "/") {
+      return add_cop2("/", comp(x.x), comp(x.y));
+    } else if (x.type === "npow") {
+      if (x.n === 0) {
+        return add_const(1, 0);
+      }
+      a = comp(x.x);
+      var n = x.n;
+      var pos = true;
+      if (n < 0) {
+        pos = false;
+        n = -n;
+      }
+      var res = add_const(1, 0);
+      while (n > 0) {
+        if (n & 1) {
+          res = add_cop2("*", res, a);
+        }
+        n = n >>> 1;
+        if (n > 0)
+          a = add_cop2("*", a, a);
+      }
+      if (!pos) {
+        return add_cop2("/", add_const(1,0), res);
+      } else {
+        return res;
+      }
+    } else if (x.type === "exp") {
+      return add_cop1("exp", comp(x.x));
+    } else if (x.type === "ln") {
+      return add_cop1("ln", comp(x.x));
+    } else if (x.type === "conj" || x.type === "re" || x.type === "im" || x.type === "abs" || x.type === "arg") {
+      return add_cop1(x.type, comp(x.x));
+    } else throw new Error(x.type);
+  }
+  var res = comp(x);
+  instrs.forEach((ins, j) => console.log(j + ": " + ins.join(' ')));
+  console.log("return " + res.join(' '));
+
+  var used = [];
+  used[res[0]] = 1;
+  used[res[1]] = 1;
+  for (var i = instrs.length - 1; i >= 0; i--) {
+    if (used[i] > 0) {
+      var instr = instrs[i];
+      if (instr[0] === "const" || instr[0] === "var") { used[i] = 1; continue; }
+      for (var j = 1; j < instr.length; j++) {
+        used[instr[j]] = (used[instr[j]]||0) + 1;
+      }
+    }
+  }
+
+  var code = [];
+  var exprs = [];
+  for (var i = 0; i < instrs.length; i++) {
+    if (!(used[i] > 0)) continue;
+    var expr;
+    var instr = instrs[i];
+    switch (instr[0]) {
+    case "var":
+      expr = instr[1];
+      break;
+    case "const":
+      expr = instr[1].toExponential();
+      break;
+    case "neg":
+      expr = "(-" + exprs[instr[1]] + ")";
+      break;
+    case "+":
+      expr = "(" + exprs[instr[1]] + " + " + exprs[instr[2]] + ")";
+      break;
+    case "-":
+      expr = "(" + exprs[instr[1]] + " - " + exprs[instr[2]] + ")";
+      break;
+    case "*":
+      expr = "(" + exprs[instr[1]] + " * " + exprs[instr[2]] + ")";
+      break;
+    case "/":
+      expr = "(" + exprs[instr[1]] + " / " + exprs[instr[2]] + ")";
+      break;
+    case "exp":
+      expr = "exp(" + exprs[instr[1]] + ")";
+      break;
+    case "log":
+      expr = "log(" + exprs[instr[1]] + ")";
+      break;
+    case "cos":
+      expr = "cos(" + exprs[instr[1]] + ")";
+      break;
+    case "sin":
+      expr = "sin(" + exprs[instr[1]] + ")";
+      break;
+    case "atan2":
+      expr = "atan(" + exprs[instr[1]] + ", " + exprs[instr[2]] + ")";
+      break;
+    case "pow":
+      expr = "pow(" + exprs[instr[1]] + ", " + exprs[instr[2]] + ")";
+      break;
+    case "sqrt":
+      expr = "sqrt(" + exprs[instr[1]] + ")";
+      break;
+    default:
+      throw new Error(instr[0]);
+    }
+    if (used[i] > 1) {
+      var v = "v" + i;
+      code.push("float " + v + " = " + expr + ";");
+      exprs[i] = v;
+    } else {
+      exprs[i] = expr;
+    }
+  }
+  code.push("vec2 res = vec2(" + exprs[res[0]] + ", " + exprs[res[1]] + ");");
+  console.log(code.join("\n"));
+  return code;
+}
+
+
+function make_icosahedron(subdiv) {
+  subdiv = subdiv|0;
+  if (subdiv < 1) subdiv = 1;
+  
+  var array = [];
+  var elts = [];
+
+  var seen_pts = {};
+  var next_idx = 0;
+  function pt(p) {
+    p = Array.from(Vec3.normalize(Vec3.create(p)));
+    if (!seen_pts.hasOwnProperty(p)) {
+      array.push.apply(array, p);
+      array.push.apply(array, p);
+      seen_pts[p] = next_idx++;
+    }
+    return seen_pts[p];
+  }
+  var t = (1+Math.sqrt(5))/2;
+  var base_pts = [
+    [-1, t, 0],
+    [1, t, 0],
+    [-1, -t, 0],
+    [1, -t, 0],
+    [0,-1,t],
+    [0,1,t],
+    [0,-1,-t],
+    [0,1,-t],
+    [t,0,-1],
+    [t,0,1],
+    [-t,0,-1],
+    [-t,0,1]
+  ];
+  var base_triangles = [
+    [0, 11, 5],
+    [0, 5, 1],
+    [0, 1, 7],
+    [0, 7, 10],
+    [0, 10, 11],
+    [1, 5, 9],
+    [5, 11, 4],
+    [11, 10, 2],
+    [10, 7, 6],
+    [7, 1, 8],
+    [3, 9, 4],
+    [3, 4, 2],
+    [3, 2, 6],
+    [3, 6, 8],
+    [3, 8, 9],
+    [4, 9, 5],
+    [2, 4, 11],
+    [6, 2, 10],
+    [8, 6, 7],
+    [9, 8, 1]
+  ];
+  base_triangles.forEach(triangle => {
+    var p0 = base_pts[triangle[0]],
+        p1 = base_pts[triangle[1]],
+        p2 = base_pts[triangle[2]];
+    function affine(s, t) {
+      var u = 1 - s - t;
+      return [u*p0[0]+s*p1[0]+t*p2[0],
+              u*p0[1]+s*p1[1]+t*p2[1],
+              u*p0[2]+s*p1[2]+t*p2[2]];
+    }
+    for (var i = 0; i < subdiv; i++) {
+      for (var j = 0; i + j < subdiv; j++) {
+        var q0 = affine(i/subdiv, j/subdiv),
+            q1 = affine((i+1)/subdiv, j/subdiv),
+            q2 = affine(i/subdiv, (j+1)/subdiv);
+        elts.push(pt(q0), pt(q1), pt(q2));
+        if (i+1 + j+1 <= subdiv) {
+          q0 = affine((i+1)/subdiv, (j+1)/subdiv);
+          elts.push(pt(q2), pt(q1), pt(q0));
+        }
+      }
+    }
+  });
+  console.log(array.length/6);
+  return {vertices: new Float32Array(array),
+          elements: new Uint16Array(elts)};
+}
+
+</script>
+<script type="x-shader/x-vertex" id="billboard.vert">
+#version 100
+
+precision mediump float;
+
+attribute vec3 a_pos;
+attribute vec2 a_uv;
+
+uniform mat4 u_P;
+uniform mat4 u_M;
+
+varying vec2 v_uv;
+
+void main(void) {
+  gl_Position = u_P * u_M * vec4(a_pos, 1.0);
+  v_uv = a_uv;
+}
+
+</script>
+<script type="x-shader/x-fragment" id="poly.frag">
+#version 100
+
+#define N 23
+
+precision mediump float;
+
+varying vec2 v_uv;
+
+uniform vec2 u_c[N];
+uniform float u_t;
+uniform float u_s;
+uniform float u_zoom;
+
+vec2 cmul(vec2 a, vec2 b) {
+  return vec2(a.x*b.x - a.y*b.y,
+              a.x*b.y + a.y*b.x);
+}
+
+const float pi = 3.141592653589793;
+
+vec3 hsv2rgb(vec3 c)
+{ // taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  vec3 res = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+  //float sum = res.x + res.y + res.z;
+  return res;// * c.z / sum;
+}
+
+void main(void) {
+  vec2 z = v_uv*u_zoom;
+  vec2 p = vec2(0.0, 0.0);
+  for (int i = N-1; i>=0; i--) {
+    p = u_c[i] + cmul(p, z);
+  }
+
+  float theta = atan(p.y, p.x) - u_t;
+  float mag = mod(2.0*log(length(p))+0.5-u_s, 1.0)-0.5;
+  //float mag = mod(length(p), 1.0)-0.5;
+  float mags = smoothstep(0.02, 0.05, abs(mag));
+
+  gl_FragColor = vec4(hsv2rgb(vec3(theta / (2.0 * pi) , 1.0, 0.7+0.3*mags)), 1.0);
+  //gl_FragColor = vec4(v_uv.x, v_uv.y, 1.0, 1.0);
+}
+
+</script>
+<script type="x-shader/x-vertex" id="line.vert">
+#version 100
+
+precision mediump float;
+
+attribute vec3 a_pos;
+
+uniform mat4 u_P;
+uniform mat4 u_M;
+
+void main(void) {
+  gl_Position = u_P * u_M * vec4(a_pos, 1.0);
+}
+
+</script>
+<script type="x-shader/x-vertex" id="circle.vert">
+#version 100
+
+#define N 23
+
+precision mediump float;
+
+attribute float a_theta;
+
+uniform mat4 u_P;
+uniform mat4 u_M;
+uniform vec2 u_c[N];
+uniform float u_r;
+uniform float u_zoom;
+
+vec2 cmul(vec2 a, vec2 b) {
+  return vec2(a.x*b.x - a.y*b.y,
+              a.x*b.y + a.y*b.x);
+}
+
+void main(void) {
+  vec2 z = u_r*vec2(cos(a_theta), sin(a_theta));
+  vec2 p = vec2(0.0, 0.0);
+  for (int i = N-1; i>=0; i--) {
+    p = u_c[i] + cmul(p, z);
+  }
+  
+  gl_Position = u_P * u_M * vec4(p/u_zoom, 0.0, 1.0);
+}
+
+</script>
+<script type="x-shader/x-fragment" id="line.frag">
+#version 100
+
+precision mediump float;
+uniform vec4 u_color;
+
+void main(void) {
+  gl_FragColor = u_color;
+}
+
+</script>
+<script type="x-shader/x-vertex" id="sphere.vert">
+#version 100
+
+precision mediump float;
+
+attribute vec3 a_pos;
+attribute vec3 a_norm;
+
+uniform mat4 u_M;
+uniform mat4 u_V;
+uniform mat4 u_P;
+uniform mat3 u_N;
+
+varying vec3 v_norm;
+varying vec3 v_cpos;
+varying vec3 v_mpos;
+varying vec3 v_pos;
+
+void main(void) {
+  vec4 mpos4 = u_M * vec4(a_pos, 1.0);
+  v_mpos = mpos4.xyz / mpos4.w;
+  vec4 pos2 = u_V * mpos4;
+  gl_Position = u_P * pos2;
+  v_cpos = pos2.xyz / pos2.w;
+  
+  v_norm = normalize(u_N * a_norm);
+
+  v_pos = a_pos;
+}
+
+</script>
+
+</head>
+<body>
+<div id="message"></div>
+<div id="error"></div>
+<div id="equations">
+  <input id="eqs" type="text" value="z^5+z+1">
+  <div id="buttons">
+    <a href="./help.html" target="_blank">Help</a>
+    <input id="savebutton" type="button" value="Save">
+    <input id="loadbutton" type="button" value="Load">
+  </div>
+</div>
+<div id="mask"></div>
+<div id="eqlist"></div>
+<div id="canvasarea">
+  <canvas id="canvas" width="300" height="300">This browser doesn't support the <code>canvas</code> element.</canvas>
+</div>
+<div id="controls">
+<label>Zoom:</label>
+<input id="minus" type="button" value="-">
+<input id="plus" type="button" value="+">
+</div>
+</body>
+</html>

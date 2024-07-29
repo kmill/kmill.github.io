@@ -1,0 +1,150 @@
+<!doctype html>
+<html><head>
+    <meta charset="utf-8">
+    <title>Math 1B, Fall 2015</title>
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+
+    
+    <style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+    
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  <style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style></head>
+  <body><div id="MathJax_Message" style="display: none;"></div>
+    <div class="main">
+      <div class="content">
+        <h1>Math 1B, Fall 2015</h1>
+        
+  
+  
+  <p>This is the homepage for the Fall 2015 <a href="https://math.berkeley.edu/courses/fall-2015-math-1b-001-lec">Math
+  1B</a>
+  discussion sections 105 and 109.</p>
+
+<p><b>Instructor:</b> <a href="../index.html">Kyle Miller</a> <br>
+  <b>E-mail:</b> kmill at math.berkeley.edu <br>
+  <b>Meeting times:</b> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;For 105, MWF 10-11 am in 9 Evans <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;For 109, MWF 12-1 pm in 85 Evans <br>
+  <b>Office hours:</b> T 2-3pm, Th 1-2pm in 1066 Evans, or by
+  appointment.  <em>For RRR week, office hours are T and Th, 1-4pm.
+    There is also a review session on Wednesday, December 9th,
+    noon-2pm, in 3 Evans.</em>
+</p>
+
+<p>The math department publishes a rough <a href="http://math.berkeley.edu/courses/choosing/lowerdivcourses/math1B">course
+  overview</a>.
+  There is also a collection of some <a href="https://math.berkeley.edu/courses/archives/exams">past
+  exams</a>.</p>
+
+<h2>1. Exams</h2><ul>
+<li>Midterm 1 (20%) is Monday, September 21.
+  </li>
+<li>Midterm 2 (20%) is Monday, October 26.
+  </li>
+<li>Final Exam (45%) is Monday, December 14, 11:30-2:30.
+  </li>
+</ul>
+<p>Update: second midterm has been dropped.  Rather than <em>per
+    cent</em>, the grades are now <em>per octogesimus</em> (that is, out of
+  eighty).</p>
+
+
+  
+  
+  <a name="worksheets"></a><h2>2. Worksheets</h2>
+  <p>The department publishes worksheets on the Lower Division Course
+  Outlines page, <a href="https://math.berkeley.edu/sites/default/files/pages/Math1B.Berkeley.pdf">Math 1B Worksheet
+  (pdf)</a>.</p>
+
+<a name="extra"></a><h2>3. Extra</h2>
+  <ol>
+<li>Aug 31. <a href="11.1.90.pdf">Solution to 11.1 problem 90</a>
+  </li>
+<li>Aug 31. <a href="11.1.91.pdf">Solution to 11.1 problem 91</a>
+  </li>
+<li>Sep 2. <a href="11.2.note.pdf">Note about the sum of convergent and divergent series</a>
+  </li>
+<li>Sep 14. <a href="sep14_series.pdf">Note about a series from lecture</a>
+  </li>
+<li>Sep 14. <a href="logtest.pdf">Note about the “log test”</a>
+  </li>
+<li>Sep 18. <a href="midterm1_review.pdf">Midterm 1 Review</a>
+  </li>
+<li>Sep 19. <a href="sep19_series_update.pdf">Note about a series from lecture
+    (update)</a>
+  </li>
+<li>Sep 23. <a href="sep23_uniqueness.pdf">Note about uniqueness of a solution in 11.9</a>
+
+  </li>
+<li>Sep 28. <a href="http://www.math.vanderbilt.edu/~schectex/commerrs/">The Most Common Errors in Undergraduate
+    Mathematics</a>
+    (external).  For getting some mathematical maturity, consider
+    looking at <a href="http://www.amazon.com/Concise-Introduction-Mathematics-Edition-Chapman/dp/1439835985">A Concise Introduction to Pure
+    Mathematics</a>
+    by Liebeck (I have a copy if you want to look at it).
+  </li>
+<li>Oct 12. <a href="numeric_integration.html">Examples of numeric integration on a computer</a>
+  </li>
+<li>Oct 21. <a href="tank.pdf">Hydrostatic pressure in a cylindrical tank</a>
+  </li>
+<li>Oct 23. <a href="midterm2_review.pdf">Midterm 2 Review</a>
+  </li>
+<li>Oct 28. <a href="midterm2_solutions.pdf">Midterm 2 Solutions</a>
+  </li>
+<li>Oct 30. <a href="spring/spring.html">Spring cart</a>
+  </li>
+<li>Nov 4. <a href="term_veloc.pdf">Terminal velocity of a water droplet</a>
+  </li>
+<li>Nov 21. <a href="homog_linear_diff.pdf">Homogeneous linear differential equations with constant coefficients</a>
+  </li>
+<li>Dec 8. <a href="final_review.pdf">Final exam review</a>
+  </li>
+</ol>
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <i>Modified 8 December 2015 by 
+      <span class="breadcrumbs">
+	<a href="../index.html">Kyle Miller</a> &gt; Math 1B, Fall 2015
+      </span></i>
+      </div>
+    </div>
+  
+</body></html>

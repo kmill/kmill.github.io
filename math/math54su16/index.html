@@ -1,0 +1,535 @@
+<!doctype html>
+<html><head>
+    <meta charset="utf-8">
+    <title>Math 54, Summer 2016</title>
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+
+    
+    <style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+    
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  <style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
+.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
+.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
+.mjx-full-width {text-align: center; display: table-cell!important; width: 10000em}
+.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
+.mjx-math * {display: inline-block; -webkit-box-sizing: content-box!important; -moz-box-sizing: content-box!important; box-sizing: content-box!important; text-align: left}
+.mjx-numerator {display: block; text-align: center}
+.mjx-denominator {display: block; text-align: center}
+.MJXc-stacked {height: 0; position: relative}
+.MJXc-stacked > * {position: absolute}
+.MJXc-bevelled > * {display: inline-block}
+.mjx-stack {display: inline-block}
+.mjx-op {display: block}
+.mjx-under {display: table-cell}
+.mjx-over {display: block}
+.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-stack > .mjx-sup {display: block}
+.mjx-stack > .mjx-sub {display: block}
+.mjx-prestack > .mjx-presup {display: block}
+.mjx-prestack > .mjx-presub {display: block}
+.mjx-delim-h > .mjx-char {display: inline-block}
+.mjx-surd {vertical-align: top}
+.mjx-mphantom * {visibility: hidden}
+.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
+.mjx-annotation-xml {line-height: normal}
+.mjx-menclose > svg {fill: none; stroke: currentColor}
+.mjx-mtr {display: table-row}
+.mjx-mlabeledtr {display: table-row}
+.mjx-mtd {display: table-cell; text-align: center}
+.mjx-label {display: table-row}
+.mjx-box {display: inline-block}
+.mjx-block {display: block}
+.mjx-span {display: inline}
+.mjx-char {display: block; white-space: pre}
+.mjx-itable {display: inline-table; width: auto}
+.mjx-row {display: table-row}
+.mjx-cell {display: table-cell}
+.mjx-table {display: table; width: 100%}
+.mjx-line {display: block; height: 0}
+.mjx-strut {width: 0; padding-top: 1em}
+.mjx-vsize {width: 0}
+.MJXc-space1 {margin-left: .167em}
+.MJXc-space2 {margin-left: .222em}
+.MJXc-space3 {margin-left: .278em}
+.mjx-chartest {display: block; visibility: hidden; position: absolute; top: 0; line-height: normal; font-size: 500%}
+.mjx-chartest .mjx-char {display: inline}
+.mjx-chartest .mjx-box {padding-top: 1000px}
+.MJXc-processing {visibility: hidden; position: fixed; width: 0; height: 0; overflow: hidden}
+.MJXc-processed {display: none}
+.mjx-test {display: block; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-transform: none; letter-spacing: normal; word-spacing: normal; overflow: hidden; height: 1px}
+.mjx-ex-box-test {position: absolute; overflow: hidden; width: 1px; height: 60ex}
+.mjx-line-box-test {display: table!important}
+.mjx-line-box-test span {display: table-cell!important; width: 10000em!important; min-width: 0; max-width: none; padding: 0; border: 0; margin: 0}
+#MathJax_CHTML_Tooltip {background-color: InfoBackground; color: InfoText; border: 1px solid black; box-shadow: 2px 2px 5px #AAAAAA; -webkit-box-shadow: 2px 2px 5px #AAAAAA; -moz-box-shadow: 2px 2px 5px #AAAAAA; -khtml-box-shadow: 2px 2px 5px #AAAAAA; padding: 3px 4px; z-index: 401; position: absolute; left: 0; top: 0; width: auto; height: auto; display: none}
+.mjx-chtml .mjx-noError {line-height: 1.2; vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+.MJXc-TeX-unknown-R {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: normal; font-weight: normal}
+.MJXc-TeX-unknown-I {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: italic; font-weight: normal}
+.MJXc-TeX-unknown-B {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: normal; font-weight: bold}
+.MJXc-TeX-unknown-BI {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: italic; font-weight: bold}
+.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
+.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
+.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
+.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
+.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
+.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
+.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
+.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
+.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
+.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
+.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
+.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
+.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
+.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
+.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
+.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
+.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
+.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
+.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
+.MJXc-TeX-vec-R {font-family: MJXc-TeX-vec-R,MJXc-TeX-vec-Rw}
+.MJXc-TeX-vec-B {font-family: MJXc-TeX-vec-B,MJXc-TeX-vec-Bx,MJXc-TeX-vec-Bw}
+@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
+@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
+@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
+@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
+@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
+@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
+@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
+@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
+@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
+@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
+@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
+@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
+@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
+@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
+@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
+@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
+@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
+@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
+@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
+@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
+@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
+@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
+@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
+@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-vec-R; src: local('MathJax_Vector'), local('MathJax_Vector-Regular')}
+@font-face {font-family: MJXc-TeX-vec-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Vector-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Vector-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Vector-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-vec-B; src: local('MathJax_Vector Bold'), local('MathJax_Vector-Bold')}
+@font-face {font-family: MJXc-TeX-vec-Bx; src: local('MathJax_Vector'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-vec-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Vector-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Vector-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Vector-Bold.otf') format('opentype')}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style></head>
+  <body><div id="MathJax_Message" style="display: none;"></div>
+    <div class="main">
+      <div class="content">
+        <h1>Math 54, Summer 2016</h1>
+        
+  
+  
+  <p>This is the homepage for the Summer 2016 <a href="https://math.berkeley.edu/courses/summer-2016-math-54-003-lec">Math 54 (Lecture
+  3)</a>
+  and its discussion section.</p>
+
+<p><b>Instructor:</b> <a href="../index.html">Kyle Miller</a> <br>
+  <b>E-mail:</b> kmill at math.berkeley.edu <br>
+  <b>Meeting times:</b> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;Lecture: MTWHF 12-1 pm in <a href="http://www.berkeley.edu/map?morgan">109 Morgan</a><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;Discussion: MTWHF 1-2 pm in <a href="http://www.berkeley.edu/map?morgan">109 Morgan</a><br>
+  <b>Office hours:</b> Wed/Thu 3-5 pm in 1066 Evans, or by appointment<br>
+  <b>bCourses:</b>
+  <a href="https://bcourses.berkeley.edu/courses/1451943">https://bcourses.berkeley.edu/courses/1451943</a><br>
+  <b>Piazza:</b>
+  <a href="https://piazza.com/berkeley/summer2016/math54/home">https://piazza.com/berkeley/summer2016/math54/home</a></p>
+
+<p>The math department publishes a rough <a href="https://math.berkeley.edu/courses/choosing/lowerdivcourses/math54">course
+  overview</a>.
+  There is also a collection of some <a href="https://math.berkeley.edu/courses/archives/exams">past
+  exams</a>.</p>
+
+<h2>1. Syllabus</h2><p><b>Prerequisites:</b> Math 1A-1B or equivalent.  Students who have
+  taken such courses at another institution may not have studied
+  differential equations and should learn the relevant material
+  (Stewart <i>Single Variable Calculus</i> chapters 9 and 17) on
+  their own by the time we get to the differential equations portion
+  of Math 54.</p>
+
+<p><b>Official description:</b> Basic linear algebra; matrix arithmetic and
+  determinants. Vector spaces; inner product spaces. Eigenvalues and
+  eigenvectors; linear transformations. Homogeneous ordinary
+  differential equations; first-order differential equations with
+  constant coefficients. Fourier series and partial differential
+  equations.</p>
+
+<p><b>Textbook:</b> Lay-Nagle-Saff-Snider, <i>Linear Algebra &amp;
+    Differential Equations</i>.  A specially priced UC Berkeley paperback
+  edition is available.  This is a combination of
+  </p>
+
+<ul>
+<li>Lay, <i>Linear Algebra and Its Applications</i> (4th ed.); and
+  </li>
+<li>Nagle, Saff, and Snider, <i>Fundamentals of Differential
+      Equations</i> (8th ed.).
+  </li>
+</ul>
+<h3>1.1. Homework, quizzes, and exams</h3><p>Homework will be due once per week, at the end of discussion
+  Friday.  Late homework will be given points according to the
+  formula <span id="MathJax-Element-1-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mn>2</mn><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo>&amp;#x2212;</mo><mi>n</mi></mrow></msup><mi>s</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-1" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-2" class="mjx-mrow"><span id="MJXc-Node-3" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-4" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.591em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-5" class="mjx-texatom" style=""><span id="MJXc-Node-6" class="mjx-mrow"><span id="MJXc-Node-7" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.313em; padding-bottom: 0.436em;">−</span></span><span id="MJXc-Node-8" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">n</span></span></span></span></span></span><span id="MJXc-Node-9" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">s</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mn>2</mn><mrow class="MJX-TeXAtom-ORD"><mo>−</mo><mi>n</mi></mrow></msup><mi>s</mi></math></span></span>, rounded down, where <span id="MathJax-Element-2-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>s</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-10" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-11" class="mjx-mrow"><span id="MJXc-Node-12" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">s</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>s</mi></math></span></span> is the score the homework
+  would have received when not late, and <span id="MathJax-Element-3-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>n</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-13" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-14" class="mjx-mrow"><span id="MJXc-Node-15" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">n</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math></span></span> is the number of days
+  late.</p>
+
+<p>We will have fifteen-minute quizzes every Friday at the beginning of
+  discussion.  There will be no make-up quizzes.</p>
+
+<p>A one-hour midterm will be given July 22nd during lecture.</p>
+
+<p>A two-hour final will be given August 12 during lecture, through
+  discussion.</p>
+
+<p>The lowest quiz score and the lowest homework score will be dropped.</p>
+
+<h3>1.2. Grading policy</h3><p>The final grade will be determined according to the following: 15%
+  homeworks, 20% quizzes, 25% midterm, 40% final exam.</p>
+
+<h3>1.3. Special accommodations</h3><p>
+  All students requesting special accommodations need to be registered
+  with the Disabled Student Services and need to provide a letter
+  indicating the necessary accommodations. Because it is very
+  difficult to arrange accommodations at the last minute, all requests
+  must be received at least 8 days prior to the exams.</p>
+
+<h3>1.4. Piazza</h3><p>This term we will be using Piazza for class discussion. I encourage
+  you to ask questions on Piazza rather than via e-mails for our
+  collective benefit. Find our class page at
+  <a href="https://piazza.com/berkeley/summer2016/math54/home">https://piazza.com/berkeley/summer2016/math54/home</a>.</p>
+
+<a name="schedule"></a><h2>2. Schedule</h2>
+  <p><i>Note:</i> Answers to odd-number exercises for Lay begin on
+  page 363.  For the second textbook, page 657.</p>
+
+<p>This schedule is subject to change.  Homework, once posted, will
+  remain constant.</p>
+
+<a name="week1"></a><h3>2.1. Week 1 (Jun 20–24)</h3>
+  <p>Reading: sections 1.1–1.5, 1.7–1.9 (Lay)</p>
+
+<p>Homework 1: (Lay) due June 24<br>
+  1.1: 1, 3, 9, 11, 17, 18, 23<br>
+  1.2: 1, 3, 4, 13, 15, 19, 21<br>
+  1.3: 1, 5, 7, 12, 14, 25<br>
+  1.4: 1, 2, 5, 11, 23, 29, 30<br>
+  1.5: 1, 5, 7, 10, 23, 33<br>
+  1.7: 1, 3, 6, 11, 15, 21<br></p>
+
+<p><a href="quiz1.pdf">Quiz 1</a> (<a href="quiz1_solutions.pdf">solutions</a>)</p>
+
+<a name="week2"></a><h3>2.2. Week 2 (Jun 27–Jul 1)</h3>
+  <p>Reading: sections 2.1–2.3, 3.1–3.3, 4.1 (Lay)</p>
+
+<p>Homework 2: (Lay) due July 1<br>
+  1.8: 1, 3, 5, 7, 9, 32, 24<br>
+  1.9: 1, 3, 5, 7, 17, 23<br>
+  2.1: 1, 5, 7, 8, 9, 17<br>
+  2.2: 1, 4, 5, 8, 9, 31<br>
+  2.3: 1, 8, 15, 16, 20, 33<br>
+  3.1: 1, 2, 6, 9, 25, 27, 29<br>
+  3.2: 5, 11, 22, 27, 37, 39<br>
+  3.3: 1, 8, 12, 19, 29<br></p>
+
+<p><a href="quiz2.pdf">Quiz 2</a> (<a href="quiz2_solutions.pdf">solutions</a>)</p>
+
+<a name="week3"></a><h3>2.3. Week 3 (Jul 5–8)</h3>
+  
+  <i>Note: July 4 is a holiday.</i><p>Reading: sections 4.2–4.7 (Lay)</p>
+
+<p>Homework 3: (Lay) due July 8<br>
+  4.1: 1, 3, 6, 11, 13, 21, 31<br>
+  4.2: 1, 4, 8, 12, 24, 31, (35, 36)<br>
+  4.3: 11, 13, 19, 23, 24, 31, 32<br>
+  4.4: 1, 9, 12, 13, 15<br>
+  4.5: 1, 10, 11, 13, 14, 29<br>
+  <em>Problems in parentheses are optional and ungraded.  Please read them, at
+    least.</em></p>
+
+<p><a href="quiz3.pdf">Quiz 3</a> (<a href="quiz3_solutions.pdf">solutions</a>)</p>
+
+<a name="week4"></a><h3>2.4. Week 4 (Jul 11–15)</h3>
+  <p>Reading: sections 5.1–5.4, 6.1 (Lay)</p>
+
+<p>Homework 4: (Lay) due July 15<br>
+  4.6: 1, 5, 8, 16, 28<br>
+  4.7: 7<br>
+  5.1: 1, 3, 11, 13, 16, 26<br>
+  5.2: 1, 2, 9, 10, 18, 20<br>
+  5.3: 1, 7, 10, 17, 18, 27<br>
+  5.4: 10, 13, 14, 22, 25, 26<br>
+  (5.5: 7, 17, 21, 22, 23)<br>
+  6.1: 1, 2, 15, 16, 27, 28<br>
+  <em>Problems in parentheses are optional and ungraded.  They are
+    fairly important, so it is worth at least reading them.</em></p>
+
+<p><a href="quiz4.pdf">Quiz 4</a> (<a href="quiz4_solutions.pdf">solutions</a>)</p>
+
+<a name="week5"></a><h3>2.5. Week 5 (Jul 18–22)</h3>
+  <p>Reading: sections 6.2–6.5, 6.7, 7.1 (Lay)</p>
+
+<p>Homework 5: (Lay) due July 25 (Monday)<br>
+  6.2: 1, 2, 8, 11, 19<br>
+  6.3: 1, 3, 12, 18<br>
+  6.4: 1, 2, 13, 18<br>
+  6.5: 1, 10, 19, 20, 21<br>
+  6.7: 3, 13, 25 (clarification: Gram-Schmidt <span id="MathJax-Element-4-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mn>1</mn></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-16" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-17" class="mjx-mrow"><span id="MJXc-Node-18" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math></span></span>, <span id="MathJax-Element-5-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>t</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-19" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-20" class="mjx-mrow"><span id="MJXc-Node-21" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.374em; padding-bottom: 0.313em;">t</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>t</mi></math></span></span> ,<span id="MathJax-Element-6-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mi>t</mi><mn>2</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-22" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-23" class="mjx-mrow"><span id="MJXc-Node-24" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-25" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.374em; padding-bottom: 0.313em;">t</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-26" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>t</mi><mn>2</mn></msup></math></span></span>)<br>
+  7.1: 13, 14, 23</p>
+
+<p><a href="midterm1_schemata.pdf">Midterm exam schemata</a></p>
+
+<p>Midterm: July 22 in lecture.</p>
+
+<p><a href="midterm.pdf">Midterm</a> (<a href="midterm_solutions.pdf">solutions</a>)</p>
+
+<a name="week6"></a><h3>2.6. Week 6 (Jul 25–29)</h3>
+  <p>Reading: sections 4.1–4.6, 6.1 (NSS)</p>
+
+<p>Homework 6: (<b>NSS</b>) due July 29<br>
+  4.1: 4, 7 <br>
+  4.2: 1, 2, 13, 14, 22, 29, 37<br>
+  4.3: 2, 3, 9, 21, 38<br>
+  4.4: 9, 12, 14, 18, 28, 30, 34<br>
+  4.5: 1, 4, 7, 9, 18, 23<br>
+  4.6: 3, 4, 20</p>
+
+<p><a href="quiz5.pdf">Quiz 5</a> (<a href="quiz5_solutions.pdf">solutions</a>)</p>
+
+<a name="week7"></a><h3>2.7. Week 7 (Aug 1–5)</h3>
+  <p>Reading: sections 6.2, 9.4–9.8 (NSS)</p>
+
+<p>Homework 7: (<b>NSS</b>) due August 5<br>
+  6.1: 7, 9, 23<br>
+  6.2: 1, 6, 15, 19<br>
+  9.1: 1, 3, 7, 11<br>
+  9.4: 14, 28, 30<br>
+  9.5: 2, 9, 12, 31, 32, 50<br>
+  9.6: 1, 13<br>
+  9.7: 1, 2, 8, 21(a), 24<br>
+  9.8: 7, 8, 12, 17, 22</p>
+
+<p><a href="quiz6.pdf">Quiz 6</a> (<a href="quiz6_solutions.pdf">solutions</a>)</p>
+
+<a name="week8"></a><h3>2.8. Week 8 (Aug 8–12)</h3>
+  <p>Reading: sections 10.1–10.7 (NSS)</p>
+
+<p>Final: August 12 in lecture.</p>
+
+<p><a href="final_planning.txt">Final exam planning</a></p>
+
+<p><a href="final.pdf">Final exam</a></p>
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <a name="lec_notes"></a><h2>3. Lecture notes</h2>
+  <ul>
+<li><a href="lecnotes_06_20.pdf">June 20</a>: linear systems.
+  </li>
+<li><a href="lecnotes_06_21.pdf">June 21</a>: matrices. <a href="disc_06_21.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_06_22.pdf">June 22</a>: vectors. <a href="disc_06_22.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_06_23.pdf">June 23</a>: existence, homogeneous systems, independence. <a href="disc_06_23.pdf">Discussion</a>. <a href="rref/rref.html">Row reducer</a>.
+  </li>
+<li><a href="lecnotes_06_24.pdf">June 24</a>: independence, linear transformations. <a href="disc_06_24.pdf">Discussion</a>. <a href="transform/transform.html">Cat transformation</a>.
+  </li>
+<li><a href="lecnotes_06_27.pdf">June 27</a>: one-to-one, onto, matrix multiplication. <a href="disc_06_27.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_06_28.pdf">June 28</a>: matrix multiplication, transposes, inverses.  <a href="disc_06_28.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_06_29.pdf">June 29</a>: inverse matrix theorem, determinants.  <a href="disc_06_29.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_06_30.pdf">June 30</a>: determinants, Cramer’s rule. <a href="disc_06_30.pdf">Discussion</a>. <a href="det/det.html">Interactive cofactor expansion</a>
+  </li>
+<li><a href="lecnotes_07_01.pdf">July 1</a>: vector spaces.  <a href="disc_07_01.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_05.pdf">July 5</a>: subspaces, nullspace,
+    column space, kernel, image.  <a href="disc_07_05.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_06.pdf">July 6</a>: independence, bases.  <a href="disc_07_06.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_07.pdf">July 7</a>: coordinates, dimension.  <a href="disc_07_07.pdf">Discussion</a>. <a href="basis/basis.html">Bases and coordinates in <span id="MathJax-Element-7-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mi mathvariant=&quot;double-struck&quot;>R</mi></mrow><mn>2</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-27" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-28" class="mjx-mrow"><span id="MJXc-Node-29" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-30" class="mjx-texatom"><span id="MJXc-Node-31" class="mjx-mrow"><span id="MJXc-Node-32" class="mjx-mi"><span class="mjx-char MJXc-TeX-ams-R" style="padding-top: 0.436em; padding-bottom: 0.313em;">R</span></span></span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.615em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-33" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow class="MJX-TeXAtom-ORD"><mi mathvariant="double-struck">R</mi></mrow><mn>2</mn></msup></math></span></span></a>
+  </li>
+<li><a href="lecnotes_07_08.pdf">July 8</a>: rank, change of basis.  
+  </li>
+<li><a href="lecnotes_07_11.pdf">July 11</a>: eigenvectors, eigenvalues, characteristic equation.  <a href="disc_07_11.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_12.pdf">July 12</a>: similarity, diagonalization.  
+    <a href="eigen/transform.html">Cat transformation: eigenvector edition</a>.
+  </li>
+<li><a href="lecnotes_07_13.pdf">July 13</a>: diagonalization, matrix of a transformation, complex numbers.  <a href="disc_07_13.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_14.pdf">July 14</a>: dot product, inner product, orthogonality, orthogonal complements.  <a href="disc_07_14.pdf">Discussion</a>.
+  </li>
+<li><a href="lecnotes_07_18.pdf">July 18</a>: orthogonal matrices, projection.  
+  </li>
+<li><a href="lecnotes_07_19.pdf">July 19</a>: Gram-Schmidt process, QR factorization.  
+  </li>
+<li><a href="lecnotes_07_20.pdf">July 20</a>: Least-squares, inner products.  
+  </li>
+<li><a href="lecnotes_07_21.pdf">July 21</a>: Spectral theorem, orthogonal diagonalization.  
+    <a href="midterm1_schemata.pdf">Midterm exam schemata</a>
+  </li>
+<li><a href="lecnotes_07_25.pdf">July 25</a>: Differential equations, second-order homogeneous linear differential equations.  
+  </li>
+<li><a href="lecnotes_07_26.pdf">July 26</a>: Existence and uniqueness, independence, Wronskian.  
+  </li>
+<li><a href="lecnotes_07_27.pdf">July 27</a>: Periodic solutions, method of undetermined coefficients.  
+  </li>
+<li><a href="lecnotes_07_28.pdf">July 28</a>: Superposition, non-homogenous second-order linear differential equations, variation of parameters.
+  </li>
+<li><a href="lecnotes_07_29.pdf">July 29</a>: Higher-order linear differential equations.
+  </li>
+<li><a href="lecnotes_08_01.pdf">August 1</a>: Higher-order linear differential equations with constant coefficients.
+  </li>
+<li><a href="lecnotes_08_02.pdf">August 2</a>: Systems of linear differential equations.
+  </li>
+<li><a href="lecnotes_08_03.pdf">August 3</a>: Homogeneous systems of linear differential equations.
+  </li>
+<li><a href="lecnotes_08_04.pdf">August 4</a>: Complex eigenvalues,
+    nonhomogeneous systems of linear differential equations.
+  </li>
+<li><a href="lecnotes_08_05.pdf">August 5</a>: Matrix exponential.
+  </li>
+<li><a href="lecnotes_08_08.pdf">August 8</a>: Partial differential
+  equations, the heat equation.<a name="ref_footnote_31_1"></a><sup><a href="./index.html#footnote_31_1">[1]</a></sup> <a href="heat/heat.html">Heat equation</a>.
+  </li>
+<li><a href="lecnotes_08_09.pdf">August 9</a>: The wave equation.
+  </li>
+<li><a href="lecnotes_08_10.pdf">August 10</a>: Fourier series.
+  </li>
+</ul>
+<a name="programs"></a><h2>4. Programs</h2>
+  
+  The following are some programs to illustrate some computations and
+  concepts from the course.  These are linked to in the
+  <a href="./index.html#lec_notes">Lecture notes</a> section.
+  <ul>
+<li><a href="rref/rref.html">Row reducer</a>
+  </li>
+<li><a href="transform/transform.html">Cat transformation</a>
+  </li>
+<li><a href="det/det.html">Interactive cofactor expansion</a>
+  </li>
+<li><a href="basis/basis.html">Bases and coordinates in <span id="MathJax-Element-8-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mi mathvariant=&quot;double-struck&quot;>R</mi></mrow><mn>2</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-34" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-35" class="mjx-mrow"><span id="MJXc-Node-36" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-37" class="mjx-texatom"><span id="MJXc-Node-38" class="mjx-mrow"><span id="MJXc-Node-39" class="mjx-mi"><span class="mjx-char MJXc-TeX-ams-R" style="padding-top: 0.436em; padding-bottom: 0.313em;">R</span></span></span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.615em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-40" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mrow class="MJX-TeXAtom-ORD"><mi mathvariant="double-struck">R</mi></mrow><mn>2</mn></msup></math></span></span></a>
+  </li>
+<li><a href="heat/heat.html">Heat equation</a>
+  </li>
+<li><a href="wave/wave.html">Wave equation</a>
+  </li>
+</ul>
+<a name="worksheets"></a><h2>5. Worksheets</h2>
+  <p>The department publishes worksheets on the Lower Division Course
+  Outlines page, <a href="https://math.berkeley.edu/sites/default/files/pages/Math54.Berkeley.pdf">Math 54 Worksheet
+  (pdf)</a>.</p>
+
+<h2>6. How to study</h2><p><b>Step 1.</b> Read the book, go to lecture, section, and office
+  hours, solve examples.  Check your understanding.</p>
+
+<p><b>Step 2.</b> Solve homework problems.  If you get stuck, you did
+  not complete Step 1, so go back and figure out exactly what you
+  still need to understand.</p>
+
+<p>Mathematics does not end with words written on a page, rather an
+  answer is an artifact or byproduct of understanding.  Furthermore,
+  you are trying to convice the reader that you are correct: thus
+  revise!  It is your responsibility to make your answers clear.  In
+  fact, if on a quiz or exam the grader does not notice you are
+  “right,” this is your fault, and you will lose points for it.</p>
+
+<p></p><div class="footnotes"><a name="footnote_31_1"></a><div class="footnote">
+<sup><a href="./index.html#ref_footnote_31_1">[1]</a></sup> Erratum: the heat equation derivation is incorrect and should have <span id="MathJax-Element-9-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mn>1</mn><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo>/</mo></mrow><msup><mi>n</mi><mn>2</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-41" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-42" class="mjx-mrow"><span id="MJXc-Node-43" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span><span id="MJXc-Node-44" class="mjx-texatom"><span id="MJXc-Node-45" class="mjx-mrow"><span id="MJXc-Node-46" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">/</span></span></span></span><span id="MJXc-Node-47" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-48" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-49" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn><mrow class="MJX-TeXAtom-ORD"><mo>/</mo></mrow><msup><mi>n</mi><mn>2</mn></msup></math></span></span> in the denominator rather than <span id="MathJax-Element-10-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mi>n</mi><mn>2</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-50" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-51" class="mjx-mrow"><span id="MJXc-Node-52" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-53" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">n</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0px; padding-right: 0.071em;"><span id="MJXc-Node-54" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>n</mi><mn>2</mn></msup></math></span></span>.</div>
+</div><p></p>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <i>Modified 10 Aug 2016 by 
+      <span class="breadcrumbs">
+	<a href="../index.html">Kyle Miller</a> &gt; Math 54, Summer 2016
+      </span></i>
+      </div>
+    </div>
+  
+</body></html>

@@ -1,0 +1,216 @@
+% f05 ribet. 9 problems (4 for math49)
+% f94 lenstra. 5 problems
+% s01 poonen 20 problems
+% s01 vojta 13 problems
+% s04 haiman 10 questions
+% s96 mergman 6 problems
+
+Ribet: You may refer to a single 2-sided sheet of notes. Your paper is
+your ambassador when it is graded. Correct answers without appropriate
+supporting work will be regarded skeptically. Incorrect answers
+without appropriate supporting work will receive no partial credit.
+
+\item bases for row and column space of a matrix
+\item $W$ subset of $\R^{3\times 3}$ of matrices $A$ with $A^T=-A$.
+  Is it a subspace, and what's it's basis?
+\item Find the inverse of a matrix
+\item Let $v=(1,-1,1,1)^T$ and $w=[1,1,1,1]$.  For $x\in\R^4$, let
+  $T(x)=(x\cdot v)v+(x\cdot w)w$.  Show that $T$ is a linear
+  transformation $\R^4\to\R^4$. Find two eigenvectors of $T$ and one
+  non-zero vector $x$ such that $T(x)=0$.
+\item Let $A$ be a $2\times 2$ matrix such that $A(-1,4)=4(-1,4)$
+  and $A(0,1)=-4(0,1)+(-1,4)$. Find functions $x(t),y(t)$ with initial values $x(0)=-2$, $y(0)=11$ that satisfy the system of differential equations $(x',y')=A(x,y)$.
+\item Suppose that $f(x)=0$ for $\pi<x<0$, $f(x)=1$ for $0\leq x\leq \pi$, and $f(x+2\pi)=f(x)$ for $x\in\R$. As usual, write the Fourier series for $f(x)$ as $a_0/2 + \sum_{m=1}^\infty(a_m\cos(mx)+b_m\sin(mx))$. Calculate the numbers $a_m$ ($m\geq 0$) and $b_m$ ($m>0$).
+\item Describe all pairs of numbers $(y_0,y_0')$ such that the
+  solution $y(t)$ to the initial value problem $y''-2y'-3y=0$,
+  $y(0)=y_0$, $y'(0)=y_0'$ satisfies $y(t)\to 0$ as $t\to+\infty$.
+\item Let $A$ be a matrix whose nullspace is $\{0\}$.  Explain carefully why each of the following statements is true: 1. The rank of $A$ equals the number of columns of $A$.  2. The rows of $A$ are linearly independent if and only if $A$ is a square matrix. 3. The product $A^TA$ is an invertible matrix.
+\item Let $V$ be the vector space of continuous functions on the real
+  line. Consider the inner product $f\cdot g=\int_0^1f(x)g(x)\,dx$ on
+  $V$. Find a non-zero function that is orthogonal to the constant
+  function $1$ and to the functions $x$ and $x^2$.
+\item Solve the partial differential equation $100u_{xx}=u_t$ on the region $0<x<1$, $t>0$, subject to the boundary conditions $u(0,t)=u(1,t)$ for $t>0$ and $u(x,0)=\sin 2\pi x-\sin 5\pi x$ for $0\leq x\leq 1$.
+
+\item Solve the system of differential equations $x_1'(t)=3x_1(t)+3x_2(t)$, $x_2'(t)=-2x_1(t)-4x_2(t)$ with initial conditions $x_1(0)=1$, $x_2(0)=3$.
+\item Find three functions $y_1,y_2,y_3$ defined on $(-\infty,\infty)$ whose Wronskian is given by $W[y_1,y_2,y_3](x)=e^{4x}$. Are these functions linearly independent on $(-\infty,\infty)$?
+\item Find a homogeneous third-order linear differential equation with constant coefficients that has $y(x)=3e^{-x}-\cos(2x)$ as a solution.  Explain how you found it.  What is the general solution of that differential equation?
+
+\item Suppose $A$ is symmetric and $v_1,v_2$ two eigenvectors of $A$ corresponding to two different eigenvalues.  Show that $v_1,v_2$ are orthogonal.
+\item Find the eigenvalues ofr $A=(1,1,-1;1,1,-1;-1,-1,1)$ and a basis for each of its eigenspaces. Then find three mutually orthogonal eigenvectors $v_1,v_2,v_3$.
+\item Find the general real-valued solution $y(t)$ of the fourth-order differential equation $y''''+8y''+16y=0$.
+\item Find the general real solution $y$ of the second-order differential equation $y''+\mu^2y=0$, where $\mu>0$. Then find that solution with the initial condition $(y(0),y'(0))=(2,3)$.
+\item Find the solution $x(t)$ of the following initial value problem. $x'(t)=(3,-5;-1,-1)x(t)$, $x(0)=(6,-6)$.
+\item With the inner product $\langle f,g\rangle = \int_0^{\pi/2}f(t)g(t)\,dt$, give the orthogonal projection of $f(x)=x$ onto the subspace whose orthogonal basis is $\{\sin x, \sin 3x, \sin 5x\}$.  You do not have to prove or check that this is an orthogonal basis, and you are free to use the fact that $\langle \sin nx, \sin nx\rangle = \pi/4$ for $n=1,3,5$.
+
+Short answer:
+\item Give the first row of the inverse of the matrix, if it exists.
+\item The determinant of this matrix equals...
+\item For what real numbers $c$ is $(1,c;0,2)$ diagonalizable.
+\item Least-squares
+\item True/false
+  \begin{itemize}
+  \item If $A$ is a square matrix, then every solution $x$ to $x'=Ax$ is a linear combination of the columns of $e^{tA}$.
+  \item If $A$ is a square matrix, and the characteristic polynomial
+    of $A$ is $(x-6)^2(x-7)^3$, then there exist two linearly
+    independent vectors $v_1,v_2$ such that $Av_1=6v_1$ and
+    $Av_2=6v_2$.
+  \item If $y_1,y_2,y_3$ are solutions to the differential equation
+    $y''-ty=0$ on $(-\infty,\infty)$, then the Wronskian
+    $W[y_1,y_2,y_3](t)$ is the zero function.
+  \item If $A$ and $B$ are symmetric $2\times 2$ matrices, then $AB$ is symmetric.
+  \end{itemize}
+\item Is it a subspace
+  \begin{itemize}
+  \item The set of solutions to $(1,2;2,4)(x,y)=(0,0)$
+  \item The set of all eigenvectors of the matrix $(4,0;0,7)$,
+    including the zero vector.
+  \item The set of all singular $2\times 2$ matrices.
+  \item The set of periodic functions $f:\R\to\R$ of period 3.
+  \item The set of functions $y$ satisfying $y''+ty'+e^t y=0$ and $y(2)=0$.
+  \end{itemize}
+\item Which trajectory does a solution have to $x'=Ax$?
+  \begin{itemize}
+  \item $A=(2,1;-1,0)$
+  \item $A=(-3,-1;-1,-3)$
+  \item $A=(-26,-60;15,10)$
+  \end{itemize}
+\item Find an orthonormal basis of $\R^3$ consisting of eigenvectors of the matrix $A=(4,2,4;2,1,2;4,2,4)$ such that $(-2/3,2/3,1/3)$ is one of the vectors in the basis.
+\item Find all possibilities for $x=(x_1,x_2)$ given that $x_1,x_2$ are functions satisfying $x_1'=x_1+4x_2$, $x_2'=-x_1+5x_2$, $x_1(0)=1$, $x_2(0)=1$.
+\item Write the matrix $(0,5,0;1,0,2;-1,3,-1)$ as a product of elementary matrices
+\item Define subspaces $V=\Span\{(1,2,3,4),(0,4,1,-1)\}$,
+  $W=\Span\{(4,3,1,-6),(2,1,2,1)\}$. Find a nonzero vector in
+  $V\cap W$.
+\item Let $\{u,v\}$ be a basis for a vector space $W$. Under what conditions on the scalars $a,b,c,d$ is the set $\{au+bv,cu+dv\}$ also a basis of $W$?
+\item Compute the determinant of the given matrix.
+\item The matrix $A=(1,1,1;1,1,-1;1,-1,1)$ has eigenvalues $-1,2,2$. Find an orthogonal matrix $Q$ and a diagonal matrix $\Lambda$ such that $Q\inv A Q=\Lambda$.
+\item Find the angle between $(1,2,3)$ and the $x$-axis.
+\item Determine the longest interval in which the initial-value
+  problem $(\tan t)y''+(t-1)y'+3y=\tan^2 t$, $y(1/2)=0$, $y'(1/2)=1$
+  is certain to have a unique twice-differentiable solution. Do not
+  attempt to find the solution.
+\item For the equation $x'=(1,1;2,0)x$, find the fundamental matrix $\Phi(t)$ satisfying $\Phi(0)=I$.
+\item For the initial value problem $x'=(0,-1;5,-2)x$, $x(0)=(1,2)$,
+  describe the behaviour of the solution as $t\to\infty$. (You do not
+  need to solve the system.)
+\item The differential equation $x'=(3,-4,1;-1,0,-1;-2,2,0)x$ has a solution $x=(6e^{2t}+e^{-t},e^{-t},-6e^{2t})$. Find its general solution.
+
+\item Compute an LU factorization.
+\item $A$ is $3\times 3$. Given two eigenvectors and the trace,
+  compute the determinant.
+\item Suppose $A$ is $m\times n$, $B$ is $n\times k$, and $AB=0$. What
+  can you say about the relationship between $\rank A$ and $\rank B$?
+\item Set of polynomials of degree at most 5 such that
+  $p(0)=p(1)=0$. Show it's a subspace, and find its dimension.
+\item Compute the angle between two vectors.
+\item Find an orthonormal basis for the subspace spanned by these two vectors.
+\item Find all solutions of the differential equation $x^{(4)}(t)+2x^''(t)+x(t)=0$.
+\item Consider the system of linear differential equations
+  $x'(t)=(-1,c;1,-1)x$.
+  \begin{itemize}
+  \item For which values of the constant $c$ does every solution
+    $x(t)=(x_1(t),x_2(t))$ have the property that
+    $\lim_{t\to\infty}x_1(t)=\lim_{t\to\infty}x_2(t)=0$?
+  \item For which values of $c$ does there exist a non-zero solution
+    such that $x_1(t)=0$ for infinitely many values of $t$?
+  \end{itemize}
+\item Solve the initial value problem $x'(t)=(0,3;-2,5)x$, $x(0)=(5,4)$.
+\item Find one solution of the system of linear differential equations
+  $x'(t)=(2,1;1,1)x+(\sin t, 0)$.
+
+\item Consider a matrix $A$. Find characteristic polynomial,
+  eigenvalues, basis of eigenvectors, and the general solution to
+  $x'=Ax$.
+\item Solve a second-order system by reducing to a first-order system.
+  Obtain a particular solution.
+\item Give examples of: (a) two $2\times 2$ matrices $A$ and $B$ where
+  $AB\neq BA$ (b) a nonzero matrix $A$ and a nonzero vector $\vec{x}$
+  such that $A\vec{x}=\vec{x}$ (c) a $2\times 2$ orthogonal matrix (e)
+  A vector space $V$ and a set $S$ which spans $V$ but is not a basis
+  of $V$ (f) A vector $\vec{v}$ which lies in the subspace of $\R^2$
+  spanned by $(1,2)$ and such that $\norm{\vec{v}}=1$.
+
+\item True, False, or Nonsense? (Nonsense means at least one
+  vocabulary word was used incorrectly.)
+  \begin{itemize}
+  \item If $W$ is any subspace of an inner product space, then
+    $W^\perp\cap W=\{\vec{0}\}$.
+  \item If $T:\mathbb{P}_2\to M^{2\times 2}(\R)$ is a one-to-one and
+    onto linear transformation, then the standard matrix $A_T$ of $T$
+    is invertible.
+  \item If $S$ is a linearly independent set of vectors in a vector
+    space $V$, then $S$ is a basis of $\Span S$.
+  \item If $P(t)$ is an $n\times n$ matrix whose columns are solutions
+    to the system of differential equations $\vec{x}'(t)=A\vec{x}(t)$,
+    then $P(t)$ is a fundamental matrix of the system.
+  \item If $A$ is $3\times 3$ with a one-dimensional nullspace, then
+    the matrix $A$ has dimension $2$.
+  \end{itemize}
+
+\item True/False (proof or counterexample)
+  \begin{itemize}
+  \item If $A,B,C$ are symmetrix $n\times n$ matrices, then $AB+C$ is
+    symmetric.
+  \item If $A,B$ are matrices such that $AB=I_n$, then both $A,B$ are
+    invertible.
+  \item If $S=\{v_1,\dots,v_n\}$ is a set of vectors in some vector
+    space, and some linear combination of them is $\vec{0}$, then $S$
+    is a linearly independent set.
+  \item If $A$ is a matrix, then $\Row A=\Row A^TA$.
+  \item The initial value problem $ay''+by'+cy=0$, $y(0)=0$ has a
+    unique solution for every $a,b,c\in\R$.
+  \item If $A$ is $n\times n$ and $A^2=0$, then the characteristic
+    polynomial of $A$ is $\lambda^n$.
+  \item If $A$ can be row-reduced to $B$, then $A$ and $B$ have the
+    same determinant.
+  \item If $A$ is $5\times 6$ and $\dim\Nul A=1$, then
+    $T(\vec{x})=A\vec{x}$ is onto.
+  \item Every linearly independent subset of a finite-dimensional
+    vector space $V$ has a subset which spans $V$.
+  \item If $\{f_1,f_2,f_3\}$ is a linearly independent set of
+    functions from $\R$ to $\R$, then the Wronskian
+    $W[f_1,f_2,f_3](t)\neq 0$ for all $t$.
+  \item If $\{v_1,\dots,v_n\}$ is a set of nonzero orthogonal vectors
+    then $\{v_1,\dots,v_n\}$ is linearly independent.
+  \item Linearly independent eigenvectors have distinct eigenvalues.
+  \end{itemize}
+\item Find a fundamental matrix for a system $\vec{x}'(t)=A\vec{x}$
+  and use it to compute $e^{tA}$.
+
+\item Find the general solution to the differential equation
+  $y''(x)-y'(x)-2y(x)=\cos x-\sin 2x$.
+
+\item Give an example of a matrix $A$ and a vector $\vec{b}$ such that
+  $A\vec{x}=\vec{b}$ has a non-unique solution.
+\item Find all solutions to the ODE $y''-4y'+5y=te^{2t}$ such that $y(0)=y'(0)$.
+\item A $3\times 3$ matrix contains integer entries, where the
+  diagonal entries are odd and the non-diagonal entries are even.  Is
+  the matrix always invertible, sometimes invertible, or never
+  invertible?
+
+\item Let $A=(0,1,1;1,0,1;1,1,0)$. Find the eigenvalues, find bases
+  for the eigenspaces, orthogonally diagonalize $A$.
+\item Let $A$ be a square matrix, $\lambda$ a real eigenvalue with
+  eigenvector $\vec{u}$. Prove that the vector-valued function
+  $\vec{x}(t)=e^{\lambda t}\vec{u}$ is a solution to the system
+  $\vec{x}'=A\vec{x}$.
+\item Suppose that $A$ is a $4\times 4$ matrix. Suppose that
+  $v_1,v_2,v_3$ are nonzero vectors in $\R^4$ such that
+  $Av_1=(1,0,0,0)$, $Av_2=(0,-2,0,0)$, $Av_3=(0,0,0,0)$. Determine the
+  minimum and maxmimum possible rank of $A$.
+\item Suppose that $T$ is an $n\times n$ matrix satisfying
+  $T^2=-I_n$. Prove that $n$ must be even.
+\item Suppose that a square matrix $A$ satisfies $(A-\lambda I)^k=0$
+  for some positive integer $k$. Prove that the only eigenvalue of $A$
+  is $\lambda$.
+\item Given a matrix, compute $e^{tB}$.
+
+\item Is a given matrix diagonalizable?
+\item Suppose $A$ is a $3\times 3$ matrix with a basis of orthonormal
+  eigenvectors $\{v_1,v_2,v_3\}$. Let $Q=[v_1\quad v_2\quad
+  v_3]$. Which of the following is always diagonal? (a) $Q^TAQ$ (b)
+  $QAQ^T$ (c) $QAQ^{-1}$ (d) None of these.
+\item Given particular solutions for different equations with the same
+  homogeneous solution, superposition.
+\item Solve the initial value problem $x'(t)=(1,1;0,1)x(t)+(e^{2t},0)$, $x(0)=(1,0)$.
+
+\item For a matrix $A$, find a matrix $B$ such that $B^2=A$.

@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Julia set viewer</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>Julia set viewer</h1>
+        
+  
+  
+  <div class="figure figure_r">
+    <A HREF="../toys/julia/julia.html"><IMG TITLE=""SRC="300_blog_14_2_2_julia.png"></A>
+  </div><P><EM>I admit that I&rsquo;m writing this in 2017, though I meant to write
+    about it 2014!</EM></P>
+
+<P>I made a <A HREF="../toys/julia/julia.html"><B>Julia set viewer</B></A>
+  that can run in the web browser, rendering it in realtime using the
+  GPU.</P>
+
+<P>The mouse controls <span class='MathJax_Preview'>c</span><script type='math/tex'>c</script> in the iteration <span class='MathJax_Preview'>z\mapsto z^2+c</span><script type='math/tex'>z\mapsto z^2+c</script>, where the
+  initial <span class='MathJax_Preview'>z</span><script type='math/tex'>z</script> is the particular point of the complex plane
+  corresponding to the pixel.</P>
+
+<P>The coloring doesn&rsquo;t mean anything; it is just from an earlier GPU
+  experiment.  The controls:
+  </P>
+
+<DL>
+<DT><B>Shift-a</B> or <B>middle click</B></DT><DD> Go on a guided tour of interesting points.
+  </DD>
+<DT><B>Esc</B></DT><DD> Regain control.
+  </DD>
+<DT><B>Space</B></DT><DD> Sets a point <span class='MathJax_Preview'>r</span><script type='math/tex'>r</script> that is fixed while held, and then <span class='MathJax_Preview'>c</span><script type='math/tex'>c</script>
+    is <span class='MathJax_Preview'>r+(m-r)\zeta</span><script type='math/tex'>r+(m-r)\zeta</script>, where <span class='MathJax_Preview'>\zeta</span><script type='math/tex'>\zeta</script> is the zoom controlled by the mousewheel and <span class='MathJax_Preview'>m</span><script type='math/tex'>m</script> is the mouse.
+  </DD>
+<DT><B>Doubleclick</B></DT><DD> Pauses or unpauses.  When pausing,
+    copies the current point to the URL.
+  </DD>
+<DT><B>Space-click</B></DT><DD> Adds point to animation path.
+  </DD>
+<DT><B>Right click</B></DT><DD> Begins animation.
+  </DD>
+<DT><B>0</B></DT><DD> Toggles rendering mode between black background and white
+    background.
+  </DD>
+<DT><B>P</B></DT><DD> Toggles showing the current point <span class='MathJax_Preview'>c</span><script type='math/tex'>c</script>.
+  </DD>
+<DT><B>Enter</B></DT><DD> Cycles modes (1, 2, or 3).
+  </DD>
+<DT><B>1</B></DT><DD> Switches to mode 1. View Julia set.
+  </DD>
+<DT><B>2</B></DT><DD> Switches to mode 2. View corresponding point in Mandelbrot
+    set.  The <span class='MathJax_Preview'>\zeta</span><script type='math/tex'>\zeta</script> for <B>Space</B> is the zoom for this view.
+  </DD>
+<DT><B>3</B></DT><DD> Switches to mode 3. Distorts between modes 1 and 2.
+  </DD>
+<DT><B>s</B></DT><DD> Replaces current point <span class='MathJax_Preview'>c</span><script type='math/tex'>c</script> with <span class='MathJax_Preview'>c^2+c</span><script type='math/tex'>c^2+c</script>.
+  </DD>
+<DT><B>v</B> and <B>w</B></DT><DD> Replaces current point with one of two inverses of <span class='MathJax_Preview'>c^2+c</span><script type='math/tex'>c^2+c</script>.
+  </DD>
+</DL>
+<P>The idea after getting the program to show Julia sets at all was to
+  make it drift through different parameters automatically.  At first,
+  I thought I thought a complicated-enough path would be sufficient,
+  but most Julia sets are not that interesting!</P>
+
+<P>I got a bunch of people to play with it and choose their favorite
+  points (<B>Shift-click</B> would send the point to the server),
+  and then the implementation of <B>Shift-A</B> is to plot a path
+  through these points.</P>
+
+<P>My hunch was that the interesting points would have something to do
+  with the boundary of the Mandelbrot set, and indeed:</P>
+
+<P><IMG TITLE=""SRC="blog_14_2_2_goodjulias.png"></P>
+
+<P>The Mandelbrot set records the connectivity of all the Julia sets.
+  The boundary of the Mandelbrot set is where the connectivity is
+  uncertain, which gives interesting fractal fringes.  Though, it
+  looks like there are some other interesting configurations in the
+  centers of the Mandelbrot bulbs, where the corresponding Julia set
+  has a pleasing symmetry.</P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 2 February 2014 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="./index.html">Mathblog</A> > Julia set viewer
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

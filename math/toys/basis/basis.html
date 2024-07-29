@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <style type="text/css">
+/*      body, html { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }*/
+      #canvas-holder { border: 0px solid #ccc; display: inline-block}
+    </style>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="basis.js"></script>
+  </head>
+  <body>
+    <div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <h1>Bases and coordinates in R<sup>2</sup></h1>
+      </div>
+      <div>
+        <div id="canvas-holder">
+          <canvas id="canvas" width="750" height="320"></canvas>
+          <div style="text-align:right;">
+            <input id="reset" type="button" value="Reset">
+          </div>
+        </div>
+      </div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <p>Drag the circular handles on the two colored vectors in the
+        right vector space to specify a basis.</p>
+
+        <p>The left vector space is the space of coordinates for the
+        vector space to the right.</p>
+
+        <p>Drag the point in the left vector space to specify a
+        coordinate <em>c</em>: the corresponding vector <em>B</em>(<em>c</em>)
+        appears in the right vector space.</p>
+
+        <p>Drag the point in the right vector space to specify a
+        vector <em>v</em>: the corresponding
+        coordinate <em>B</em><sup>-1</sup>(<em>v</em>) appears in the left vector
+        space.</p>
+
+        <p>If the black point is to escape the square region on either
+          side, its position is "clamped."  This is to make sure you
+          can always see the point in both vector spaces at all times.
+          The "preimage" of the boundary of the right vector space is
+          represented as a parallelogram in the left, and its only
+          purpose is to show the limits to the point's location.</p>
+
+        <p>If the vectors are linearly dependent (that is, if the
+          basis matrix has a zero determinant), then dragging the
+          black point is temporarily disabled.</p>
+
+        <p>The standard basis for the right vector space is shown as a
+        light blue grid.</p>
+
+        <h2>Guided tour</h2>
+        <ul>
+          <li>With the (default) standard basis, move the point around.  What is the relationship between the point and its coordinate?</li>
+          <li>Move the green vector to (1,1) and the red vector to
+          (-1,1).  Move the point to (2,1) in the right vector space:
+          check that its coordinates are (1.5,-0.5).  Move the point
+          to coordinate (1,1) in the left vector space: check that the
+          corresponding vector is (0,2).</li>
+          <li>Create a basis with determinant 1 and with determinant
+          -1.  What is the sign of the determinant measuring?  Look at
+          the spatial relationship between the green and red vectors
+          in each case.
+          <li>Let's pretend that the horizontal axis in the right side
+          represents the constant term of a polynomial, and the
+          vertical axis the linear term, so (<em>a</em>,<em>b</em>)
+          is <em>a</em> + <em>bx</em>.  Move the green vector to 1
+          - <em>x</em> and the red vector to 1 + <em>x</em>.  What is
+          the coordinate of 2<em>x</em>?  (Check that it is
+          (-1,1).)</li>
+        </ul>
+
+        <hr>
+
+        <p>&copy;2016 Kyle Miller</p>
+      </div>
+    </div>
+  </body>
+</html>

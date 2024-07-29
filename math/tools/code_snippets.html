@@ -1,0 +1,434 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Code snippets</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>Code snippets</h1>
+        
+  
+  
+  <P>The following code is for informational use only, with no
+  warranties, express or implied.  (Any corrections or improvements to
+  these snippets are welcome!)</P>
+
+<A NAME="sec%3Afox-derivs"></A><H2>1. Fox derivatives and the Alexander ideals</H2>
+  <P>Here is some Mathematica code for calculating Fox derivatives,
+  Wirtinger presentations, and Alexander ideals.  There are a few
+  parts: <tt>w</tt> represents words in the free group algebra,
+  <tt>FD</tt> calculates Fox derivatives of such elements, <tt>wirt</tt>
+  calculates Wirtinger presentations of oriented <tt>PD</tt>s (planar
+  diagrams), and <tt>alex</tt> calculates elementary ideals of a group
+  presentation, assuming there is a homomorphism to an infinite cyclic
+  group such that all the generators map to <span class='MathJax_Preview'>t</span><script type='math/tex'>t</script> (!) (see
+  <A HREF="./code_snippets.html#sec%3Aabel-alex-gps">Abelianizations and Alexander ideals of groups</A> for how to do multivariate Alexander
+  ideals).</P>
+
+<P><pre>ClearAll[w];
+(* w is multiplication in the free group algebra, as a multilinear map *)
+w[x___, w[y___], z___] := w[x, y, z];
+w[x___, a_ + b_, y___] := w[x, a, y] + w[x, b, y];
+w[x___, 0, y___] := 0;
+w[x___, (coeff : Except[_w]) a_w, y___] := coeff w[x, a, y];
+w /: x_w^-1 := #^-1 &amp; /@ Reverse[x];
+w /: x_w^n_Integer := w @@ Table[If[n &gt;= 0, x, x^-1], Abs[n]];
+w[x___, g_Symbol^n_Integer, z___] /; n != -1 := w[x, w[g]^n, z];
+w[x___, a_, a_^-1, y___] := w[x, y];
+w[x___, a_^-1, a_, y___] := w[x, y];
+
+ClearAll[FD];
+FD::usage = 
+  "FD[word_w,g_Symbol] is the Fox derivative of w with respect to g.";
+FD[w[g_Symbol], h_] := If[SameQ[g, h], w[], 0];
+FD[w[], h_] := 0;
+FD[w[g_Symbol^-1], h_] := -w[g^-1, FD[w[g], h]];
+FD[w[u_, v___], h_] := FD[w[u], h] + w[u, FD[w[v], h]];
+</pre></P>
+
+<P>For example, <tt>FD[w[x^3, y^-2], x]</tt> is
+  <tt>w[] + w[x] + w[x, x]</tt> and <tt>FD[w[x^3, y^-2], y]</tt> is
+  <tt>-w[x, x, x, 1/y] - w[x, x, x, 1/y, 1/y]</tt>.  (Mathematica
+  considers <tt>y^-1</tt> and <tt>1/y</tt> to be exactly the same.)</P>
+
+<P><pre>ClearAll[wirt, PD, Xr, Xl];
+PD::usage = "PD[Xr...,Xl...] is an oriented planar diagram.";
+Xr::usage = 
+  "Xr[a_,b_,c_,d_] d-to-b is the overstrand, a-to-c is the understrand.";
+Xl::usage = 
+  "Xl[b_,c_,d_,a_] a-to-c is the overstrand, d-to-b is the understrand.";
+wirt[p_PD] := Module[{g, rel},
+   g[i_] := Symbol["g" &lt;&gt; ToString[i]];
+   rel[Xr[a_, b_, c_, d_]] := {
+     w[g[d], g[b]^-1], 
+     w[g[c], g[b], g[a]^-1, g[d]^-1]};
+   rel[Xl[b_, c_, d_, a_]] := {
+     w[g[a], g[c]^-1], 
+     w[g[c], g[b], g[a]^-1, g[d]^-1]};
+   pres[g /@ Union[Flatten[List @@@ List @@ p]],
+    Flatten[rel /@ List @@ p]]
+   ];
+(* a right-handed trefoil knot: *)
+k31 = PD[Xr[1, 2, 5, 4], Xr[2, 3, 6, 5], Xr[3, 1, 4, 6]];
+(* a figure-eight knot: *)
+k41 = PD[Xl[2, 7, 1, 6], Xl[6, 3, 5, 2], Xr[7, 5, 8, 4], 
+   Xr[3, 1, 4, 8]];
+</pre></P>
+
+<div class="figure figure_c">
+    <CENTER>
+      <IMG TITLE=""SRC="550_pd_crossings.png">
+    </CENTER>
+
+      <div class="caption"><b>Figure 1.</b> <tt>X</tt> is a crossing for unoriented planar diagrams,
+      and <tt>Xr</tt> and <tt>Xl</tt> are crossings for oriented planar
+      diagrams.</div>
+  </div>
+  <div class="figure figure_c">
+    <CENTER>
+      <IMG TITLE=""SRC="pd_fig_eight.png">
+    </CENTER>
+
+      <div class="caption"><b>Figure 2.</b> The edge numbering used in the planar diagram <tt>k41</tt>.</div>
+  </div><P>This definition of the Wirtinger presentation is not particularly
+  efficient with the number of generators, but the approach makes it so we do
+  not need to figure out the arcs.</P>
+
+<P><pre>ClearAll[alex];
+alex::usage = 
+  "alex[presentation,t] assumes all generators have image t in the abelianization";
+alex[pres[gens_, rels_], t_] := 
+  Module[{jacobi, abjacobi, ideals},
+   jacobi = Outer[FD[#2, #1] &amp;, gens, rels];
+   abjacobi = jacobi /. (# -&gt; t &amp; /@ gens) /. val_w :&gt; Times @@ val;
+   ideals = 
+    Table[GroebnerBasis[Flatten[Minors[abjacobi, k]], t, CoefficientDomain -&gt; Integers],
+      {k, 1, Min[Length@gens, Length@rels]}];
+   Replace[
+    ideals, {{1} ..., good : (Except[{} | {1}] ..), {} ...} :&gt; 
+     Reverse[{good}]]
+   ];
+</pre></P>
+
+<P>This function returns the list of elementary ideals, in ascending
+  order of inclusion.  The first ideal is generated by a single
+  element, the Alexander polynomial.</P>
+
+<P>For example, <tt>alex[wirt[k31], t]</tt> is <tt>{{1 - t + t^2}}</tt>,
+  and <tt>alex[wirt[k41], t]</tt> is <tt>{{1 - 3 t + t^2}}</tt>.</P>
+
+<P>As it is, <span class='MathJax_Preview'>8_{18}</span><script type='math/tex'>8_{18}</script> is out of reach of this algorithm due to the sizes of the intermediate matrices.
+<pre>k8i18 = PD[Xl[8, 13, 7, 12], Xr[13, 3, 14, 2], Xr[1, 7, 2, 6], 
+   Xl[4, 9, 3, 8], Xl[12, 1, 11, 16], Xr[9, 15, 10, 14], 
+   Xr[5, 11, 6, 10], Xl[16, 5, 15, 4]];
+</pre></P>
+
+<P>But, with some simple Tietze moves:
+<pre>ClearAll[simplifyPres];
+simplifyPres[pres[gens_, {x___, w[], y___}]] := 
+  simplifyPres[pres[gens, {x, y}]];
+simplifyPres[pres[gens_, {x___, w[g_, h_^-1] | w[h_^-1, g_], y___}]] := 
+  simplifyPres[pres[DeleteCases[gens, h], {x, y} /. h -&gt; g]];
+simplifyPres[p_pres] := p;
+</pre>
+  we can get
+<pre>In[1]:= alex[simplifyPres[wirt[k8i18]], t]
+
+Out[1]= {{1 - 5 t + 10 t^2 - 13 t^3 + 10 t^4 - 5 t^5 + t^6},
+         {1 - t + t^2}}
+</pre></P>
+
+<A NAME="sec%3Akauffman-bracket"></A><H2>2. The Kauffman bracket polynomial</H2>
+  <P>This Mathematica code is basically from <A HREF="http://katlas.org/wiki/The_Jones_Polynomial">the Knot
+  Atlas</A>.  The idea is
+  that the local relation on diagrams for the Kauffman bracket
+  polynomial can be thought of as an expansion in the Temperley-Lieb
+  planar algebra.</P>
+
+<P>The first definition is for calculations in
+  <span class='MathJax_Preview'>\mathrm{TL}^{-(A^2+A^{-2})}</span><script type='math/tex'>\mathrm{TL}^{-(A^2+A^{-2})}</script>.  Loops evaluate to <span class='MathJax_Preview'>-(A^2+A^{-2})</span><script type='math/tex'>-(A^2+A^{-2})</script>,
+  and paths contract.  <tt>P[a,b]</tt> is an unoriented path between
+  boundary half-edges <tt>a</tt> and <tt>b</tt>.</P>
+
+<P><pre>ClearAll[P, A];
+SetAttributes[P, Orderless];
+P /: P[a_, b_] P[b_, c_] := P[a, c];
+P /: P[a_, b_]^2 := P[a, a];
+P /: P[a_, a_] := -(A^2 + A^-2);
+</pre></P>
+
+<P>We need that rule for squaring because of the way Mathematica can
+  simplify expressions.</P>
+
+<P>Then, like in <A HREF="./code_snippets.html#sec%3Afox-derivs">Fox derivatives and the Alexander ideals</A>, we have a definition for
+  <tt>PD</tt>s of <EM>unoriented</EM> planar diagrams.
+<pre>ClearAll[PD, X];
+(*a right-handed trefoil*)
+k31 = PD[X[1, 2, 5, 4], X[2, 3, 6, 5], X[3, 1, 4, 6]];
+</pre></P>
+
+<P>The normalized Kauffman bracket can be given by the following expansion:
+<pre>ClearAll[kb];
+kb[diagram_PD] := FullSimplify[Times @@ (diagram /. {
+        X[a_, b_, c_, d_] :&gt; A P[a, b] P[c, d] + A^-1 P[a, d] P[b, c]
+        })/-(A^2 + A^-2)];
+</pre>
+  Since every crossing is given two terms, the running time is
+  exponential in the number of crossings.  The Knot Atlas gives a
+  heuristic for multiplication order based on minimizing the size of
+  the frontier as one expands out the Kauffman bracket.  Using planar
+  separators, one can even find a
+  <span class='MathJax_Preview'>O(\operatorname{poly}(n)2^{C\sqrt{n}})</span><script type='math/tex'>O(\operatorname{poly}(n)2^{C\sqrt{n}})</script> time-and-space algorithm
+  (for some <span class='MathJax_Preview'>C&gt;0</span><script type='math/tex'>C>0</script>)<A NAME="ref_footnote_8_1"></A><sup><A HREF="./code_snippets.html#footnote_8_1">[1]</A></sup></P>
+
+<P>For oriented planar diagrams, in the sense of <A HREF="./code_snippets.html#sec%3Afox-derivs">Fox derivatives and the Alexander ideals</A>,
+  we can obtain the Jones polynomial since the writhe is easy to
+  calculate.</P>
+
+<P><pre>ClearAll[jones, writhe, mirror];
+writhe[diagram_PD] := Plus @@ (diagram /. {_Xr -&gt; 1, _Xl -&gt; -1});
+mirror[diagram_PD] := diagram /. {
+    Xr[a_, b_, c_, d_] :&gt; Xl[b, c, d, a],
+    Xl[b_, c_, d_, a_] :&gt; Xr[a, b, c, d]};
+jones[diagram_PD] := 
+  Collect[FullSimplify[
+    kb[diagram /. Xr | Xl -&gt; X]*(-A^-3)^writhe[diagram] /. 
+     A -&gt; t^(-1/4)], t];
+</pre></P>
+
+<P>So, with the right-handed trefoil:
+<pre>k31 = PD[Xr[1, 2, 5, 4], Xr[2, 3, 6, 5], Xr[3, 1, 4, 6]];
+</pre>
+  we have
+<pre>In[1]:= jones[k31]
+
+Out[1]= t + t^3 - t^4
+
+In[2]:= jones[mirror[k31]]
+
+Out[2]= -(1/t^4) + 1/t^3 + 1/t
+</pre></P>
+
+<A NAME="sec%3Aabel-alex-gps"></A><H2>3. Abelianizations and Alexander ideals of groups</H2>
+  <P>This is Mathematica code for dealing with group words,
+  abelianizations, and Alexander ideals of groups.  The first part is
+  group words, which are <tt>w</tt> terms of symbols raised to powers.</P>
+
+<P><pre>ClearAll[w];
+w[x___, 1, y___] := w[x, y];
+w[x___, w[y___], z___] := w[x, y, z];
+w /: word_w^-1 := #^-1 &amp; /@ Reverse[word];
+w /: word_w^n_ := w @@ Table[Sequence @@ If[n &gt;= 0, word, word^-1], Abs[n]];
+w[x___, a_, a_, y___] := w[x, a^2, y];
+w[x___, a_, a_^n_, y___] := w[x, a^(1 + n), y];
+w[x___, a_^n_, a_, y___] := w[x, a^(n + 1), y];
+w[x___, a_^n_, a_^m_, y___] := w[x, a^(n + m), y];
+</pre></P>
+
+<P>We also have group presentations.  For example:
+<pre>s3 = pres[{x, y}, {w[x, x, x], w[y, y], w[x, y, x, y]}];
+trefwirt = pres[{a, b}, {w[a, b, a, w[b, a, b]^-1]}];
+treftorus = pres[{x, y}, {w[x^2, y^-3]}];
+quaternions = pres[{i, j, k}, {w[i, j, k^-1], w[j, k, i^-1], w[k, i, j^-1]}];
+</pre></P>
+
+<P>Abelianizations are a matter of computing Smith normal form of the
+  linearized presentation matrix.
+<pre>ClearAll[ab];
+ab[pres[gens_, rels_]] := Module[{smod, vec, linRel, u, r, v, ords},
+   (*smod is Mod but allows mod by 0*)
+   SetAttributes[smod, {Listable}];
+   smod[m_, 0] := m;
+   smod[m_, n_] := Mod[m, n];
+
+   (*an indicator vector for a generator*)
+   vec[g_Symbol] := Replace[gens, {g -&gt; 1, h_ :&gt; 0}, 1];
+
+   (*linearize a relationship*)
+   linRel[word_w] := Plus @@ Replace[List @@ word,
+      x_Symbol^(n_: 1) :&gt; n vec[x]
+      , 1];
+   {u, r, v} = SmithDecomposition[linRel /@ rels];
+
+   (*get the diagonal with the correct length*)
+   ords = MapThread[Plus, r];
+
+   With[{nontriv = Position[ords, Except[1], 1, Heads -&gt; False]},
+    ords = Extract[ords, nontriv];
+    abhom[ords, 
+     MapThread[#1 -&gt; smod[Extract[#2, nontriv], ords] &amp;, {gens, v}]]
+    ]
+   ];
+</pre>
+  The result is a pair of (1) the orders for the direct summands of
+  the abelianization and (2) a homomorphism from the group to the
+  abelianization. For example,
+<pre>In[1]:= ab[treftorus]
+
+Out[1]= abhom[{0}, {x -&gt; {3}, y -&gt; {2}}]
+</pre>
+  means that the abelianization of <span class='MathJax_Preview'>\langle x,y\mid x^2y^{-3}\rangle</span><script type='math/tex'>\langle x,y\mid x^2y^{-3}\rangle</script>
+  is <span class='MathJax_Preview'>\mathbb{Z}</span><script type='math/tex'>\mathbb{Z}</script> (since this is <span class='MathJax_Preview'>\mathbb{Z}/0\mathbb{Z}</span><script type='math/tex'>\mathbb{Z}/0\mathbb{Z}</script>), and the
+  abelianization homomorphism is given by <span class='MathJax_Preview'>x\mapsto 3</span><script type='math/tex'>x\mapsto 3</script> and
+  <span class='MathJax_Preview'>y\mapsto 2</span><script type='math/tex'>y\mapsto 2</script>.</P>
+
+<P>The Alexander ideals of a group can be thought of as the elementary
+  ideals of the presentation matrix for the first homology of the
+  maximal abelian cover of a <span class='MathJax_Preview'>K(G,1)</span><script type='math/tex'>K(G,1)</script>, with the homology group as a
+  module over the group ring of the abelianization.  This can be
+  calculated using Fox derivatives.  We deal with torsion by inserting
+  polynomials such as <span class='MathJax_Preview'>t^n-1</span><script type='math/tex'>t^n-1</script> into the ideals (as <tt>rideal</tt>), and
+  so the resulting ideals should be thought of as being in the free
+  Laurent polynomial ring.
+<pre>ClearAll[alex];
+alex[p : pres[gens_, rels_]] := 
+  Module[{ords, hom, vars, ghom, rideal, jacobi, abjacobi, fw, FD, ideals},
+   
+   {ords, hom} = List @@ ab[p];
+   vars = Table[Symbol["t" &lt;&gt; ToString[i]], {i, Length@ords}];
+   ghom = Replace[hom, {(g_ -&gt; vec_) :&gt; (g -&gt; Times @@ (vars^vec))}, 1];
+   rideal = MapThread[#2^#1 - 1 &amp;, {ords, vars}];
+   
+   (*fw is multiplication in the free group algebra, as a multilinear map*)
+   fw[x___, fw[y___], z___] := fw[x, y, z];
+   fw[x___, a_ + b_, y___] := fw[x, a, y] + fw[x, b, y];
+   fw[x___, 0, y___] := 0;
+   fw[x___, (coeff : Except[_fw]) a_fw, y___] := coeff fw[x, a, y];
+   fw /: x_fw^-1 := #^-1 &amp; /@ Reverse[x];
+   fw /: x_fw^n_Integer := fw @@ Table[If[n &gt;= 0, x, x^-1], Abs[n]];
+   fw[x___, g_Symbol^n_Integer, z___] /; n != -1 := fw[x, fw[g]^n, z];
+
+   (*fw is multiplication in the free group algebra,as a multilinear map*)
+   fw[x___, fw[y___], z___] := fw[x, y, z];
+   fw[x___, a_ + b_, y___] := fw[x, a, y] + fw[x, b, y];
+   fw[x___, 0, y___] := 0;
+   fw[x___, (coeff : Except[_fw]) a_fw, y___] := coeff fw[x, a, y];
+   fw[x___, g_Symbol^n_Integer, z___] /; n != -1 :=
+     fw[x, Sequence @@ Table[If[n &gt;= 0, g, g^-1], Abs[n]], z];
+   
+   FD::usage = "FD[word_w,g_Symbol] is the Fox derivative of w with respect to g.";
+   FD[fw[g_Symbol], h_] := If[SameQ[g, h], fw[], 0];
+   FD[fw[], h_] := 0;
+   FD[fw[g_Symbol^-1], h_] := -fw[g^-1, FD[fw[g], h]];
+   FD[fw[u_, v___], h_] := FD[fw[u], h] + fw[u, FD[fw[v], h]];
+   
+   jacobi = Outer[FD[#2 /. a_w :&gt; fw @@ a, #1] &amp;, gens, rels];
+   abjacobi = jacobi /. fw :&gt; Times /. ghom;
+   
+   ideals = 
+    Table[GroebnerBasis[Join[rideal, Flatten[Minors[abjacobi, k]]], 
+      vars,
+      CoefficientDomain -&gt; Integers],
+     {k, 1, Min[Length@gens, Length@rels]}];
+   
+   {ghom, 
+    Replace[ideals, {{1} ..., good : (Except[{} | {1}] ..), {} ...} :&gt;
+       Reverse[{good}]]}
+   ];
+</pre>
+  The result is a map from group generators to polynomials (thought as
+  elements of the group ring for the abelianization) and a list of the
+  Alexander ideals in ascending order of inclusion.
+<pre>In[1]:= alex[s3]
+        alex[trefwirt]
+        alex[treftorus]
+        alex[quaternions]
+
+Out[1]= {{x -&gt; 1, y -&gt; t1},
+         {{1 + t1}, {3, 1 + t1}}}
+
+Out[2]= {{a -&gt; t1, b -&gt; t1},
+         {{1 - t1 + t1^2}}}
+
+Out[3]= {{x -&gt; t1^3, y -&gt; t1^2},
+         {{1 - t1 + t1^2}}}
+
+Out[4]= {{i -&gt; t1 t2, j -&gt; t1, k -&gt; t2},
+         {{-1 + t2^2, 1 + t1 + t2 + t1 t2, -1 + t1^2},
+          {2, 1 + t2, 1 + t1}}}
+</pre></P>
+
+<P>A more exciting example is the Borromean rings.
+<pre>In[1]:= borrom = simplifyPres[
+ wirt[PD[Xr[1, 5, 2, 8], Xr[5, 9, 6, 12], Xr[9, 1, 10, 4], 
+   Xl[8, 11, 7, 10], Xl[12, 3, 11, 2], Xl[4, 7, 3, 6]]]]
+
+Out[1]= pres[{g2, g4, g6, g8, g10, g12}, {w[g2, g8, 1/g4, 1/g8], 
+  w[g6, g12, 1/g8, 1/g12], w[g10, g4, 1/g12, 1/g4], 
+  w[g10, g8, 1/g10, 1/g6], w[g2, g12, 1/g2, 1/g10], 
+  w[g6, g4, 1/g6, 1/g2]}]
+
+In[2]:= alex[borrom] // Factor
+
+Out[2]= {{g2 -&gt; t2, g4 -&gt; t2, g6 -&gt; t1, g8 -&gt; t1, g10 -&gt; t3, g12 -&gt; t3},
+         {{(-1 + t1) (-1 + t2) (-1 + t3)^2,
+           (-1 + t1) (-1 + t2)^2 (-1 + t3),
+           (-1 + t1)^2 (-1 + t2) (-1 + t3)},
+          {(-1 + t2) (-1 + t3), (-1 + t1) (-1 + t3), (-1 + t1) (-1 + t2)}}}
+</pre></P>
+
+<P><div class="footnotes"><A NAME="footnote_8_1"></A><div class="footnote">
+<sup><A HREF="./code_snippets.html#ref_footnote_8_1">[1]</A></sup> Lauren Ellenberg, Gabriella Newman,
+    Stephen Sawin, and Jonathan Shi. &ldquo;Efficient Computation of the
+    Kauffman Bracket.&rdquo; Journal of Knot Theory and Its
+    Ramifications. 23
+    (2013). <A HREF="https://doi.org/10.1142/S0218216514500266">10.1142/S0218216514500266</A>. </div>
+</div></P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 20 July 2018 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="./tools.html">Math tools</A> > Code snippets
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

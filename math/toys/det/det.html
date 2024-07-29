@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript" src="kq.js"></script>
+<script type="text/javascript" src="bignum.js"></script>
+<script type="text/javascript" src="det.js"></script>
+<style type="text/css">
+  #matrix {
+    min-width: 300px;
+    min-height: 150px;
+  }
+  .matrix {
+    position: relative;
+  }
+  .matrix td {
+    text-align: center;
+    padding: 5px;
+  }
+  .matrix:before, .matrix:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    border: 1px solid #000;
+    width: 6px;
+    height: 100%;
+  }
+  .matrix:before {
+    left: -6px;
+    border-right: 0px;
+  }
+  .matrix:after {
+    right: -6px;
+    border-left: 0px;
+  }
+
+  .det {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 2px;
+  }
+  .det td {
+    text-align: center;
+    padding: 5px;
+  }
+  .det:before, .det:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    border: 1px solid #000;
+    width: 1px;
+    height: 100%;
+  }
+  .det:before {
+    left: -0px;
+    border-width: 0 0 0 1px;
+  }
+  .det:after {
+    right: -0px;
+    border-width: 0 1px 0 0;
+  }
+
+
+  .actions {
+    padding: 1em;
+  }
+
+  #output {
+    padding: 2em;
+  }
+</style>
+</head>
+<body>
+  <p>Enter a matrix using Mathematica-style notation.  Rational number
+  such as <tt>3/7</tt> are allowed, but not floating-point numbers.</p>
+  <textarea id="matrix">{{1,1,1},{1,2,3},{1,4,9}}</textarea>
+  <br>
+  <input type="button" id="compute" value="Expand!">
+  <div id="error"></div>
+  <div id="output"></div>
+</body>

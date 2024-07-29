@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <style type="text/css">
+/*      body, html { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }*/
+      #canvas-holder { border: 0px solid #ccc; display: inline-block}
+    </style>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="fft.js"></script>
+    <script type="text/javascript" src="wave.js"></script>
+  </head>
+  <body>
+    <div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <h1>Wave equation</h1>
+      </div>
+      <div>
+        <div id="canvas-holder">
+          <canvas id="canvas" width="750" height="320"></canvas>
+          <div style="text-align:right;">
+            <input id="reset" type="button" value="Reset">
+          </div>
+        </div>
+      </div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <p>This shows the time evolution of a solution for the wave
+        equation <em>u<sub>tt</sub></em>
+        = <em>&alpha;</em><sup>2</sup><em>u<sub>xx</sub></em> given an
+        initial condition, and subject to the boundary conditions of
+        the left and right endpoints being fixed.</p>
+
+        <p>Click and drag to adjust the current wave displacement at
+        different points along the curve.  The light grey lines are
+        different terms of the Fourier series at the current moment
+        &mdash; the linear combination of these gives the black
+        line.</p>
+
+        <p>Try creating standing waves, for instance picking out a
+        single Fourier mode.</p>
+
+        <p>Try creating small impulses and see how they reflect off of
+          the boundaries.</p>
+
+        <p>Try creating the shape you would imagine a string would be
+        when it is about to be plucked.</p>
+
+        <p>&copy;2016 Kyle Miller</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <style type="text/css">
+/*      body, html { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }*/
+      #canvas-holder { border: 0px solid #ccc; display: inline-block}
+    </style>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="basis.js"></script>
+  </head>
+  <body>
+    <div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <h1>Basis change toy</h1>
+      </div>
+      <div>
+        <div id="canvas-holder">
+          <canvas id="canvas" width="750" height="750"></canvas>
+          <div style="text-align:right;">
+            <input id="reset" type="button" value="Reset">
+          </div>
+        </div>
+      </div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <p>The vector space on the right has two separate bases: one
+        given by a green and a red vector, and the other by blue and
+        yellow.  Drag the circular handles on the vectors in this
+        space to choose the two basis matrices displayed in the
+        center.</p>
+
+        <p>The change of basis matrix for the chosen bases is
+          displayed on the left.  This transforms coordinates relative
+          to the first basis into coordinates relative to the
+          second.</p>
+
+        <p>Drag the black point in any of the three vector spaces to
+        see its corresponding position in the other two.  If the black
+        point is to escape the square region in any of the vector
+        spaces, its position is "clamped."  This is to make sure you
+        can always see the point in each vector space at all
+        times.</p>
+
+        <p>If the vectors are linearly dependent (that is, if the
+          basis matrix has a zero determinant), then dragging the
+          black point is temporarily disabled.</p>
+
+        <hr>
+
+        <p>&copy;2016 Kyle Miller</p>
+      </div>
+    </div>
+  </body>
+</html>

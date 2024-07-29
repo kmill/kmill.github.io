@@ -1,0 +1,584 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>What are Gauss and Dowker-Thistlethwaite codes?</title>
+    <LINK REL="stylesheet" HREF="../css/style.css" TYPE="text/css">
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        showProcessingMessages:false,
+        messageStyle:"none",
+        extensions:["AssistiveMML.js","a11y/accessibility-menu.js"],
+        jax:["input/TeX", "output/CommonHTML"],
+        TeX:{
+          extensions:["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"],
+          noUndefined:{attributes:{mathcolor:"red",mathbackground:"#FFEEEE",mathsize:"90%"}},
+          equationNumbers:{
+            autoNumber:"AMS"            
+          },
+          Macros:{"C": ["\\mathbb{C}", 0], "abs": ["\\lvert #1 \\rvert", 1], "F": ["\\mathbb{F}", 0], "inv": ["^{-1}", 0], "N": ["\\mathbb{N}", 0], "Q": ["\\mathbb{Q}", 0], "R": ["\\mathbb{R}", 0], "im": ["\\operatorname{im}", 0], "Aut": ["\\operatorname{Aut}", 0], "id": ["\\operatorname{id}", 0], "Z": ["\\mathbb{Z}", 0], "gen": ["\\langle #1 \\rangle", 1]}
+        },
+        "SVG":{
+          font:"TeX",
+          linebreaks:{automatic:true}
+        },
+        "CommonHTML":{
+        }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js"></script>
+    <script type="text/javascript">
+       window.typesettingCompleted = false;
+       MathJax.Hub.Queue(function () {
+         //console.log("rendering completed");
+         document.querySelectorAll("script").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_Preview").forEach(tag => {
+           tag.remove();
+         });
+         document.querySelectorAll(".MathJax_CHTML").forEach(tag => {
+           tag.removeAttribute("tabindex");
+         });
+         window.typesettingCompleted = true;
+       });
+    </script>
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="content">
+        <h1>What are Gauss and Dowker-Thistlethwaite codes?</h1>
+        
+  
+  
+  <P>A popular way to study <A HREF="https://en.wikipedia.org/wiki/Knot_(mathematics)">knots</A> is to work with diagrams, which, formally speaking, are immersions of a circle in the plane along with the information about which of the two strands goes over the other at each crossing.
+  The usual convention is to draw the under-strand with a gap, giving a sort of chiaroscuro effect that suggests the under-strand is just a little too far away to be lit.
+  For example, here is how one might draw the knot <A HREF="http://katlas.org/wiki/7_6"><span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script></A>:
+  <CENTER>
+    <IMG TITLE=""SRC="280_7_6.png">
+  </CENTER>
+
+  This represents something like the following knot tied into a loop of rope:
+  <CENTER>
+    <IMG TITLE=""SRC="280_7_6_rope.jpg">
+  </CENTER>
+
+  Diagrams reduce the infinite complexity of all the ways a loop might be embedded in three-dimensional space to a finite amount of data.
+  In this article, we will talk about exactly what this data is and some ways to represent it.
+  The aim is to show how even a computer can do things with knots.</P>
+
+<P>We will begin with how knot (and link) diagrams are planar graphs with additional crossing information, then discuss how to represent particular planar embeddings of a graph with combinatorial maps.
+  From there, we will talk specifically about representing knots with Gauss codes, and then move to the more-efficient representation, Dowker-Thistlethwaite (DT) codes.  It should be known that this comes at the cost of being unable to distinguish between mirror images of the same knot, and there is even more ambiguity for non-prime diagrams, though we&rsquo;ll see a variation without this limitation.</P>
+
+<P>The description of DT codes here &mdash; motivated through combinatorial maps &mdash; is done in a way I personally find to be less confusing, and hopefully you, who might have found this page in a search to understand them, will appreciate it.</P>
+
+<H2>1. Link diagrams as planar graphs</H2><P>Recall that <EM>links</EM> are a generalization of knots: rather than having a single closed loop, a link is made of any number of closed loops embedded in three-dimensional space.
+  There&rsquo;s no harm in generalizing to this case, and it doesn&rsquo;t really add any additional complexity (though we will go back to just considering knots when we get to Gauss codes and Dowker-Thistlethwaite codes).
+  Links might be oriented, which pictorially is represented by an arrowhead somewhere along each link component.</P>
+
+<P>As you can find in most textbooks on knot theory, every link has a diagram.
+  One way to get a diagram is to perturb the link slightly with an <A HREF="https://en.wikipedia.org/wiki/Homotopy#Isotopy">isotopy</A> in a &ldquo;generic&rdquo; way and then project it down to a plane.
+  Since isotopic knots and links are considered to be equivalent, one simplification we will make is to assume that, when there is a split diagram, no diagram component is &ldquo;inside&rdquo; any other by isotoping each component away from each other:
+  <CENTER>
+    <IMG TITLE=""SRC="450_split.png">
+  </CENTER>
+</P>
+
+<P>Diagrams themselves can be isotoped around, and any two isotopic diagrams are considered to be equivalent.
+  With this in mind, what is the data of a diagram?
+  In other words, if someone found a cool knot and wanted to tell someone about it, but they had to do it over the phone, what could they say to guarantee they are perfectly understood?</P>
+
+<P>Something to notice about a diagram is that (1) it has <EM>crossings</EM>, which can be thought of as two short pieces of string overlapping at a single point, and (2) it has <EM>edges</EM>, which are the pieces of string that are between two crossings.
+  This reductive kind of thinking gives us a <span class='MathJax_Preview'>4</span><script type='math/tex'>4</script>-regular planar graph, where the crossings become vertices.
+  <CENTER>
+    <IMG TITLE=""SRC="450_7_6_graph.png">
+  </CENTER>
+
+  The graph itself is certainly not enough to recover the knot, since it forgets which edges form the overstrand at each crossing.
+  If we adapt Alexander&rsquo;s notation<A NAME="ref_footnote_27_1"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_1">[1]</A></sup>, we can use two blue dots to indicate how to interpret a vertex as a crossing:
+  <CENTER>
+    <IMG TITLE=""SRC="300_alexander_notation.png">
+  </CENTER>
+</P>
+
+<P>For this notation to make sense, the way in which the graph is embedded in the plane is important (at least up to isotopy).
+  An answer to representing embeddings is called a <A HREF="https://en.wikipedia.org/wiki/Combinatorial_map"><EM>combinatorial map</EM></A>.
+  Let&rsquo;s get a formal definition out of the way and not speak much of it again.
+  A combinatorial map is a set <span class='MathJax_Preview'>D</span><script type='math/tex'>D</script> of <EM>darts</EM>, an involution <span class='MathJax_Preview'>\alpha</span><script type='math/tex'>\alpha</script> of <span class='MathJax_Preview'>D</span><script type='math/tex'>D</script> with no fixed points, and a permutation <span class='MathJax_Preview'>\sigma</span><script type='math/tex'>\sigma</script> of <span class='MathJax_Preview'>D</span><script type='math/tex'>D</script>.
+  The orbits of <span class='MathJax_Preview'>\alpha</span><script type='math/tex'>\alpha</script> are the <EM>edges</EM>, and the orbits of <span class='MathJax_Preview'>\sigma</span><script type='math/tex'>\sigma</script> are the <EM>vertices</EM>.</P>
+
+<P>What problem is this solving?  We would like to have a way to know the cyclic order of incident edges around each vertex and how they are attached.
+  As it turns out, if you know this, you can perfectly reconstruct the embedding of the planar graph<A NAME="ref_footnote_27_2"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_2">[2]</A></sup>.
+  We would also eventually like to be able to deal with oriented links, which involves giving each edge of the graph an orientation, but if we just kept track of the order of edges around each vertex there is an issue when it comes to self loops: which end of the edge is attached in which order?</P>
+
+<P>So what is a dart?  I like to think about a dart as being half an edge, but you can also think of it as being a vector at an endpoint of an edge that points into the edge.
+  Then, every edge has two darts, and for each vertex you record the cyclic order of the incident darts (say, going around counter-clockwise).
+  All of this together is enough to reconstruct the planar embedding.</P>
+
+<P>For link diagrams, you still need to know which darts participate in the overstrand and which participate in the understrand.
+  One way to deal with this is to record the four darts in order as a list, but to make sure the first one in the list is for an understrand.
+  That way, the first and third form the understrand, and the second and fourth form the overstrand.
+  Cyclically shifting the darts over by two doesn&rsquo;t change the meaning of the data.</P>
+
+<P>What we can do is take each edge of the diagram, subdivide it into two darts, then label them all with a number.
+  It is convenient to make it so darts <span class='MathJax_Preview'>2k+1</span><script type='math/tex'>2k+1</script> and <span class='MathJax_Preview'>2k+2</span><script type='math/tex'>2k+2</script> correspond to the same edge &mdash; that way we don&rsquo;t need to record the correspondence.
+  For example, if we label the darts of <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> like so:
+  <CENTER>
+    <IMG TITLE=""SRC="420_7_6_darts.png">
+  </CENTER>
+
+  then we can record the the combinatorial map in a table:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 13 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  4 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 24 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  8 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 21 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right"> 16 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      14 </TD><TD style="border-left-style: solid; text-align: right">  2 </TD><TD style="border-left-style: solid; text-align: right"> 26 </TD><TD style="border-left-style: solid; text-align: right">  6 </TD><TD style="border-left-style: solid; text-align: right"> 19 </TD><TD style="border-left-style: solid; text-align: right"> 10 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> 23 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      28 </TD><TD style="border-left-style: solid; text-align: right"> 12 </TD><TD style="border-left-style: solid; text-align: right">  5 </TD><TD style="border-left-style: solid; text-align: right"> 25 </TD><TD style="border-left-style: solid; text-align: right">  9 </TD><TD style="border-left-style: solid; text-align: right"> 20 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> 17 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+      15 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  3 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 27 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  7 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 18 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 11 </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid"> 22 </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  Each column corresponds to a different crossing (the order of the crossings does not matter), with the darts coming in counter-clockwise order around the crossing, and the first dart is one of the two darts corresponding to the understrand.<P>This is all there is to communicating a knot to someone, and everything else is merely an optimization.
+  <span class='MathJax_Preview'>4n</span><script type='math/tex'>4n</script> numbers can be a lot to store, though (especially if you are someone like Ben Burton, who likes tabulating all knots up to some large number of crossings).</P>
+
+<P>Before optimizing anything, it&rsquo;s worth discussing things you can do with a diagram given in this representation:
+  </P>
+
+<UL>
+<LI>A dart with label <span class='MathJax_Preview'>2k+i</span><script type='math/tex'>2k+i</script>, where <span class='MathJax_Preview'>i\in\{0,1\}</span><script type='math/tex'>i\in\{0,1\}</script>, represents sitting at a crossing and facing in the direction of the dart.  You can travel down the dart&rsquo;s edge and sit at the other crossing, then about-face, just by calculating <span class='MathJax_Preview'>\alpha(2k+i)=2k+1-i</span><script type='math/tex'>\alpha(2k+i)=2k+1-i</script>.
+  </LI>
+<LI>Given a dart <span class='MathJax_Preview'>d</span><script type='math/tex'>d</script>, one can rotate 90 degrees counter-clockwise and get a new dart <span class='MathJax_Preview'>\sigma(d)</span><script type='math/tex'>\sigma(d)</script> by taking the next dart (cyclicly) in the list associated with the vertex for <span class='MathJax_Preview'>d</span><script type='math/tex'>d</script>.
+  </LI>
+<LI>A dart represents an orientation of a link component.  Walking along a link is repeatedly calculating <span class='MathJax_Preview'>\sigma(\sigma(\alpha(d)))</span><script type='math/tex'>\sigma(\sigma(\alpha(d)))</script> to (1) flip across an edge then (2) rotate 180 degrees.
+  </LI>
+<LI>You can represent an oriented link diagram by making edges be oriented in the <span class='MathJax_Preview'>2k+1 \to 2k+2</span><script type='math/tex'>2k+1 \to 2k+2</script> direction, with respect to dart labels.  This was done in the example above.
+  </LI>
+<LI>Seifert circuits for oriented link diagrams are from taking an odd-labeled dart <span class='MathJax_Preview'>d=2k+1</span><script type='math/tex'>d=2k+1</script>, then continuing along <span class='MathJax_Preview'>\sigma(\alpha(d))</span><script type='math/tex'>\sigma(\alpha(d))</script> or <span class='MathJax_Preview'>\sigma^{-1}(\alpha(d))</span><script type='math/tex'>\sigma^{-1}(\alpha(d))</script>, depending on which of the two is odd.
+  </LI>
+<LI>Faces (which are useful for the Dehn presentation of the fundamental group of a link complement) come from the orbits of <span class='MathJax_Preview'>\sigma^{-1}\circ\alpha</span><script type='math/tex'>\sigma^{-1}\circ\alpha</script>, at least for non-split diagrams.  In a split diagram, we arranged for one of the faces to be a punctured disk, and for this face orbits instead give its boundary components.
+  </LI>
+</UL>
+
+  When doing calculations on a computer, it seems to be a good idea to convert things into this representation first.  At least, I&rsquo;ve found it to be very convenient.<A NAME="ref_footnote_27_3"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_3">[3]</A></sup><P><B>An optimization for diagrams with no self loops.</B>  If the diagram has no self loops (that is, it has no applicable Reidemeister I moves), then instead of labeling darts, you can get away with labeling edges, giving the small savings that each label needs one fewer binary digit that before (there being half as many labels).
+  The orientation of a component can be recorded by labeling edges using consecutive numbers like so:
+  <CENTER>
+    <IMG TITLE=""SRC="250_7_6_edges.png">
+  </CENTER>
+
+  As before, the combinatorial data can be recorded in a table:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  7 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  2 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 12 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  4 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 11 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right">  8 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+       7 </TD><TD style="border-left-style: solid; text-align: right">  1 </TD><TD style="border-left-style: solid; text-align: right"> 13 </TD><TD style="border-left-style: solid; text-align: right">  3 </TD><TD style="border-left-style: solid; text-align: right"> 10 </TD><TD style="border-left-style: solid; text-align: right">  5 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> 12 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      14 </TD><TD style="border-left-style: solid; text-align: right">  6 </TD><TD style="border-left-style: solid; text-align: right">  3 </TD><TD style="border-left-style: solid; text-align: right"> 13 </TD><TD style="border-left-style: solid; text-align: right">  5 </TD><TD style="border-left-style: solid; text-align: right"> 10 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right">  9 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+       8 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  2 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 14 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  4 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  9 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  6 </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid"> 11 </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  This is exactly the data of a <A HREF="http://katlas.org/wiki/Planar_Diagrams">Planar Diagram (PD)</A> as used by <A HREF="http://katlas.org/wiki/The_Mathematica_Package_KnotTheory%60">KnotTheory</A> and <A HREF="https://snappy.math.uic.edu/">SnapPy</A>.
+  In the format of KnotTheory, this can be written as
+<pre>PD[X[1,7,14,8], X[7,1,6,2], X[2,13,3,14], X[12,3,13,4],
+   X[4,10,5,9], X[11,5,10,6], X[8,12,9,11]]
+</pre>
+  and in SnapPy, this can be written as
+<pre>Link([(1,7,14,8), (7,1,6,2), (2,13,3,14), (12,3,13,4),
+      (4,10,5,9), (11,5,10,6), (8,12,9,11)])
+</pre><P>Unlike for the full combinatorial map, it is less convenient walking along various features of the diagram when it is in this format.</P>
+
+<P><EM>Remark.</EM> I have considered using a variant of PDs for oriented diagrams that uses the dart convention, so for example the first entry would be <TT>X[1,14,28,15]</TT> instead of <TT>X[1,7,14,8]</TT>.  Parity gives orientations.  Or, one could use positive and negative numbers to indicate dart orientations.</P>
+
+<P><B>Unknots and paths.</B>  One thing I have swept under the rug is that the <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-crossing diagram of an <A HREF="https://en.wikipedia.org/wiki/Unknot">unknot</A> has no crossings, so it cannot be represented in this way!
+  We can fix this by allowing edges to be subdivided using degree-<span class='MathJax_Preview'>2</span><script type='math/tex'>2</script> vertices.  Then, in addition to a crossing table, we would have a paths table containing pairs of darts that are joined by the degree-<span class='MathJax_Preview'>2</span><script type='math/tex'>2</script> vertices.
+  In KnotTheory notation, the additional paths are represented using <TT>P</TT> inside the <TT>PD</TT>, so the <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>-crossing unknot would be
+<pre>PD[P[1, 1]]
+</pre></P>
+
+<P>This extension makes it easy to implement the Kauffman bracket in Mathematica, as explained at <A HREF="../tools/code_snippets.html#sec%3Akauffman-bracket">The Kauffman bracket polynomial</A> (see also <A HREF="http://katlas.org/wiki/The_Jones_Polynomial#How_is_the_Jones_polynomial_computed.3F">The Knot Atlas</A>).</P>
+
+<P><B>Oriented crossings.</B>  Rather than orienting the edges, a variation that KnotTheory can use is an orientation at the crossings themselves in terms of the sign of the crossing.
+  Each <TT>X</TT> is instead an <TT>Xp</TT> or <TT>Xm</TT> depending on whether the crossing is respectively positive or negative, given the following order for edge labels:
+  <CENTER>
+    <IMG TITLE=""SRC="400_oriented_pd.png">
+  </CENTER>
+
+  The knot <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script>, oriented according to the edge labels from before, can be represented this way as
+<pre>PD[Xp[14,8,1,7], Xp[6,2,7,1], Xm[2,13,3,14], Xm[12,3,13,4],
+   Xp[4,10,5,9], Xp[10,6,11,5], Xp[8,12,9,11]]
+</pre></P>
+
+<H2>2. Gauss codes</H2><P>An early problem in &ldquo;<EM>geometria situs</EM>&rdquo; (now called combinatorial topology) considered by Gauss<A NAME="ref_footnote_27_4"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_4">[4]</A></sup>, is the following.
+  Given a generic oriented immersed loop in the plane (that is, an oriented closed loop that is allowed to self intersect only transversely and without triple points), one can label the double points and, beginning from some base point on the curve, read off these labels to form a word where every label appears exactly twice.  The problem is the converse: under what circumstances does such a word correspond to some such planar curve?</P>
+
+<P>Gauss presumably considered this problem because these curves are the <EM>shadow</EM> of a knot, and it is a reasonable first step to study what knots exist &mdash; later one might introduce crossings.</P>
+
+<P><EM>Remark.</EM> While Gauss called these generic immersed loops <EM>knoten</EM>, they are certainly not knots.</P>
+
+<P>There is a lot to say about the Gauss word realization problem (which Gauss did not fully solve!), but it would take us too far afield.  I refer you to Jeff Erickson&rsquo;s nice notes on <A HREF="http://jeffe.cs.illinois.edu/teaching/topology17/notes/02-planar-curves.pdf">planar curves</A> from his course <EM>One-dimensional computational topology</EM>.<A NAME="ref_footnote_27_5"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_5">[5]</A></sup></P>
+
+<P>Closer to what we need is the idea of a <EM>signed</EM> Gauss word.  Rather than just writing down the labels, we also record the orientation of the other strand through the double point, which is done using the sign of the determinant of the tangent vectors of both strands at the double point (that is, the signed intersection number).
+  In the following, the gray strand is the other strand.
+  <CENTER>
+    <IMG TITLE=""SRC="350_gauss_sign.png">
+  </CENTER>
+
+  For example, with the shadow of <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script>,
+  <CENTER>
+    <IMG TITLE=""SRC="300_7_6_gauss.png">
+  </CENTER>
+
+  the oriented code from the turquoise basepoint is
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    \overline{A}BC\overline{D}\overline{E}F\overline{B}A\overline{G}E\overline{F}GD\overline{C},
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    \overline{A}BC\overline{D}\overline{E}F\overline{B}A\overline{G}E\overline{F}GD\overline{C},
+  \end{equation*}</script>
+  where <span class='MathJax_Preview'>\overline{L}</span><script type='math/tex'>\overline{L}</script> means <span class='MathJax_Preview'>L</span><script type='math/tex'>L</script> with negative sign.
+  Notice each label appears with both signs.</P>
+
+<P>A signed Gauss word should be thought of as being a compact representation of a combinatorial map that is an oriented knot shadow (characterized by having every vertex be degree <span class='MathJax_Preview'>4</span><script type='math/tex'>4</script> and having exactly one oriented circuit).
+  For example, consider the edge <span class='MathJax_Preview'>\overline{A}B</span><script type='math/tex'>\overline{A}B</script>.  We can give <span class='MathJax_Preview'>\overline{A}B</span><script type='math/tex'>\overline{A}B</script> and <span class='MathJax_Preview'>B\overline{A}</span><script type='math/tex'>B\overline{A}</script> as labels for its two darts, and all these names will be unique across all darts.
+  Then, the cyclic order of the darts incident to a vertex comes from directly from a Gauss word as illustrated in the following diagram, where the green arrows represent the darts:
+  <CENTER>
+    <IMG TITLE=""SRC="500_gauss_comb_map.png">
+  </CENTER>
+
+  This is meant to represent that the following is the counter-clockwise cyclic order of the darts incident to <span class='MathJax_Preview'>A</span><script type='math/tex'>A</script>, given that the signed Gauss word contains <span class='MathJax_Preview'>W^{\pm}AY^{\pm}</span><script type='math/tex'>W^{\pm}AY^{\pm}</script> and <span class='MathJax_Preview'>X^{\pm}\overline{A}Z^{\pm}</span><script type='math/tex'>X^{\pm}\overline{A}Z^{\pm}</script>:
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    AY^{\pm} \mapsto \overline{A} Z^{\pm} \mapsto AW^{\pm} \mapsto \overline{A}X^{\pm} \mapsto AY^{\pm}.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    AY^{\pm} \mapsto \overline{A} Z^{\pm} \mapsto AW^{\pm} \mapsto \overline{A}X^{\pm} \mapsto AY^{\pm}.
+  \end{equation*}</script></P>
+
+<P>The following theorem shows the degree to which signs are needed for reconstructing knot shadows.</P>
+
+<P>A knot shadow is called <EM>prime</EM> if, as a <span class='MathJax_Preview'>4</span><script type='math/tex'>4</script>-regular graph, it is <A HREF="https://en.wikipedia.org/wiki/K-edge-connected_graph"><span class='MathJax_Preview'>3</span><script type='math/tex'>3</script>-edge-connected</A>.  An equivalent definition is that, for every circle that transversely intersects the shadow in exactly two points away from the double points, at least one side of the circle has no double points.  Yet another equivalent definition is that no cyclic permutation of its Gauss word is the concatenation of two Gauss words.
+  Prime knots have prime knot shadows.</P>
+
+<P><B>Theorem.</B> <EM>If two prime knot shadows have the same unsigned Gauss word (allowing relabeling and change of basepoint), then either they are isotopic (in <span class='MathJax_Preview'>S^2</span><script type='math/tex'>S^2</script>) or are mirror images.</EM></P>
+
+<P><EM>Proof.</EM> The choice of signs in a Gauss word is a choice for each vertex of whether the above cyclic order is clockwise or counter-clockwise.  Consider two knot shadows <span class='MathJax_Preview'>S_1</span><script type='math/tex'>S_1</script> and <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> (on <span class='MathJax_Preview'>S^2</span><script type='math/tex'>S^2</script>) with equivalent unsigned Gauss words.  Color <span class='MathJax_Preview'>S^2</span><script type='math/tex'>S^2</script> white, and for each double point of <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> that has reversed orientation from the corresponding double point of <span class='MathJax_Preview'>S_1</span><script type='math/tex'>S_1</script>, place a black disk on the double point.  Now, wherever there are adjacent double points with black disks, join the black disks together along the edge.  This might give monochromatic white disks that do not contain any of <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> &mdash; color these black.  The result is a collection of black regions that can be thought of as being regions of <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> with reversed orientations from <span class='MathJax_Preview'>S_1</span><script type='math/tex'>S_1</script>.  If there is both a black and a white region, there is a black or white disk region &mdash; assume it is black.  Its boundary is a circle that avoids double points and intersects <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> transversely, so by primality (and the Jordan curve theorem) it must intersect <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> at least four times.  But this is a contradiction, because flipping the portion of <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> inside the disk over would enlarge the portion of the graph that matches the orientation of <span class='MathJax_Preview'>S_1</span><script type='math/tex'>S_1</script>, but flipping this portion results in a non-planar graph.  Therefore there is exactly one region, implying <span class='MathJax_Preview'>S_2</span><script type='math/tex'>S_2</script> is either isotopic to <span class='MathJax_Preview'>S_1</span><script type='math/tex'>S_1</script> or a mirror image of it. QED</P>
+
+<P><B>Now what about knots?</B>  Since we now understand the correspondence between a signed Gauss word and its combinatorial map, we know all we need to indicate is the over and under information so the double points become actual crossings, and this will give the (signed) <EM>Gauss code</EM> of the knot.</P>
+
+<P><EM>One thing you should avoid being confused about if you can help it:</EM> the right-handed and left-handed crossings are also known as positive and negative crossings, respectively.  This use of positive and negative is distinct from their use in Gauss words.  For crossings, it is contribution to linking number, but for double points it is the signed intersection number.</P>
+
+<P>We can indicate the crossing types by recording along with the sign of the intersection whether the strand goes over or under.
+  So, for <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> with crossings labeled like so
+  <CENTER>
+    <IMG TITLE=""SRC="300_7_6_gauss_code.png">
+  </CENTER>
+
+  we can write down the <EM>signed Gauss code</EM>
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    \overline{A^U}B^OC^U\overline{D^O}\overline{E^U}F^O\overline{B^U}
+    A^O\overline{G^U}E^O\overline{F^U}G^OD^U\overline{C^O}.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    \overline{A^U}B^OC^U\overline{D^O}\overline{E^U}F^O\overline{B^U}
+    A^O\overline{G^U}E^O\overline{F^U}G^OD^U\overline{C^O}.
+  \end{equation*}</script>
+  The fact the diagram is an alternating diagram is reflected in the alternating <span class='MathJax_Preview'>U</span><script type='math/tex'>U</script>&rsquo;s and <span class='MathJax_Preview'>O</span><script type='math/tex'>O</script>&rsquo;s.</P>
+
+<P>Using the theorem from the previous section, if we only care about a prime knot up to mirror image, we can omit the intersection signs.
+  It is common then to have <span class='MathJax_Preview'>-A</span><script type='math/tex'>-A</script> denote <span class='MathJax_Preview'>A^U</span><script type='math/tex'>A^U</script> and <span class='MathJax_Preview'>A</span><script type='math/tex'>A</script> denote <span class='MathJax_Preview'>A^O</span><script type='math/tex'>A^O</script>, so the above code becomes an <EM>unsigned</EM> Gauss code
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    -A, B, -C, D, -E, F, -B, A, -G, E, -F, G, -D, C.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    -A, B, -C, D, -E, F, -B, A, -G, E, -F, G, -D, C.
+  \end{equation*}</script>
+  (The actual notations used for Gauss codes can vary, but what is universal is the idea of recording visited vertices, over and under information, and possibly intersection signs for the shadow.)</P>
+
+<P>As a matter of normalization, we can &ldquo;multiply&rdquo; this by <span class='MathJax_Preview'>-1</span><script type='math/tex'>-1</script> so that the first letter is always positive, since the unsigned Gauss code only determines the knot up to mirror image anyway.
+  Another thing we can do is consider all cyclic shifts and relabelings and take the lexicographically minimal one.
+  Using numeric indices instead of letters, according to <A HREF="https://www.indiana.edu/~knotinfo/">KnotInfo</A> the lexicographically minimal Gauss code (also allowing orientation reversal) is
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    1, -2, 3, -4, 5, -6, 7, -3, 2, -7, 6, -1, 4, -5.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    1, -2, 3, -4, 5, -6, 7, -3, 2, -7, 6, -1, 4, -5.
+  \end{equation*}</script></P>
+
+<P><B>A quick space usage analysis.</B>  In an <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script>-crossing knot diagram, a Gauss code will have <span class='MathJax_Preview'>2n</span><script type='math/tex'>2n</script> terms each adorned with <span class='MathJax_Preview'>O</span><script type='math/tex'>O</script> or <span class='MathJax_Preview'>U</span><script type='math/tex'>U</script> and possibly an intersection sign.  For over and under information, we only need to record whether it is the first or second instance of the label that is over, and intersection sign is similar.
+  Since we can normalize the labeling so that the letters are introduced in order, the number of unsigned Gauss words with <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> labels is counted by <span class='MathJax_Preview'>\frac{(2n)!}{n!2^n}</span><script type='math/tex'>\frac{(2n)!}{n!2^n}</script> (planar or not).  Putting this together, there are <span class='MathJax_Preview'>2^n\frac{(2n)!}{n!}</span><script type='math/tex'>2^n\frac{(2n)!}{n!}</script> signed Gauss words.  The logarithm base <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script> of this gives a theoretical lower bound on the number of bits required to encode one, and there is an approximation
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    \log_2\left(2^n\frac{(2n)!}{n!}\right) \approx n \log_2 n+(3-\ln(2)^{-1})n+\frac{1}{2},
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    \log_2\left(2^n\frac{(2n)!}{n!}\right) \approx n \log_2 n+(3-\ln(2)^{-1})n+\frac{1}{2},
+  \end{equation*}</script>
+  where their difference tends to <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script> for large <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script>.  Thus, the number of bits to store a signed Gauss code has the following rough upper bound (good to a few decimal places):
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    n \log_2 n + 1.557n + 0.5.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    n \log_2 n + 1.557n + 0.5.
+  \end{equation*}</script>
+  Subtract <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> to get the bits for an unsigned Gauss code.
+  This does not take into account the fact we need to store <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> itself (using roughly <span class='MathJax_Preview'>\log_2n</span><script type='math/tex'>\log_2n</script> bits).
+  One approach is to fix some <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> for all knots under consideration and use obvious Reidemeister I moves to pad the representation.
+  Another is to have one table per <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script>.</P>
+
+<P>The following table shows how large of a knot diagram can be stored in a given number of bytes, where the representation is either a signed Gauss code or an unsigned Gauss code.
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="text-align: right">
+      Bytes</TD><TD style="text-align: right"> Signed Gauss code max crossings </TD><TD style="text-align: right"> Unsigned Gauss code max crossings </TD></TR>
+<TR><TD style="border-top-style: solid; text-align: right">
+      
+      8 </TD><TD style="border-top-style: solid; text-align: right"> 12 </TD><TD style="border-top-style: solid; text-align: right"> 14 </TD></TR>
+<TR><TD style="text-align: right">
+      16 </TD><TD style="text-align: right"> 21 </TD><TD style="text-align: right"> 24 </TD></TR>
+<TR><TD style="text-align: right">
+      32 </TD><TD style="text-align: right"> 37 </TD><TD style="text-align: right"> 42 </TD></TR>
+<TR><TD style="text-align: right">
+      64 </TD><TD style="text-align: right"> 67 </TD><TD style="text-align: right"> 75
+    </TD></TR>
+</TABLE>
+
+  </CENTER>
+<H2>3. Dowker-Thistlethwaite codes</H2><P>Dowker and Thistlethwaite modified Tait&rsquo;s original notation for the purpose of tabulating knots by computer.
+  First let&rsquo;s quickly see their definition, and then we will relate this to combinatorial maps.
+  For the double points in a knot shadow, consider the preimages, which we may number consecutively by <span class='MathJax_Preview'>1,2,\dots,2n</span><script type='math/tex'>1,2,\dots,2n</script>, and thus the pairs of numbers assigned to a double point defines an involution <span class='MathJax_Preview'>a</span><script type='math/tex'>a</script> on the set <span class='MathJax_Preview'>\{1,2,\dots,2n\}</span><script type='math/tex'>\{1,2,\dots,2n\}</script>.
+  They use the fact that this involution sends even numbers to odd numbers, and vice versa, so the sequence <span class='MathJax_Preview'>(a(1),a(3),\dots,a(2n-1))</span><script type='math/tex'>(a(1),a(3),\dots,a(2n-1))</script> determines the involution.
+  They then use negative signs to record the crossing type, where <span class='MathJax_Preview'>a(2k+1)</span><script type='math/tex'>a(2k+1)</script> gets a negative sign if the point <span class='MathJax_Preview'>2k+1</span><script type='math/tex'>2k+1</script> of the knot corresponds to the overstrand.<A NAME="ref_footnote_27_6"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_6">[6]</A></sup><A NAME="ref_footnote_27_7"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_7">[7]</A></sup></P>
+
+<P>A different way of assigning labels to darts in an oriented knot shadow is to (1) assign <span class='MathJax_Preview'>1,2,3,\dots</span><script type='math/tex'>1,2,3,\dots</script> to edges in consecutive order along the knot&rsquo;s orientation, (2) for each dart that points in the direction of the orientation, label it with its edge label, and (3) for each dart that points in the opposite direction, label it with the negative of the label opposite it at the crossing.  That is, (a) the sign of each dart corresponds to whether or not it is co-oriented with the knot, (b) the absolute values of the darts are non-decreasing with respect to the orientation of the knot, (c) along each edge the darts are labeled <span class='MathJax_Preview'>x \to -x-1</span><script type='math/tex'>x \to -x-1</script>, and (d) around each crossing the darts satisfy the following labelings:
+  <CENTER>
+    <IMG TITLE=""SRC="250_dt_darts.png">
+  </CENTER>
+
+  For example, labeling <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> gives
+  <CENTER>
+    <IMG TITLE=""SRC="300_7_6_dt.png">
+  </CENTER>
+</P>
+
+<P>Looking at the labels around a crossing, there seems to be a lot of redundancy, like somehow only two of the four numbers might be needed.</P>
+
+<P>For the same reason that the involution described by Dowker and Thistlethwaite is parity reversing, every crossing has darts that are even and odd.  One way to see this is that if you took an arc of a knot whose projection is a path from a crossing to itself, then the <span class='MathJax_Preview'>\Z/2\Z</span><script type='math/tex'>\Z/2\Z</script> intersection number with the image of the complementary arc (another loop) would be <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script>, and each self intersection counts for two points along the arc, so in total there would be an even number of preimage points on the interval, implying the two outgoing darts have opposite parity.</P>
+
+<P>Thus, for each crossing we can record the positive odd dart <span class='MathJax_Preview'>d</span><script type='math/tex'>d</script>, the dart that is counter-clockwise to it, and whether <span class='MathJax_Preview'>d</span><script type='math/tex'>d</script> is on the understrand or overstrand.
+  As illustrated by the case of <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script>, for alternating knots it is either all-overstrand or all-understrand:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  3 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  5 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  7 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  9 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 11 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right"> 13 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      -8 </TD><TD style="border-left-style: solid; text-align: right"> 14 </TD><TD style="border-left-style: solid; text-align: right">-10 </TD><TD style="border-left-style: solid; text-align: right"> -2 </TD><TD style="border-left-style: solid; text-align: right">-12 </TD><TD style="border-left-style: solid; text-align: right"> -6 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right">  4</TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+       U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  Then, we only need to store the second and third rows to perfectly represent the knot since the first row is implicit.
+  This can be generalized to links, too, where monotonic edge label assignment is done component by component, and where we also record the starting edge label for each link component.<P>This representation is about as convenient as the combinatorial map representation from before in that it is easy to navigate faces and other kinds of circuits, though anything involving modifying the knot diagram would do better in the combinatorial map representation since it more flexible in how darts are labeled.</P>
+
+<P>For the purpose of figuring out how to navigate a knot, it is worth thinking about this representation as being a short-hand for the following table (the even columns of which can be dynamically computed on the fly), which has a column for all positive darts and not just the odd ones:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  2 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  3 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  4 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  5 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  6 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  7 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  8 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  9 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 10 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 11 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 12 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 13 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right"> 14 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      -8 </TD><TD style="border-left-style: solid; text-align: right">  7 </TD><TD style="border-left-style: solid; text-align: right"> 14 </TD><TD style="border-left-style: solid; text-align: right">-13 </TD><TD style="border-left-style: solid; text-align: right">-10 </TD><TD style="border-left-style: solid; text-align: right"> 11 </TD><TD style="border-left-style: solid; text-align: right"> -2 </TD><TD style="border-left-style: solid; text-align: right">  1 </TD><TD style="border-left-style: solid; text-align: right">-12 </TD><TD style="border-left-style: solid; text-align: right">  5 </TD><TD style="border-left-style: solid; text-align: right"> -6 </TD><TD style="border-left-style: solid; text-align: right">  9 </TD><TD style="border-left-style: solid; text-align: right">  4 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> -3 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+       U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  U </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid">  O </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  Notice how the map sending <span class='MathJax_Preview'>i</span><script type='math/tex'>i</script> to the absolute value of the <span class='MathJax_Preview'>i</span><script type='math/tex'>i</script>th entry of the second row is an involution and that exactly one of the two entries in the orbit is positive.  This is the data of a chord diagram, which has found use in Vassiliev invariants.<P>In the non-expanded version, since the second row is all even, we can add <span class='MathJax_Preview'>0</span><script type='math/tex'>0</script> or <span class='MathJax_Preview'>1</span><script type='math/tex'>1</script> to it depending on whether the dart is over or under.  With <span class='MathJax_Preview'>8</span><script type='math/tex'>8</script>-bit signed integers, this can handle knots with up to <span class='MathJax_Preview'>64</span><script type='math/tex'>64</script> crossings in at most <span class='MathJax_Preview'>64</span><script type='math/tex'>64</script> bytes (one cache line).  For packed storage, <span class='MathJax_Preview'>6</span><script type='math/tex'>6</script>-bit signed integers can handle knots up to <span class='MathJax_Preview'>16</span><script type='math/tex'>16</script> crossings in at most <span class='MathJax_Preview'>12</span><script type='math/tex'>12</script> bytes each.  In between, <span class='MathJax_Preview'>7</span><script type='math/tex'>7</script>-bit signed integers handle <span class='MathJax_Preview'>32</span><script type='math/tex'>32</script> crossings in <span class='MathJax_Preview'>28</span><script type='math/tex'>28</script> bytes.</P>
+
+<P><B>A quick space usage analysis.</B>  We can record the signs of each counter-clockwise dart separately, so the over and under information and sign information take <span class='MathJax_Preview'>2n</span><script type='math/tex'>2n</script> bits together.  The even numbers, when divided by <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script>, form a permutation of <span class='MathJax_Preview'>\{1,2,\dots,n\}</span><script type='math/tex'>\{1,2,\dots,n\}</script>.  Not all the <span class='MathJax_Preview'>n!</span><script type='math/tex'>n!</script> permutations correspond to actual knot shadows, and in fact if the permutation is not a derangement there is an obvious Reidemeister I move that could simplify the diagram &mdash; at the least, <span class='MathJax_Preview'>(n-1)(n-1)!</span><script type='math/tex'>(n-1)(n-1)!</script> gives a usable upper bound, where a modification to factoriadics can be made to be able to efficiently decode a number in <span class='MathJax_Preview'>[0,n(n-2))</span><script type='math/tex'>[0,n(n-2))</script> as a permutation.  Thus, we get the following upper bound on the number of bits:
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    \log_2 \left(2^{2n} (n-1)(n-1)!\right) \approx n\log_2n + (2-\log_2(2)^{-1})n + \frac{1}{2}\log_2n + \log_2\sqrt{2\pi}
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    \log_2 \left(2^{2n} (n-1)(n-1)!\right) \approx n\log_2n + (2-\log_2(2)^{-1})n + \frac{1}{2}\log_2n + \log_2\sqrt{2\pi}
+  \end{equation*}</script>
+  Thus Gauss codes take roughly <span class='MathJax_Preview'>n-0.5\log_2n-0.826</span><script type='math/tex'>n-0.5\log_2n-0.826</script> more bits than DT codes, using the estimate from optimal Gauss code storage.</P>
+
+<P>Assuming an optimal encoding scheme for derangements, we have the following table of maximum sizes of knot diagrams by storage space:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="text-align: right">
+      Bytes</TD><TD style="text-align: right"> Signed DT code max crossings </TD><TD style="text-align: right"> Unsigned DT code max crossings </TD></TR>
+<TR><TD style="border-top-style: solid; text-align: right">
+      
+      8 </TD><TD style="border-top-style: solid; text-align: right"> 14 </TD><TD style="border-top-style: solid; text-align: right"> 17 </TD></TR>
+<TR><TD style="text-align: right">
+      16 </TD><TD style="text-align: right"> 24 </TD><TD style="text-align: right"> 28 </TD></TR>
+<TR><TD style="text-align: right">
+      32 </TD><TD style="text-align: right"> 42 </TD><TD style="text-align: right"> 48 </TD></TR>
+<TR><TD style="text-align: right">
+      64 </TD><TD style="text-align: right"> 75 </TD><TD style="text-align: right"> 85
+    </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  For these sizes, DT codes can fit intersection signs into the same space as an unsigned Gauss code for the same diagram.<P><B>Mirror image equivalence.</B>
+  Since Dowker and Thistlethwaite were only considering prime knots up to mirror image, they did not care about the sign of the intersection in the knot shadow.
+  The sign of each number of the second row in the table is exactly the sign of the intersection, so we can take the absolute value.
+  Then, we may use the O or U to apply a sign to the resulting dart label, where the convention is <span class='MathJax_Preview'>O</span><script type='math/tex'>O</script> is <span class='MathJax_Preview'>-1</span><script type='math/tex'>-1</script> and <span class='MathJax_Preview'>U</span><script type='math/tex'>U</script> is <span class='MathJax_Preview'>+1</span><script type='math/tex'>+1</script>.
+  Thus, for the <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> example we get
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  3 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  5 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  7 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  9 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 11 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right"> 13 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+       8 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 14 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 10 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  2 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 12 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">  6 </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid">  4</TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  The DT code is then rendered as
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    8, 14, 10, 2, 12, 6, 4.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    8, 14, 10, 2, 12, 6, 4.
+  \end{equation*}</script>
+  Like in the case of Gauss codes, we can normalize by taking the lexicographically minimal one over all choices of basepoints, and since these codes do not keep track of mirror images, we do so over the mirror of the knot as well.  The specific ordering used is that the absolute values of the DT codes are lexicographically ordered, but if two DT codes have the same absolute value, then the one with a negative sign coming first comes first.
+  According to <A HREF="https://www.indiana.edu/~knotinfo/">KnotInfo</A>, the DT code for <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> normalized in this way is
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    4, 8, 12, 2, 14, 6, 10
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    4, 8, 12, 2, 14, 6, 10
+  \end{equation*}</script><P><EM>Remark:</EM> this normalization solves the graph isomorphism problem for knot diagrams up to mirror image. It does not solve the knot equivalence problem.</P>
+
+<A NAME="sec%3Anew-code"></A><H2>4. Another code for knots</H2>
+  <P>While writing this article, I realized there was a variation on DT codes that was worth looking into, since it remembers chirality.
+  It goes to show that thinking carefully about things might turn up something new!</P>
+
+<P>Looking back at the redundancy in the dart labelings from the previous section, two labels can actually determine both the rest of the labels <EM>and</EM> the crossing type.
+  Let us make this clearer by arranging the crossings in the forms of <TT>Xp</TT> and <TT>Xm</TT> from oriented planar diagrams:
+  <CENTER>
+    <IMG TITLE=""SRC="250_dt_darts_like_pd.png">
+  </CENTER>
+
+  This shows that if we took the full table for the combinatorial map then took only the first two rows, then the rest of the table can be reconstructed by the taking their negatives.
+  If we start from the strand labeled <span class='MathJax_Preview'>y</span><script type='math/tex'>y</script> for each crossing, then the corresponding columns of the truncated combinatorial map would be <span class='MathJax_Preview'>(y,-x,-y,x)</span><script type='math/tex'>(y,-x,-y,x)</script> and <span class='MathJax_Preview'>(y,x,-y,-x)</span><script type='math/tex'>(y,x,-y,-x)</script>, so we would only need to record <span class='MathJax_Preview'>(y,-x)</span><script type='math/tex'>(y,-x)</script> and <span class='MathJax_Preview'>(y,x)</span><script type='math/tex'>(y,x)</script>.
+  With the <span class='MathJax_Preview'>7_6</span><script type='math/tex'>7_6</script> example again, this is given by the table
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       1 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  3 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  5 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  7 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right">  9 </TD><TD style="border-top-style: solid; border-left-style: solid; text-align: right"> 11 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right"> 13 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+      -8 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> 14 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">-10 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> -2 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">-12 </TD><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid"> -6 </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid">  4</TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  It is just a coincidence that the first row consists only of odd numbers.  In general, non-alternating knots will have the odd numbers in the first and second rows.<P>We can sort the vertices so that the first row is in increasing order.  In this form, if we record only the second row we can reconstruct the first: it is <span class='MathJax_Preview'>\{1,2,\dots,2n\}-\bigcup_i\abs{a_i}</span><script type='math/tex'>\{1,2,\dots,2n\}-\bigcup_i\abs{a_i}</script> in sorted order, where <span class='MathJax_Preview'>(a_1,\dots,a_n)</span><script type='math/tex'>(a_1,\dots,a_n)</script> is the second row.
+  If we only care about prime diagrams up to mirror image, we can remove the signs, since we know the second row is always for the overstrand.</P>
+
+<P>Using a straightforward encoding scheme, the list of <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> numbers in the range <span class='MathJax_Preview'>[1,2n]</span><script type='math/tex'>[1,2n]</script> takes <span class='MathJax_Preview'>n\log_2(2n)</span><script type='math/tex'>n\log_2(2n)</script> bits to store, and the signs take an additional <span class='MathJax_Preview'>n</span><script type='math/tex'>n</script> bits.  This is the same amount of space as a signed DT code takes when stored as a list of numbers.</P>
+
+<P>Of course, there are many things one could try to improve this encoding.  There are <span class='MathJax_Preview'>\frac{(2n)!}{n!n!}</span><script type='math/tex'>\frac{(2n)!}{n!n!}</script> subsets that can appear in the first row, and for each of these there are <span class='MathJax_Preview'>2^n</span><script type='math/tex'>2^n</script> sign choices and <span class='MathJax_Preview'>n!</span><script type='math/tex'>n!</script> permutations of the second row, giving <span class='MathJax_Preview'>2^n\frac{(2n)!}{n!}</span><script type='math/tex'>2^n\frac{(2n)!}{n!}</script> possible codes.  This is exactly the same as the number of Gauss codes of the same size, as one would expect, so the analysis from that section applies.</P>
+
+<P>There are 1,701,936 knots up to 16 crossings, and using this simple encoding scheme (as a list of numbers) they can be stored in about 16.2 MB with either this system or unsigned DT codes.  Without using the fact that prime diagrams only need a single bit to specify chirality, it would take an additional 3.2 MB to store intersection signs.  A more optimal unsigned DT code scheme (using derangements) would take about 12 MB.</P>
+
+<H2>5. Virtual knots</H2><P>A <EM>virtual knot</EM> is what happens when you start with knots, go to combinatorial map representations of diagrams, then generalize to allow <EM>all</EM> combinatorial map representations, whether or not they might be planar.  Then, since Reidemeister moves can be done directly on combinatorial map representations, there is a notion of virtual knot equivalence.  It is a surprising fact that if two knots are equivalent through &ldquo;virtual moves,&rdquo; then they are equivalent as knots<A NAME="ref_footnote_27_8"></A><sup><A HREF="./gauss_dt_codes.html#footnote_27_8">[8]</A></sup>, so the theory doesn&rsquo;t just collapse.</P>
+
+<P>Something that wasn&rsquo;t mentioned before was that (connected) combinatorial maps are good for representing graphs embedded in closed oriented surfaces, with the proviso that each face be a disk.  And, given an arbitrary combinatorial map, the genus of a surface it can be embedded in with this condition can be computed from the number of vertices, edges, and faces: <span class='MathJax_Preview'>v-e+f=2b_0-2g</span><script type='math/tex'>v-e+f=2b_0-2g</script>, where <span class='MathJax_Preview'>b_0</span><script type='math/tex'>b_0</script> is the number of connected components of the map.</P>
+
+<P>Each virtual knot can be drawn on a surface this way.  But, since paper tends to be planar, and since only the combinatorial map part really needs to be recorded, what we can do is draw the crossings and then connect them together without any regard for whether the edges intersect or not &mdash; only what is connected to what matters.  These intersections, which are artefacts of non-planarity, are called <EM>virtual crossings</EM>.  In the literature you will see &ldquo;detour moves&rdquo; as being part of the definition of virtual knot equivalence, but you can think of the move as being the act of erasing an edge and redrawing it with a new route.  This doesn&rsquo;t change the combinatorial map.</P>
+
+<P>For example, here is the &ldquo;virtual trefoil knot,&rdquo; which is a nontrivial crossing number <span class='MathJax_Preview'>2</span><script type='math/tex'>2</script> virtual knot that would more comfortably be drawn on a torus:
+  <CENTER>
+    <IMG TITLE=""SRC="200_virtual_trefoil.png">
+  </CENTER>
+</P>
+
+<P>There are a number of things about encoding knots that fail for virtual knots.  The first is that the intersection sign truly matters, since changing a crossing&rsquo;s intersection sign (what Kauffman calls &ldquo;flanking by virtuals&rdquo;) gives another valid virtual knot.
+  In the example of the virtual trefoil, changing the intersection sign of either crossing gives the unknot!</P>
+
+<P>Another thing that fails is that the DT involution is no longer parity reversing, and the involution comes from the full symmetric group on <span class='MathJax_Preview'>2n</span><script type='math/tex'>2n</script> symbols.</P>
+
+<P>Using the dart numbering scheme from the DT section, starting with the positive understrand, we can represent the virtual trefoil through the following combinatorial map:
+  <CENTER>
+    </P>
+
+<TABLE class="tabular" style="border-collapse: collapse;">
+<TR><TD style="border-top-style: solid; border-left-style: solid; text-align: right">
+      
+       3 </TD><TD style="border-top-style: solid; border-right-style: solid; border-left-style: solid; text-align: right">  2 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      -1 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> -4 </TD></TR>
+<TR><TD style="border-left-style: solid; text-align: right">
+      -3 </TD><TD style="border-right-style: solid; border-left-style: solid; text-align: right"> -2 </TD></TR>
+<TR><TD style="text-align: right; border-bottom-style: solid; border-left-style: solid">
+       1 </TD><TD style="border-right-style: solid; text-align: right; border-bottom-style: solid; border-left-style: solid">  4 </TD></TR>
+</TABLE>
+
+  </CENTER>
+
+  With the code from the previous section, we can represent this virtual trefoil as
+  <div class='MathJax_Preview'><pre>\begin{equation*}
+    -4, -1.
+  \end{equation*}</pre></div><script type='math/tex; mode=display'>\begin{equation*}
+    -4, -1.
+  \end{equation*}</script><P>The space analysis from the previous section applies to all codes, planar or non-planar.  So <span class='MathJax_Preview'>20</span><script type='math/tex'>20</script>-crossing virtual knots can be stored within <span class='MathJax_Preview'>16</span><script type='math/tex'>16</script> bytes, too.</P>
+
+<P><div class="footnotes"><A NAME="footnote_27_1"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_1">[1]</A></sup> J. W. Alexander, <EM>Topological invariants of knots and links</EM>, Transactions of the American Mathematical Society <B>30</B> (1928), no. 2, 275–306. MR 1501429 <EM>(Remark: this is the paper where Alexander introduced his polynomial invariant)</EM></div>
+<A NAME="footnote_27_2"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_2">[2]</A></sup> There is a caveat: you can reconstruct it on <span class='MathJax_Preview'>S^2</span><script type='math/tex'>S^2</script>, but for <span class='MathJax_Preview'>\R^2</span><script type='math/tex'>\R^2</script> there is some ambiguity for which face is the &ldquo;outer&rdquo; face of the graph.  As far as knots and links go, you can change which face of a diagram is the &ldquo;outer&rdquo; face by doing some isotopy of the link, so this ambiguity is OK.  It&rsquo;s also safe imagining that diagrams are always drawn on <span class='MathJax_Preview'>S^2</span><script type='math/tex'>S^2</script> and then stereographically projected onto a piece of paper.</div>
+<A NAME="footnote_27_3"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_3">[3]</A></sup> I used a variant of this in <A HREF="https://kmill.github.io/knotfolio/">KnotFolio</A>, but with additional degree-<span class='MathJax_Preview'>2</span><script type='math/tex'>2</script> vertices, which are described a bit later.  I also used a dart labeling scheme where the two darts in an edge have labels <span class='MathJax_Preview'>d&gt;0</span><script type='math/tex'>d>0</script> and <span class='MathJax_Preview'>-d&lt;0</span><script type='math/tex'>-d<0</script>.</div>
+<A NAME="footnote_27_4"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_4">[4]</A></sup> Carl Friedrich Gauß, <EM>Werke</EM>, vol. VIII, 271&ndash;281, 1900. Teubner.  Originally written circa 1823&ndash;1840.</div>
+<A NAME="footnote_27_5"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_5">[5]</A></sup> A cool thing is that there are <span class='MathJax_Preview'>O(n)</span><script type='math/tex'>O(n)</script> algorithms that take a Gauss word and computer whether or not it is realizable in the plane.  Pierre Rosenstiehl and Robert~E. Tarjan, <EM>Gauss codes, planar Hamiltonian graphs, and stack-sortable permutations</EM>, Journal of Algorithms
+  <B>5</B> (1984), no. 3, 375&ndash;390. MR 756164</div>
+<A NAME="footnote_27_6"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_6">[6]</A></sup> C.H. Dowker and Morwen B. Thistlethwaite, <EM>Classification of knot
+      projections</EM>, Topology Appl. <B>16</B> (1983), no. 1, 19&ndash;31. MR 702617  <EM>(Remark: this paper focuses on knot shadows.)</EM></div>
+<A NAME="footnote_27_7"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_7">[7]</A></sup> Jim Hoste, Morwen Thistlethwaite, and Jeff Weeks, <EM>The first 1,701,936
+    knots</EM>, The Mathematical Intelligencer <B>20</B> (1998), no. 4, 33&ndash;48.  MR 1646740</div>
+<A NAME="footnote_27_8"></A><div class="footnote">
+<sup><A HREF="./gauss_dt_codes.html#ref_footnote_27_8">[8]</A></sup> Greg Kuperberg, <EM>What is a virtual link?</EM>, Algebraic &amp; Geometric Topology <B>3</B> (2003), 587&ndash;591. MR 1997331</div>
+</div></P>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <I>Modified 25 August 2019 by 
+      <span CLASS="breadcrumbs">
+	<A HREF="../index.html">Kyle Miller</A> > <A HREF="../blog/index.html">Mathblog</A> > What are Gauss and Dowker-Thistlethwaite codes?
+      </span></I>
+      </div>
+    </div>
+  </body>
+</html>

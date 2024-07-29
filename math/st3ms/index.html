@@ -1,0 +1,340 @@
+<!doctype html>
+<html><head>
+    <meta charset="utf-8">
+    <title>Student 3-Manifold Seminar</title>
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
+
+    
+    <style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+    
+    <style>.MathJax_CHTML:focus { outline: none; }</style>
+
+  <style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">.mjx-chtml {display: inline-block; line-height: 0; text-indent: 0; text-align: left; text-transform: none; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; letter-spacing: normal; word-wrap: normal; word-spacing: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; margin: 0; padding: 1px 0}
+.MJXc-display {display: block; text-align: center; margin: 1em 0; padding: 0}
+.mjx-chtml[tabindex]:focus, body :focus .mjx-chtml[tabindex] {display: inline-table}
+.mjx-full-width {text-align: center; display: table-cell!important; width: 10000em}
+.mjx-math {display: inline-block; border-collapse: separate; border-spacing: 0}
+.mjx-math * {display: inline-block; -webkit-box-sizing: content-box!important; -moz-box-sizing: content-box!important; box-sizing: content-box!important; text-align: left}
+.mjx-numerator {display: block; text-align: center}
+.mjx-denominator {display: block; text-align: center}
+.MJXc-stacked {height: 0; position: relative}
+.MJXc-stacked > * {position: absolute}
+.MJXc-bevelled > * {display: inline-block}
+.mjx-stack {display: inline-block}
+.mjx-op {display: block}
+.mjx-under {display: table-cell}
+.mjx-over {display: block}
+.mjx-over > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-under > * {padding-left: 0px!important; padding-right: 0px!important}
+.mjx-stack > .mjx-sup {display: block}
+.mjx-stack > .mjx-sub {display: block}
+.mjx-prestack > .mjx-presup {display: block}
+.mjx-prestack > .mjx-presub {display: block}
+.mjx-delim-h > .mjx-char {display: inline-block}
+.mjx-surd {vertical-align: top}
+.mjx-mphantom * {visibility: hidden}
+.mjx-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 2px 3px; font-style: normal; font-size: 90%}
+.mjx-annotation-xml {line-height: normal}
+.mjx-menclose > svg {fill: none; stroke: currentColor}
+.mjx-mtr {display: table-row}
+.mjx-mlabeledtr {display: table-row}
+.mjx-mtd {display: table-cell; text-align: center}
+.mjx-label {display: table-row}
+.mjx-box {display: inline-block}
+.mjx-block {display: block}
+.mjx-span {display: inline}
+.mjx-char {display: block; white-space: pre}
+.mjx-itable {display: inline-table; width: auto}
+.mjx-row {display: table-row}
+.mjx-cell {display: table-cell}
+.mjx-table {display: table; width: 100%}
+.mjx-line {display: block; height: 0}
+.mjx-strut {width: 0; padding-top: 1em}
+.mjx-vsize {width: 0}
+.MJXc-space1 {margin-left: .167em}
+.MJXc-space2 {margin-left: .222em}
+.MJXc-space3 {margin-left: .278em}
+.mjx-chartest {display: block; visibility: hidden; position: absolute; top: 0; line-height: normal; font-size: 500%}
+.mjx-chartest .mjx-char {display: inline}
+.mjx-chartest .mjx-box {padding-top: 1000px}
+.MJXc-processing {visibility: hidden; position: fixed; width: 0; height: 0; overflow: hidden}
+.MJXc-processed {display: none}
+.mjx-test {display: block; font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-transform: none; letter-spacing: normal; word-spacing: normal; overflow: hidden; height: 1px}
+.mjx-ex-box-test {position: absolute; overflow: hidden; width: 1px; height: 60ex}
+.mjx-line-box-test {display: table!important}
+.mjx-line-box-test span {display: table-cell!important; width: 10000em!important; min-width: 0; max-width: none; padding: 0; border: 0; margin: 0}
+#MathJax_CHTML_Tooltip {background-color: InfoBackground; color: InfoText; border: 1px solid black; box-shadow: 2px 2px 5px #AAAAAA; -webkit-box-shadow: 2px 2px 5px #AAAAAA; -moz-box-shadow: 2px 2px 5px #AAAAAA; -khtml-box-shadow: 2px 2px 5px #AAAAAA; padding: 3px 4px; z-index: 401; position: absolute; left: 0; top: 0; width: auto; height: auto; display: none}
+.mjx-chtml .mjx-noError {line-height: 1.2; vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+.MJXc-TeX-unknown-R {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: normal; font-weight: normal}
+.MJXc-TeX-unknown-I {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: italic; font-weight: normal}
+.MJXc-TeX-unknown-B {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: normal; font-weight: bold}
+.MJXc-TeX-unknown-BI {font-family: STIXGeneral,'Cambria Math','Arial Unicode MS',serif; font-style: italic; font-weight: bold}
+.MJXc-TeX-ams-R {font-family: MJXc-TeX-ams-R,MJXc-TeX-ams-Rw}
+.MJXc-TeX-cal-B {font-family: MJXc-TeX-cal-B,MJXc-TeX-cal-Bx,MJXc-TeX-cal-Bw}
+.MJXc-TeX-frak-R {font-family: MJXc-TeX-frak-R,MJXc-TeX-frak-Rw}
+.MJXc-TeX-frak-B {font-family: MJXc-TeX-frak-B,MJXc-TeX-frak-Bx,MJXc-TeX-frak-Bw}
+.MJXc-TeX-math-BI {font-family: MJXc-TeX-math-BI,MJXc-TeX-math-BIx,MJXc-TeX-math-BIw}
+.MJXc-TeX-sans-R {font-family: MJXc-TeX-sans-R,MJXc-TeX-sans-Rw}
+.MJXc-TeX-sans-B {font-family: MJXc-TeX-sans-B,MJXc-TeX-sans-Bx,MJXc-TeX-sans-Bw}
+.MJXc-TeX-sans-I {font-family: MJXc-TeX-sans-I,MJXc-TeX-sans-Ix,MJXc-TeX-sans-Iw}
+.MJXc-TeX-script-R {font-family: MJXc-TeX-script-R,MJXc-TeX-script-Rw}
+.MJXc-TeX-type-R {font-family: MJXc-TeX-type-R,MJXc-TeX-type-Rw}
+.MJXc-TeX-cal-R {font-family: MJXc-TeX-cal-R,MJXc-TeX-cal-Rw}
+.MJXc-TeX-main-B {font-family: MJXc-TeX-main-B,MJXc-TeX-main-Bx,MJXc-TeX-main-Bw}
+.MJXc-TeX-main-I {font-family: MJXc-TeX-main-I,MJXc-TeX-main-Ix,MJXc-TeX-main-Iw}
+.MJXc-TeX-main-R {font-family: MJXc-TeX-main-R,MJXc-TeX-main-Rw}
+.MJXc-TeX-math-I {font-family: MJXc-TeX-math-I,MJXc-TeX-math-Ix,MJXc-TeX-math-Iw}
+.MJXc-TeX-size1-R {font-family: MJXc-TeX-size1-R,MJXc-TeX-size1-Rw}
+.MJXc-TeX-size2-R {font-family: MJXc-TeX-size2-R,MJXc-TeX-size2-Rw}
+.MJXc-TeX-size3-R {font-family: MJXc-TeX-size3-R,MJXc-TeX-size3-Rw}
+.MJXc-TeX-size4-R {font-family: MJXc-TeX-size4-R,MJXc-TeX-size4-Rw}
+.MJXc-TeX-vec-R {font-family: MJXc-TeX-vec-R,MJXc-TeX-vec-Rw}
+.MJXc-TeX-vec-B {font-family: MJXc-TeX-vec-B,MJXc-TeX-vec-Bx,MJXc-TeX-vec-Bw}
+@font-face {font-family: MJXc-TeX-ams-R; src: local('MathJax_AMS'), local('MathJax_AMS-Regular')}
+@font-face {font-family: MJXc-TeX-ams-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-B; src: local('MathJax_Caligraphic Bold'), local('MathJax_Caligraphic-Bold')}
+@font-face {font-family: MJXc-TeX-cal-Bx; src: local('MathJax_Caligraphic'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-cal-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-R; src: local('MathJax_Fraktur'), local('MathJax_Fraktur-Regular')}
+@font-face {font-family: MJXc-TeX-frak-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-frak-B; src: local('MathJax_Fraktur Bold'), local('MathJax_Fraktur-Bold')}
+@font-face {font-family: MJXc-TeX-frak-Bx; src: local('MathJax_Fraktur'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-frak-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-BI; src: local('MathJax_Math BoldItalic'), local('MathJax_Math-BoldItalic')}
+@font-face {font-family: MJXc-TeX-math-BIx; src: local('MathJax_Math'); font-weight: bold; font-style: italic}
+@font-face {font-family: MJXc-TeX-math-BIw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-R; src: local('MathJax_SansSerif'), local('MathJax_SansSerif-Regular')}
+@font-face {font-family: MJXc-TeX-sans-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-B; src: local('MathJax_SansSerif Bold'), local('MathJax_SansSerif-Bold')}
+@font-face {font-family: MJXc-TeX-sans-Bx; src: local('MathJax_SansSerif'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-sans-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-sans-I; src: local('MathJax_SansSerif Italic'), local('MathJax_SansSerif-Italic')}
+@font-face {font-family: MJXc-TeX-sans-Ix; src: local('MathJax_SansSerif'); font-style: italic}
+@font-face {font-family: MJXc-TeX-sans-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-script-R; src: local('MathJax_Script'), local('MathJax_Script-Regular')}
+@font-face {font-family: MJXc-TeX-script-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Script-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Script-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Script-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-type-R; src: local('MathJax_Typewriter'), local('MathJax_Typewriter-Regular')}
+@font-face {font-family: MJXc-TeX-type-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Typewriter-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Typewriter-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Typewriter-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-cal-R; src: local('MathJax_Caligraphic'), local('MathJax_Caligraphic-Regular')}
+@font-face {font-family: MJXc-TeX-cal-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-B; src: local('MathJax_Main Bold'), local('MathJax_Main-Bold')}
+@font-face {font-family: MJXc-TeX-main-Bx; src: local('MathJax_Main'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-main-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-I; src: local('MathJax_Main Italic'), local('MathJax_Main-Italic')}
+@font-face {font-family: MJXc-TeX-main-Ix; src: local('MathJax_Main'); font-style: italic}
+@font-face {font-family: MJXc-TeX-main-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-main-R; src: local('MathJax_Main'), local('MathJax_Main-Regular')}
+@font-face {font-family: MJXc-TeX-main-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-math-I; src: local('MathJax_Math Italic'), local('MathJax_Math-Italic')}
+@font-face {font-family: MJXc-TeX-math-Ix; src: local('MathJax_Math'); font-style: italic}
+@font-face {font-family: MJXc-TeX-math-Iw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Math-Italic.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size1-R; src: local('MathJax_Size1'), local('MathJax_Size1-Regular')}
+@font-face {font-family: MJXc-TeX-size1-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size2-R; src: local('MathJax_Size2'), local('MathJax_Size2-Regular')}
+@font-face {font-family: MJXc-TeX-size2-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size3-R; src: local('MathJax_Size3'), local('MathJax_Size3-Regular')}
+@font-face {font-family: MJXc-TeX-size3-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size3-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size3-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size3-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-size4-R; src: local('MathJax_Size4'), local('MathJax_Size4-Regular')}
+@font-face {font-family: MJXc-TeX-size4-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Size4-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Size4-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Size4-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-vec-R; src: local('MathJax_Vector'), local('MathJax_Vector-Regular')}
+@font-face {font-family: MJXc-TeX-vec-Rw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Vector-Regular.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Vector-Regular.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Vector-Regular.otf') format('opentype')}
+@font-face {font-family: MJXc-TeX-vec-B; src: local('MathJax_Vector Bold'), local('MathJax_Vector-Bold')}
+@font-face {font-family: MJXc-TeX-vec-Bx; src: local('MathJax_Vector'); font-weight: bold}
+@font-face {font-family: MJXc-TeX-vec-Bw; src /*1*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/eot/MathJax_Vector-Bold.eot'); src /*2*/: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/woff/MathJax_Vector-Bold.woff') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/fonts/HTML-CSS/TeX/otf/MathJax_Vector-Bold.otf') format('opentype')}
+</style></head>
+  <body><div id="MathJax_Message" style="display: none;"></div>
+    <div class="main">
+      <div class="content">
+        <h1>Student 3-Manifold Seminar</h1>
+        
+  
+  
+  <p>The aim of this seminar is to learn basic 3-manifold topology, since Berkeley has not recently offered such a course.
+  The topics overlap somewhat with the Student Geometry and Low-Dimensional Topology Seminar, but our focus will be on this particular dimension.
+  This seminar complements Prof. Agol’s 3-manifold seminar, which tends to be more research-focused.</p>
+
+<p>The current plan is to meet weekly in 939 Evans at 4–5:30pm on Fridays for Fall 2019, beginning 9/13/19.</p>
+
+<p>Possible topics:
+  </p>
+
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Manifold_decomposition">3-manifold decompositions</a> (prime and JSJ)
+  </li>
+<li>Geometric classifications
+  </li>
+<li>The loop and sphere theorems
+  </li>
+<li>Incompressible surfaces and Haken manifolds
+  </li>
+<li>Hyperbolic link complements
+  </li>
+<li>Dehn surgery and the Lickorish–Wallace and Kirby theorems
+  </li>
+<li>Branched covers and the Montesinos trick
+  </li>
+<li>Triangulations and piecewise linear structures
+  </li>
+<li>Normal surface theory and recognition algorithms
+  </li>
+<li>Heegaard splittings
+  </li>
+<li>Sutured manifold hierarchies, Thurston norms
+  </li>
+<li>Thurston’s geometrization conjecture theorem
+  </li>
+<li>Fundamental groups of 3-manifolds
+  </li>
+<li>The surface subgroup conjecture
+  </li>
+<li>Thin position arguments
+  </li>
+<li>Spanning surfaces of knots
+  </li>
+<li>Turaev surfaces
+  </li>
+<li>Khovanov homology
+  </li>
+</ul>
+<h2>1. References</h2><ul>
+<li><a href="http://pi.math.cornell.edu/~hatcher/3M/3Mdownloads.html">Hatcher’s notes</a> (<a href="https://pi.math.cornell.edu/~hatcher/Papers/3Mslides.pdf">overview</a>)
+  </li>
+<li><a href="https://math.uchicago.edu/~dannyc/courses/3manifolds_2014/3manifolds_2014.html">Calegari’s notes</a>, which are <a href="https://math.uchicago.edu/~dannyc/books/3manifolds/3manifolds.html">being made into a book</a>
+  </li>
+<li><a href="http://people.maths.ox.ac.uk/lackenby/">Lackenby’s notes</a> (at the bottom, “Three-dimensional manifolds”).  <a href="lackenby-thrmns.pdf">As a single pdf</a>
+  </li>
+<li><a href="https://press.princeton.edu/titles/6086.html">Thurston, “Three-Dimensional Geometry and Topology”</a>
+  </li>
+<li><a href="http://library.msri.org/books/gt3m/">Thurston’s notes</a> (more thorough than the book)
+  </li>
+<li><a href="http://users.monash.edu/~jpurcell/book/HypKnotTheory.pdf">Purcell, “Hyperbolic knot theory”</a> (an expansion of some of Thurston’s notes)
+  </li>
+<li><a href="https://bookstore.ams.org/chel-349-h/">Hempel, “3-Manifolds”</a>
+  </li>
+<li><a href="https://bookstore.ams.org/cbms-43">Jaco, “Lectures on Three-Manifold Topology”</a>
+  </li>
+<li><a href="https://bookstore.ams.org/chel-346-h/">Rolfsen, “Knots and Links”</a>
+  </li>
+<li><a href="https://www.springer.com/us/book/9780387982540">Lickorish, “An Introduction to Knot Theory”</a>
+  </li>
+<li><a href="https://www.springer.com/us/book/9783540111023">Rourke and Sanderson, “Introduction to Piecewise-Linear Topology”</a>
+  </li>
+<li><a href="http://www.math.harvard.edu/~lurie/937.html">Lurie’s notes</a> about PL topology
+  </li>
+</ul>
+<h2>2. Schedule (Spring 2020)</h2>
+  <dl>
+<dt>2/13/2020 — Linking numbers for 2-knots — Michael Klug</dt><dd><p>
+    An introduction to link homotopy of 2-spheres in <span id="MathJax-Element-1-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mi>S</mi><mn>4</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-1" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-2" class="mjx-mrow"><span id="MJXc-Node-3" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.032em;"><span id="MJXc-Node-4" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em; padding-right: 0.032em;">S</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0.13em; padding-right: 0.071em;"><span id="MJXc-Node-5" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">4</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>S</mi><mn>4</mn></msup></math></span></span> and the Kirk invariant.</p>
+
+</dd>
+<dt>2/19/2020 — Linking numbers for 2-knots (part 2) — Michael Klug</dt><dd>
+  </dd>
+</dl>
+<h2>3. Schedule (Fall 2019)</h2><dl>
+<dt>9/13/2019 — Tait’s conjecture — Kyle Miller</dt><dd><p>
+    This will be an organizational meeting for a student learning seminar about 3-manifolds.
+    We will talk about Tait’s conjecture that reduced alternating link diagrams have minimal crossing number, which was resolved in 1987 by Kauffman, Murasugi, and Thistlethwaite using the Jones polynomial.</p>
+
+</dd>
+<dt>9/20/2019 — Tait conjectures, part 2 — Kyle Miller</dt><dd><p>
+    Turaev genus, the Kauffman bracket, and the conjectures.</p>
+
+</dd>
+<dt>9/27/2019 — Geometry of alternating links — Kyle Miller</dt><dd><p>
+    I’ll be talking about the geometry of alternating links, and in particular Menasco’s results for alternating links, which succinctly can be expressed as “alternating diagrams of non-split links are obviously non-split” and “alternating diagrams of prime links are obviously prime.”  If we have time, we will see how non-split non-prime non-torus alternating links are hyperbolic, and perhaps we will at least see the statements of some geometric characterizations of alternating links.</p>
+
+</dd>
+<dt>10/25/2019 — The (involutive) Kuperberg invariant — Kyle Miller</dt><dd>
+    We’ll talk about Kuperberg’s invariant of cobordisms between surfaces.  We’ll start by reviewing trace diagrams (a.k.a. tensor networks, Penrose notation, string diagrams, etc.) and then go over Hopf algebras using this notation.  Then we will learn about Heegaard diagrams for compact oriented 3-manifolds thought of as cobordisms between pairs of surfaces.  Finally, we will see how to define Kuperberg’s invariant <span id="MathJax-Element-2-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi mathvariant=&quot;normal&quot;>&amp;#x0023;</mi><mo stretchy=&quot;false&quot;>(</mo><mi>M</mi><mo>,</mo><mi>A</mi><mo stretchy=&quot;false&quot;>)</mo></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-6" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-7" class="mjx-mrow"><span id="MJXc-Node-8" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.56em;">#</span></span><span id="MJXc-Node-9" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-10" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span><span id="MJXc-Node-11" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="margin-top: -0.183em; padding-bottom: 0.56em;">,</span></span><span id="MJXc-Node-12" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.251em;">A</span></span><span id="MJXc-Node-13" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="normal">#</mi><mo stretchy="false">(</mo><mi>M</mi><mo>,</mo><mi>A</mi><mo stretchy="false">)</mo></math></span></span> and why <span id="MathJax-Element-3-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi mathvariant=&quot;normal&quot;>&amp;#x0023;</mi><mo stretchy=&quot;false&quot;>(</mo><mi>M</mi><mo>,</mo><mi>k</mi><mo stretchy=&quot;false&quot;>[</mo><mi>G</mi><mo stretchy=&quot;false&quot;>]</mo><mo stretchy=&quot;false&quot;>)</mo></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-14" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-15" class="mjx-mrow"><span id="MJXc-Node-16" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.56em;">#</span></span><span id="MJXc-Node-17" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-18" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span><span id="MJXc-Node-19" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="margin-top: -0.183em; padding-bottom: 0.56em;">,</span></span><span id="MJXc-Node-20" class="mjx-mi MJXc-space1"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em;">k</span></span><span id="MJXc-Node-21" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">[</span></span><span id="MJXc-Node-22" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em;">G</span></span><span id="MJXc-Node-23" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">]</span></span><span id="MJXc-Node-24" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="normal">#</mi><mo stretchy="false">(</mo><mi>M</mi><mo>,</mo><mi>k</mi><mo stretchy="false">[</mo><mi>G</mi><mo stretchy="false">]</mo><mo stretchy="false">)</mo></math></span></span> counts homomorphisms <span id="MathJax-Element-4-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mi>&amp;#x03C0;</mi><mn>1</mn></msub><mo stretchy=&quot;false&quot;>(</mo><mi>M</mi><mo stretchy=&quot;false&quot;>)</mo><mo stretchy=&quot;false&quot;>&amp;#x2192;</mo><mi>G</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-25" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-26" class="mjx-mrow"><span id="MJXc-Node-27" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.003em;"><span id="MJXc-Node-28" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.189em; padding-bottom: 0.313em; padding-right: 0.003em;">π</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-29" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span></span></span><span id="MJXc-Node-30" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-31" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span><span id="MJXc-Node-32" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span><span id="MJXc-Node-33" class="mjx-mo MJXc-space3"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.251em; padding-bottom: 0.374em;">→</span></span><span id="MJXc-Node-34" class="mjx-mi MJXc-space3"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em;">G</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>π</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo><mo stretchy="false">→</mo><mi>G</mi></math></span></span> for G a finite group.
+  </dd>
+<dt>11/1/2019 — 4-manifold invariants from Hopf algebras — Julian Chaidez</dt><dd>
+    Julian will talk about his recent work on 4-manifold invariants from Hopf algebras <a href="https://arxiv.org/abs/1910.14662">https://arxiv.org/abs/1910.14662</a>.
+    Their invariant is in the spirit of Kuperberg’s invariant, which is an invariant arising from a Heegaard diagram of a 3-manifold, by constructing a diffeomorphism-invariant assignment of trace diagrams to trisection diagrams of closed 4-manifolds.  While every finite-dimensional (involutive) Hopf algebra defines a Kuperberg invariant, every finite-dimensional “Hopf triplet” defines a 4-manifold invariant.
+  </dd>
+<dt>12/6/2019 — Cyclic branched covers and rational tangles — Kyle Miller</dt><dd><p>
+    We will talk about cyclic branched covers, knot determinants, and computing double branched covers of rational tangles.</p>
+
+</dd>
+</dl>
+<h2>4. Schedule (Spring 2019)</h2><dl>
+<dt>1/25/2019 — Prime decompositions (part 1) — Kyle Miller <a href="st3ms-kyle-miller-2019-1-25-prime-decomp-pt1.pdf">(Notes)</a></dt><dd><p>
+    This is an organizational meeting for this learning seminar. We will additionally discuss a little PL topology and begin with the existence and uniqueness of prime decompositions for connected, oriented, compact 3-manifolds, due to Kneser and Milnor.</p>
+
+</dd>
+<dt>2/1/2019 — Prime decompositions (part 2) — Kyle Miller <a href="st3ms-kyle-miller-2019-2-1-prime-decomp-pt2.pdf">(Notes)</a></dt><dd><p>
+    We will continue discussing Kneser’s and Milnor’s results on the existence and uniqueness of prime decompositions for connected, oriented, compact 3-manifolds.</p>
+
+</dd>
+<dt>2/8/2019 — The loop theorem and Dehn’s lemma — Kyle Miller <a href="st3ms-kyle-miller-2019-2-8-loop-theorem.pdf">(Notes)</a></dt><dd><p>
+    Simplified, the loop theorem states that if the induced map <span id="MathJax-Element-5-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mi>&amp;#x03C0;</mi><mn>1</mn></msub><mo stretchy=&quot;false&quot;>(</mo><mi mathvariant=&quot;normal&quot;>&amp;#x2202;</mi><mi>M</mi><mo stretchy=&quot;false&quot;>)</mo><mo stretchy=&quot;false&quot;>&amp;#x2192;</mo><msub><mi>&amp;#x03C0;</mi><mn>1</mn></msub><mo stretchy=&quot;false&quot;>(</mo><mi>M</mi><mo stretchy=&quot;false&quot;>)</mo></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-35" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-36" class="mjx-mrow"><span id="MJXc-Node-37" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.003em;"><span id="MJXc-Node-38" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.189em; padding-bottom: 0.313em; padding-right: 0.003em;">π</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-39" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span></span></span><span id="MJXc-Node-40" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-41" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.374em; padding-right: 0.035em;">∂</span></span><span id="MJXc-Node-42" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span><span id="MJXc-Node-43" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span><span id="MJXc-Node-44" class="mjx-mo MJXc-space3"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.251em; padding-bottom: 0.374em;">→</span></span><span id="MJXc-Node-45" class="mjx-msubsup MJXc-space3"><span class="mjx-base" style="margin-right: -0.003em;"><span id="MJXc-Node-46" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.189em; padding-bottom: 0.313em; padding-right: 0.003em;">π</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-47" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span></span></span><span id="MJXc-Node-48" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-49" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span><span id="MJXc-Node-50" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>π</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi mathvariant="normal">∂</mi><mi>M</mi><mo stretchy="false">)</mo><mo stretchy="false">→</mo><msub><mi>π</mi><mn>1</mn></msub><mo stretchy="false">(</mo><mi>M</mi><mo stretchy="false">)</mo></math></span></span> for a <span id="MathJax-Element-6-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mn>3</mn></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-51" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-52" class="mjx-mrow"><span id="MJXc-Node-53" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.374em;">3</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math></span></span>-manifold <span id="MathJax-Element-7-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>M</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-54" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-55" class="mjx-mrow"><span id="MJXc-Node-56" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>M</mi></math></span></span> is not injective, then there is a nullhomotopy of an essential loop in <span id="MathJax-Element-8-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi mathvariant=&quot;normal&quot;>&amp;#x2202;</mi><mi>M</mi></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-57" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-58" class="mjx-mrow"><span id="MJXc-Node-59" class="mjx-mi"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.374em; padding-right: 0.035em;">∂</span></span><span id="MJXc-Node-60" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.081em;">M</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="normal">∂</mi><mi>M</mi></math></span></span> that can be represented by an embedded disk.  We will go through the proof of Stalling’s formulation of the loop theorem using Papakyriakopoulos’s tower construction and discuss some applications.</p>
+
+</dd>
+<dt>2/15/2019 — The Sphere Theorem (part 1) — Kyle Miller <a href="st3ms-kyle-miller-2019-2-15-sphere-theorem-pt1.pdf">(Notes)</a></dt><dd><p>
+    A version of the Papakyriakopoulos Sphere Theorem states that a compact <span id="MathJax-Element-9-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mn>3</mn></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-61" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-62" class="mjx-mrow"><span id="MJXc-Node-63" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.374em;">3</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math></span></span>-manifold with nontrivial <span id="MathJax-Element-10-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mi>&amp;#x03C0;</mi><mn>2</mn></msub></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-64" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-65" class="mjx-mrow"><span id="MJXc-Node-66" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.003em;"><span id="MJXc-Node-67" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.189em; padding-bottom: 0.313em; padding-right: 0.003em;">π</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-68" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">2</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>π</mi><mn>2</mn></msub></math></span></span> has a two-sided embedded sphere or projective plane representing a nontrivial homotopy class. We will discuss ends of groups and how the theorem follows from Stallings’s theorem on finitely generated groups with more than one end.</p>
+
+</dd>
+<dt>2/22/2019 — The Sphere Theorem (part 2) — Kyle Miller <a href="st3ms-kyle-miller-2019-2-22-sphere-theorem-pt2.pdf">(Notes)</a></dt><dd><p>
+    This is a continuation of the previous talk.  (References: Stallings, <em>Group theory and three-dimensional manifolds</em>, 1971. Epstein, <em>Ends</em>, Topology of 3-manifolds and related topics, 1961. Peschke, <em>The Theory of Ends</em>, 1990. Calegari, <em>Notes on 3-manifold topology</em>.)</p>
+
+</dd>
+<dt>3/1/2019 — JSJ decompositions — Kyle Miller</dt><dd><p>
+    The irreducible <span id="MathJax-Element-11-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mn>3</mn></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-69" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-70" class="mjx-mrow"><span id="MJXc-Node-71" class="mjx-mn"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.374em;">3</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>3</mn></math></span></span>-manifolds that come from a prime decomposition can be further decomposed along embedded tori.  Jaco, Shalen, and Johannson proved there is a minimal collection of such tori, unique up to isotopy, that splits an irreducible compact orientable manifold into pieces that are either Seifert-fibered or atoroidal.  We will discuss examples, incompressible surfaces, and Seifert-fibered spaces.</p>
+
+</dd>
+<dt>3/8/2019 — JSJ decompositions (cont’d) — Kyle Miller</dt><dd><p>
+    This is a continuation of last week’s talk. We will discuss Seifert-fibered spaces and the existence of JSJ decompositions.</p>
+
+</dd>
+<dt>3/15/2019 — JSJ decompositions (cont’d) — Kyle Miller</dt><dd><p>
+    This is a continuation of the discussion about the existence and uniqueness of JSJ decompositions.</p>
+
+</dd>
+<dt>4/5/2019 — Haken manifolds and their hierarchies  — Michael Klug</dt><dd><p>
+    Compact surfaces with non-positive Euler characteristic can be inductively decomposed by cutting along finitely many properly embedded loops and arcs until one is left with a collection of disks; such a decomposition is called a hierarchy. An analogue up a dimension is called a Haken manifold, which can be inductively decomposed by cutting along two-sided incompressible surfaces until one is left with a collection of balls. Examples of Haken manifolds include link complements and surface bundles over circles. Certain facts about Haken manifolds can be proved by induction on a hierarchy.</p>
+
+</dd>
+<dt>4/12/2019 — Reidemeister torsion — Calvin McPhail-Snyder</dt><dd><p>
+    Some background: An early homological invariant of knot complements is the Alexander polynomial (which is the “just” a kind of determinant of <span id="MathJax-Element-12-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mi>H</mi><mn>1</mn></msub></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-72" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-73" class="mjx-mrow"><span id="MJXc-Node-74" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.057em;"><span id="MJXc-Node-75" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.251em; padding-right: 0.057em;">H</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-76" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.313em;">1</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>H</mi><mn>1</mn></msub></math></span></span> of the knot complement with coefficients twisted by the abelianization), and the polynomial shows up in many guises.  One way is through a torsion that Reidemeister introduced to classify lens spaces up to homeomorphism.  Using a cellular decomposition of a space, the torsion extracts a little more information from a chain complex, and unlike homology it is not invariant under homotopy equivalence.</p>
+
+</dd>
+<dt>4/19/2019 — Knot and link complements — Kyle Miller</dt><dd><p>
+    We will talk about some of the basic theory of knots and links in <span id="MathJax-Element-13-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mi>S</mi><mn>3</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-77" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-78" class="mjx-mrow"><span id="MJXc-Node-79" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.032em;"><span id="MJXc-Node-80" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em; padding-right: 0.032em;">S</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0.13em; padding-right: 0.071em;"><span id="MJXc-Node-81" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.374em;">3</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>S</mi><mn>3</mn></msup></math></span></span> with a special focus on the geometry of the complementary space.</p>
+
+</dd>
+<dt>4/26/2019 — Knot and link invariants — Kyle Miller</dt><dd><p>
+    We will continue our discussion of spaces that are the complement of a knot or link in <span id="MathJax-Element-14-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msup><mi>S</mi><mn>3</mn></msup></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-82" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-83" class="mjx-mrow"><span id="MJXc-Node-84" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.032em;"><span id="MJXc-Node-85" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.498em; padding-bottom: 0.313em; padding-right: 0.032em;">S</span></span></span><span class="mjx-sup" style="font-size: 70.7%; vertical-align: 0.513em; padding-left: 0.13em; padding-right: 0.071em;"><span id="MJXc-Node-86" class="mjx-mn" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.374em; padding-bottom: 0.374em;">3</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>S</mi><mn>3</mn></msup></math></span></span>, and then we will talk about Conway’s normalization of the Alexander polynomial. If time permits, we will see the definition of the Jones polynomial via the Kauffman bracket.</p>
+
+</dd>
+<dt>5/3/2019 — All the ways I know how to define the Alexander polynomial – Kyle Miller</dt><dd><p>
+    In this talk, I will try to go through all the ways I am aware of that one can define the Alexander polynomial. To name a few: Alexander’s original definition, the Fox calculus, the Conway potential function, polynomial extrapolation of <span id="MathJax-Element-15-Frame" class="mjx-chtml MathJax_CHTML" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mi>U</mi><mi>q</mi></msub><mo stretchy=&quot;false&quot;>(</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mi mathvariant=&quot;fraktur&quot;>s</mi><mi mathvariant=&quot;fraktur&quot;>l</mi></mrow><mo stretchy=&quot;false&quot;>(</mo><mi>n</mi><mo stretchy=&quot;false&quot;>)</mo><mo stretchy=&quot;false&quot;>)</mo></math>" role="presentation" style="font-size: 101%; position: relative;"><span id="MJXc-Node-87" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-88" class="mjx-mrow"><span id="MJXc-Node-89" class="mjx-msubsup"><span class="mjx-base" style="margin-right: -0.084em;"><span id="MJXc-Node-90" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.436em; padding-bottom: 0.313em; padding-right: 0.084em;">U</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-91" class="mjx-mi" style=""><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.498em; padding-right: 0.014em;">q</span></span></span></span><span id="MJXc-Node-92" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-93" class="mjx-texatom"><span id="MJXc-Node-94" class="mjx-mrow"><span id="MJXc-Node-95" class="mjx-mi"><span class="mjx-char MJXc-TeX-frak-R" style="padding-top: 0.251em; padding-bottom: 0.313em;">s</span></span><span id="MJXc-Node-96" class="mjx-mi"><span class="mjx-char MJXc-TeX-frak-R" style="padding-top: 0.436em; padding-bottom: 0.313em;">l</span></span></span></span><span id="MJXc-Node-97" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">(</span></span><span id="MJXc-Node-98" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.251em; padding-bottom: 0.313em;">n</span></span><span id="MJXc-Node-99" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span><span id="MJXc-Node-100" class="mjx-mo"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.436em; padding-bottom: 0.622em;">)</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>U</mi><mi>q</mi></msub><mo stretchy="false">(</mo><mrow class="MJX-TeXAtom-ORD"><mi mathvariant="fraktur">s</mi><mi mathvariant="fraktur">l</mi></mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></math></span></span> quantum invariants, Reidemeister torsion, the Burau representation of braid groups, Alexander representations of the knot quandle, and knot Floer homology.</p>
+
+</dd>
+</dl>
+<h2>5. Other things</h2><p>There is a list of upcoming conferences in low-dimensional topology
+  at the <a href="https://ldtopology.wordpress.com/conferences/">Low-dimensional topology
+  blog</a>.</p>
+
+
+      </div>
+      <div class="clear"></div>
+      <div class="footer">
+        <i>Modified 12 Sep 2019 by 
+      <span class="breadcrumbs">
+	<a href="../index.html">Kyle Miller</a> &gt; Student 3-Manifold Seminar
+      </span></i>
+      </div>
+    </div>
+  
+</body></html>

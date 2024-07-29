@@ -1,0 +1,694 @@
+<!doctype html>
+<html>
+<head>
+  <title>R^2 Homology Simulator 2014</title>
+<script src="underscore-min.js"></script>
+<script src="gl-matrix.js"></script>
+<script src="jquery.min.js" ></script>
+<script src="jquery.mousewheel.js"></script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+  attribute vec4 aVertexPosition;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * aVertexPosition;
+  }
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+  precision mediump float;
+  uniform float uTime;
+  uniform int uMode;
+  uniform vec2 uPoints[24];
+  uniform int uPointSpin[24];
+
+  vec3 hsv2rgb(vec3 c)
+  { // taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    vec3 res = c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    //float sum = res.x + res.y + res.z;
+    return res;// * c.z / sum;
+  }
+
+  const float pi = 3.141592653589793;
+
+  void main(void) {
+    float x0 = gl_FragCoord.x;
+    float y0 = gl_FragCoord.y;
+
+    float theta = -uTime * 0.5;
+
+    for (int i = 0; i < 24; i++) {
+      float angle = atan(uPoints[i].y-y0, uPoints[i].x-x0);
+      theta += angle * float(uPointSpin[i]);
+    }
+
+    if (uMode == 0) {
+      gl_FragColor = vec4(hsv2rgb(vec3(theta / (2.0 * pi) , 1.0, 1.0)), 1.0);
+    } else if (uMode == 1) {
+      float s = fract(theta / (2.0 * pi));
+      if (s <= 0.95) {
+        s /= 0.95;
+      } else if (s > 0.95) {
+        s = (1.0 - s)/0.05;
+      }
+      gl_FragColor = vec4(hsv2rgb(vec3(0.0, s, 1.0)), 1.0);
+    } else if (uMode == 2) {
+      float re = 1.0-smoothstep(0.03, 0.05, abs(mod(0.5 + theta / pi, 1.0) - 0.5));
+      float im = 1.0-smoothstep(0.03, 0.05, abs(mod(0.5 + theta / pi+0.5, 1.0) - 0.5));
+      gl_FragColor = vec4(1.0-im, 1.0-re-im, 1.0-re, 1.0);
+    }
+  }
+  </script>
+
+
+
+<script type="text/javascript">
+
+  // opengl
+
+
+var gl = null;
+var shaderProgram = null;
+
+var mvMatrix = mat4.create();
+var mvMatrixStack = [];
+var pMatrix = mat4.create();
+
+function mvPushMatrix() {
+    var copy = mat4.create();
+    mat4.copy(copy, mvMatrix);
+    mvMatrixStack.push(copy);
+}
+function mvPopMatrix() {
+    if (mvMatrixStack.length == 0) {
+        throw new Error("invalid popMatrix!");
+    }
+    mvMatrix = mvMatrixStack.pop();
+}
+function setMatrixUniforms() {
+    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+}
+
+function getShader(id) {
+    var shaderScript = $(document.getElementById(id));
+    var str = shaderScript.text();
+    var type = shaderScript.attr("type");
+
+    var shader = null;
+    if (type === "x-shader/x-fragment") {
+        shader = gl.createShader(gl.FRAGMENT_SHADER);
+    } else if (type === "x-shader/x-vertex") {
+        shader = gl.createShader(gl.VERTEX_SHADER);
+    } else {
+        throw new Error("No such type");
+    }
+
+    gl.shaderSource(shader, str);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(shader));
+    }
+
+    return shader;
+}
+
+function initShaders() {
+    var fragmentShader = getShader("shader-fs");
+    var vertexShader = getShader("shader-vs");
+
+    shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        throw new Error("Could not initialize shaders");
+    }
+
+    gl.useProgram(shaderProgram);
+
+    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+    
+    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    
+    shaderProgram.uTime = gl.getUniformLocation(shaderProgram, "uTime");
+    shaderProgram.uMode = gl.getUniformLocation(shaderProgram, "uMode");
+    shaderProgram.uPoints = gl.getUniformLocation(shaderProgram, "uPoints");
+    shaderProgram.uPointSpin = gl.getUniformLocation(shaderProgram, "uPointSpin");
+}
+
+function initWebGL(canvas) {
+    var gl = null;
+//    var options = {antialias: true};
+    var options = {};
+    try {
+        gl = canvas.getContext("web-gl", options) || canvas.getContext("experimental-webgl", options);
+    }
+    catch (e) {}
+    
+    if (!gl) {
+        alert("Unable to initialize WebGL.");
+        throw new Exception("Unable to initialize WebGL.");
+    }
+    return gl;
+}
+
+var buffer;
+
+function initBuffers() {
+    var strip = new Float32Array([
+        -1, -1, 0, 1,
+        1, -1, 0, 1,
+        -1, 1, 0, 1,
+        1, 1, 0, 1
+    ]);
+    buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, strip, gl.STATIC_DRAW);
+    buffer.itemSize = 4;
+    buffer.numItems = strip.length / 4;
+}
+function drawBuffers() {
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, buffer.numItems);
+}
+
+  function drawFrame(pts) {
+      initBuffers();
+      gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+      gl.clearColor(1.0, 1.0, 1.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      
+      mat4.identity(pMatrix);
+      mat4.identity(mvMatrix);
+
+      setMatrixUniforms();
+
+      var numPoints = 24;
+      var points = new Float32Array(numPoints*2);
+      var pointSpins = new Int32Array(numPoints);
+
+      var i = 0;
+      _.each(pts, function (pt) {
+          if (i < numPoints) {
+              points[2*i] = pt.x;
+              points[2*i+1] = gl.viewportHeight - pt.y;
+              pointSpins[i] = pt.spin;
+              i++;
+          }
+      });
+      for (; i < numPoints; i++) {
+          points[2*i] = points[2*i+1] = -22;
+          pointSpins[i] = 0;
+      }
+
+      gl.uniform1f(shaderProgram.uTime, offset);
+      gl.uniform2fv(shaderProgram.uPoints, points);
+      gl.uniform1iv(shaderProgram.uPointSpin, pointSpins);
+      gl.uniform1i(shaderProgram.uMode, mode);
+      
+      drawBuffers();
+  }
+
+
+  // client input
+
+  var SHIFT = 16;
+  var CTRL = 17;
+  var ALT = 18;
+
+  function InputWatcher(mouseSelector) {
+      var o = this;
+      o.keys = {};
+      o.buttons = {};
+      o.x = null;
+      o.y = null;
+      o.path = null;
+
+      o.mouseHandlers = [];
+      o.mouseWheelHandlers = [];
+      o.keyHandlers = [];
+      $(function () {
+          $(document).keydown(function (e) {
+              e.preventDefault();
+              o.keys[e.which] = true;
+              _.each(o.keyHandlers, function (l) {
+                  l(o, true, e.which);
+              });
+          });
+          $(document).keyup(function (e) {
+              e.preventDefault();
+              delete o.keys[e.which];
+              _.each(o.keyHandlers, function (l) {
+                  l(o, false, e.which);
+              });
+          });
+          $(mouseSelector).mousemove(function (e) {
+              o.x = e.pageX;
+              o.y = e.pageY;
+              if (o.path) {
+                  o.path.push({x : o.x, y : o.y});
+              }
+          });
+          $(mouseSelector).mousedown(function (e) {
+              e.preventDefault();
+              o.x = e.pageX;
+              o.y = e.pageY;
+              if (o.buttons[e.which] === void 0) {
+                  o.buttons[e.which] = {
+                      x : o.x,
+                      y : o.y
+                  };
+              } else {
+                  // do nothing; this is due to going off the window
+              }
+              o.path = [{x : o.x, y : o.y}];
+              _.each(o.mouseHandlers, function (l) {
+                  l(o, e.which, false);
+              });
+          });
+          $(mouseSelector).mouseup(function (e) {
+              e.preventDefault();
+              o.x = e.pageX;
+              o.y = e.pageY;
+              var released = o.buttons[e.which];
+              var path = o.path;
+              delete o.buttons[e.which];
+              o.path = null;
+              _.each(o.mouseHandlers, function (l) {
+                  l(o, e.which, released, path);
+              });
+          });
+          $(mouseSelector).mousewheel(function (e) {
+              e.preventDefault();
+              _.each(o.mouseWheelHandlers, function (l) {
+                  l(o, e.deltaX, e.deltaY);
+              });
+          });
+
+          $(mouseSelector).on("contextmenu", function (e) {
+              e.preventDefault();
+          });
+      });
+  }
+  InputWatcher.prototype.listenMouse = function (l) {
+      this.mouseHandlers.push(l);
+  };
+  InputWatcher.prototype.listenMouseWheel = function (l) {
+      this.mouseWheelHandlers.push(l);
+  };
+  InputWatcher.prototype.listenKeys = function (l) {
+      this.keyHandlers.push(l);
+  };
+  InputWatcher.prototype.reset = function () {
+      this.keys = {};
+      this.buttons = {};
+  };
+  InputWatcher.prototype.shift = function () {
+      return _.has(this.keys, SHIFT);
+  };
+  InputWatcher.prototype.ctrl = function () {
+      return _.has(this.keys, CTRL);
+  };
+  InputWatcher.prototype.alt = function () {
+      return _.has(this.keys, ALT);
+  };
+
+
+  // canvas
+
+
+
+  var canvas, ctxt, input;
+  function updateCanvasSize() {
+      $(canvas).attr("width", window.innerWidth).attr("height", window.innerHeight);
+
+      $("#glcanvas").attr("width", window.innerWidth).attr("height", window.innerHeight);
+      gl.viewportWidth = +$("#glcanvas").attr("width");
+      gl.viewportHeight = +$("#glcanvas").attr("height");
+  }
+
+
+  var selectedId = null;
+  var radius = 15;
+
+  var mode = 0;
+
+  $(function () {
+
+      $("#intro").click(function () {
+          $("#intro").fadeOut();
+      });
+
+      canvas = document.getElementById("canvas");
+      ctxt = canvas.getContext("2d");
+      $(window).on("resize", function (e) {
+          updateCanvasSize();
+      });
+
+      var glcanvas = document.getElementById("glcanvas");
+      gl = initWebGL(glcanvas);
+      initShaders();
+
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LEQUAL);
+
+      mat4.identity(mvMatrix);
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      updateCanvasSize();
+      animationLoop();
+
+      input = new InputWatcher("#canvas");
+      input.listenMouse(function (input, which, released, path) {
+          $("#intro").fadeOut();
+          if (released === false) {
+              selectedId = null;
+              var handled = false;
+              _.each(_.keys(pts), function (i) {
+                  if (handled) return;
+                  var pt = pts[i];
+                  if (dist2d(input, pt) < radius) {
+                      selectedId = i;
+                      startdelta = {x : input.x - pt.x, y : input.y - pt.y};
+                      handled = true;
+                      pt.isEnteringNumber = false;
+                  }
+              });
+              if (which == 3) {
+                  if (selectedId !== null) {
+                      delete pts[selectedId];
+                      selectedId = null;
+                  } else {
+                      var pt = {x : input.x, y : input.y, spin : 0};
+                      selectedId = addPt(pt);
+                      console.log(selectedId);
+                  }
+              }
+          }
+      });
+      input.listenMouseWheel(function (input, deltaX, deltaY) {
+          var id = selectedId;
+          if (selectedId == null) {
+              id = mouseOver;
+          }
+          var delta = deltaY - deltaX;
+          if (id !== null) {
+              if (delta > 0) {
+                  pts[id].spin += 1;
+              } else if (delta < 0) {
+                  pts[id].spin -= 1;
+              }
+              pts[id].isEnteringNumber = false;
+          }
+      });
+      input.listenKeys(function (input, isDown, which) {
+          if (isDown) {
+              var id = selectedId;
+              if (selectedId == null) {
+                  id = mouseOver;
+              }
+              if (which == 38) { // up
+                  if (id !== null) {
+                      pts[id].spin += 1;
+                      pts[id].isEnteringNumber = false;
+                  }
+              } else if (which == 40) { // down
+                  if (id !== null) {
+                      pts[id].spin -= 1;
+                      pts[id].isEnteringNumber = false;
+                  }
+              } else if (which == 46 || which == 8) { // delete or backspace
+                  if (id !== null) {
+                      if (which == 8 && pts[id].isEnteringNumber && pts[id].spin !== 0) { // delete last digit maybe
+                          pts[id].spin = ~~(pts[id].spin/10);
+                      } else {
+                          delete pts[id];
+                          selectedId = null;
+                      }
+                  }
+              } else if (which == 37) { // left arrow
+                  speed -= 1;
+              } else if (which == 39) { // right arrow
+                  speed += 1;
+              } else if (which == 9) { // tab
+                  mode += input.shift() ? -1 : 1;
+                  mode = (3 + mode) % 3;
+              } else if (which == 191 && input.shift()) { // ?
+                  if ($("#intro").css("display") === "none") {
+                      $("#intro").show();
+                  } else {
+                      $("#intro").fadeOut();
+                  }
+              } else if (which == 77) { // m
+                  showMarkers = !showMarkers;
+              } else if (48 <= which && which <= 57) { // 0 through 9
+                  if (id !== null) {
+                      var n = which - 48;
+                      if (pts[id].isEnteringNumber) {
+                          if (isNeg0(pts[id].spin) || pts[id].spin < 0) {
+                              pts[id].spin = 10*pts[id].spin - n;
+                          } else {
+                              pts[id].spin = 10*pts[id].spin + n;
+                          }
+                      } else {
+                          pts[id].spin = n;
+                          pts[id].isEnteringNumber = true;
+                      }
+                  }
+              } else if (189 == which) { // negative
+                  if (id !== null) {
+                      pts[id].spin = -0;
+                      pts[id].isEnteringNumber = true;
+                  }
+              } else if (13 == which) { // enter
+                  if (id !== null) {
+                      pts[id].isEnteringNumber = false;
+                  }
+              }
+          }
+      });
+  });
+
+  function isNeg0(x) {
+      return x === 0 && 1/x === -Infinity;
+  }
+
+  var requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+
+
+  var offset = 0;
+
+  function animationLoop() {
+      requestAnimFrame(function (timestamp) {
+          animationLoop();
+          animateStep(timestamp);
+      });
+      // setTimeout(function () {
+      //     animationLoop();
+      //     animateStep();
+      // }, 1000/30);
+  }
+
+  var startTimestamp = null;
+
+  var lastTime = null;
+
+  var offset = 0;
+
+  var speed = 0;
+
+  function animateStep(timestamp) {
+      if (startTimestamp === null) lastTime = startTimestamp = timestamp;
+      var multiplier = speed/2 + 1;
+      offset += multiplier * (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+      draw();
+  }
+
+  function hsi2rgb(H, S, I) {
+      H = H || 0;
+      S = S || 0;
+      I = I || 0;
+      var r, g, b;
+      if (H < 0) {
+          H = 2*Math.PI - ((-H) % (2*Math.PI));
+      } else {
+          H = H % (2*Math.PI);
+      }
+      if (H < 120*Math.PI/180) {
+          r = 255*I/3*(1+S*Math.cos(H)/Math.cos(60*Math.PI/180 - H));
+          g = 255*I/3*(1+S*(1-Math.cos(H)/Math.cos(60*Math.PI/180 - H)));
+          b = 255*I/3*(1-S);
+      } else if (H < 240*Math.PI/180) {
+          H = H - 120*Math.PI/180;
+          g = 255*I/3*(1+S*Math.cos(H)/Math.cos(60*Math.PI/180 - H));
+          b = 255*I/3*(1+S*(1-Math.cos(H)/Math.cos(60*Math.PI/180 - H)));
+          r = 255*I/3*(1-S);
+      } else {
+          H = H - 240*Math.PI/180;
+          b = 255*I/3*(1+S*Math.cos(H)/Math.cos(60*Math.PI/180 - H));
+          r = 255*I/3*(1+S*(1-Math.cos(H)/Math.cos(60*Math.PI/180 - H)));
+          g = 255*I/3*(1-S);
+      }
+      return [r, g, b];
+  }
+
+  function angleToColor(theta) {
+      var r, g, b, R, G, B, sum;
+//      r = (1 + Math.cos(theta))/2;
+//      g = (1 + Math.cos(theta - 2*Math.PI/3))/2;
+//      b = (1 + Math.cos(theta + 2*Math.PI/3))/2;
+      //sum = r + g + b;
+      //R = ~~(255 * r / sum);
+      //G = ~~(255 * g / sum);
+//      B = ~~(255 * b / sum);
+      
+
+      rgb = hsi2rgb(theta, 1, 1);
+      R = ~~rgb[0];
+      G = ~~rgb[1];
+      B = ~~rgb[2];
+
+      return "rgb(" + R + "," + G + "," + B + ")";
+  }
+
+
+
+  var pts = {1 : {x : 300, y : 300, spin : 2},
+             2 : {x : 500, y : 300, spin : -3}};
+  var nextPt = 3;
+  function addPt(pt) {
+      var id = nextPt++;
+      pts[id] = pt;
+      return id;
+  }
+
+  var mouseOver = null;
+  var startdelta = null;
+  var showMarkers = true;
+
+  function draw() {
+      drawFrame(pts);
+
+      if (selectedId === null) {
+      } else {
+          if (input.buttons[1]) {
+              pts[selectedId].x = input.x - startdelta.x;
+              pts[selectedId].y = input.y - startdelta.y;
+          }
+      }
+
+      var oldMouseOver = mouseOver;
+      mouseOver = null;
+
+      ctxt.save();
+
+      ctxt.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (showMarkers) {
+
+      ctxt.textAlign = "center";
+      ctxt.textBaseline = "middle";
+      ctxt.font = "12px sans-serif";
+      _.each(pts, function (pt, i) {
+          ctxt.fillStyle = "#000";
+          ctxt.beginPath();
+          ctxt.arc(pt.x, pt.y, radius, 0, 2*Math.PI, false);
+          ctxt.fill();
+
+          if (dist2d(input, pt) <= radius || selectedId == i) {
+              if (selectedId == i) {
+                  ctxt.strokeStyle = "#fff";
+              } else {
+                  if (oldMouseOver !== i) {
+                      pt.isEnteringNumber = false;
+                  }
+                  mouseOver = i;
+                  ctxt.strokeStyle = "#33f";
+              }
+              ctxt.lineWidth = 3;
+              ctxt.stroke();
+          }
+
+          ctxt.fillStyle = "#fff";
+          ctxt.fillText("" + (isNeg0(pt.spin) ? "-" : pt.spin), pt.x, pt.y);
+      });
+
+      }
+
+      if (window.showKeys) {
+          ctxt.fillText(_.keys(input.keys).join(), 100, 100);
+      }
+
+      ctxt.restore();
+  }
+
+  function dist2d(pt1, pt2) {
+      var dx = pt1.x - pt2.x;
+      var dy = pt1.y - pt2.y;
+      return Math.sqrt(dx*dx + dy*dy);
+  }
+
+</script>
+<style type="text/css">
+  body {
+      margin: 0;
+      padding: 0;
+  }
+  #glcanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+  }
+  #canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+  }
+
+  #intro {
+      position: fixed;
+      bottom: 1em;
+      left: 1em;
+      border: 3px solid #000;
+      border-radius: 5px;
+      margin: 0;
+      padding: 1em 2em;
+      font-family: sans-serif;
+      background: #fff;
+      opacity: 0.7;
+  }
+</style>
+
+</head>
+<body>
+  <canvas id="glcanvas" width="640" height="480"></canvas>
+  <canvas id="canvas"></canvas>
+
+  <div id="intro">
+    <h1>R<sup>2</sup> Homology Simulator 2014</h1>
+    <p>Explore a model of the homology of the punctured plane!</p>
+    <ul>
+      <li><em>Left click</em> to select or deselect singularities.</li>
+      <li><em>Right click</em> to add or remove singularities.</li>
+      <li><em>Up/down arrow</em> or <em>mouse wheel</em> to adjust the residue of a selected singularity.</li>
+      <li><em>Right/left arrow</em> to adjust animation speed.</li>
+      <li><em>Tab</em> to change coloring mode.</li>
+      <li><em>m</em> to toggle the singularity markers.</li>
+      <li><em>?</em> to bring this box back.</li>
+    </ul>
+  </div>
+</body>
+</html>

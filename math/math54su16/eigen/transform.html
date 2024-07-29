@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <style type="text/css">
+/*      body, html { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }*/
+      #canvas-holder { border: 0px solid #ccc; display: inline-block}
+    </style>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="transform.js"></script>
+  </head>
+  <body>
+    <div style="display:none;"><img id="image" src="kitty.jpg"/></div>
+    <div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <h1>Transformation toy: eigenvector edition</h1>
+      </div>
+      <div>
+        <div id="canvas-holder">
+          <canvas id="canvas" width="750" height="320"></canvas>
+          <div style="text-align:right;">
+            <input id="reset" type="button" value="Reset">
+          </div>
+        </div>
+      </div>
+      <div style="width: 700px; box-sizing: border-box; padding: 0.5em;">
+        <p>Drag the circular handles on the two colored vectors in the
+          vector space to the right to choose the columns of a matrix
+          of a linear transformation.</p>
+
+        <p>The locations of the points of the cat image are
+          transformed according to the transformation, and the
+          resulting image is given on the right.</p>
+
+        <p>The eigenvectors of the matrix, when there are real
+        eigenvectors, are drawn spanning a grid in both the left and
+        right vector spaces.  Since matrices scale eigenvectors, the
+        grid on the right is the grid on the left but scaled by
+        different amounts in each eigenvector direction.  Thus, the
+        parallelograms are going "in the same direction" as the ones
+        on the left.</p>
+
+        <p>Compare corresponding parallelogram regions and see how
+        they are stretched.</p>
+        
+        <hr>
+
+        <p>&copy;2016 Kyle Miller</p>
+      </div>
+    </div>
+  </body>
+</html>

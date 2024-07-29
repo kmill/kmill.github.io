@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="kq.js"></script>
+    <script type="text/javascript" src="spring.js"></script>
+  </head>
+  <body>
+    <div>
+      <div style="width: 600px; box-sizing: border-box; padding: 0 0.5em 0.5em 0.5em;">
+        <p>This is a simulation of a cart connected to a spring.  You
+          can drag the cart and release it at a particular
+          velocity or click on the phase diagram.</p>
+      </div>
+
+      <table>
+        <tr>
+          <td>
+            <canvas id="cart-canvas" width="600" height="100"></canvas>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+            <var>m</var><var>x</var>&Prime; + <var>c</var><var>x</var>&prime; + <var>k</var><var>x</var> = 0
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <canvas id="phase-canvas" width="600" height="600"></canvas>
+          </td>
+          <td style="padding-left: 1em">
+            <table class="params">
+              <tr title="Cart mass">
+                <td style="text-align: center"><var>m</var></td><td> = </td>
+                <td>
+                  <input data-var="m" type="range" min="0.01" max="2" value="1" step="0.01">
+                  <input data-var="m" type="textbox">
+                </td>
+              </tr>
+              <tr title="Damping factor">
+                <td style="text-align: center"><var>c</var></td><td> = </td>
+                <td>
+                  <input data-var="c" type="range" min="0" max="4" value="1" step="0.01">
+                  <input data-var="c" type="textbox">
+                </td>
+              </tr>
+              <tr title="Spring constant">
+                <td style="text-align: center"><var>k</var></td><td> = </td>
+                <td>
+                  <input data-var="k" type="range" min="0" max="4" value="1" step="0.01">
+                  <input data-var="k" type="textbox">
+                </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr title="Cart position">
+                <td style="text-align: center"><var>x</var></td><td> = </td>
+                <td>
+                  <input data-var="x" type="range" min="-5" max="5" value="1" step="0.01">
+                  <input data-var="x" type="textbox">
+                </td>
+              </tr>
+              <tr title="Cart velocity">
+                <td style="text-align: center"><var>x</var>&prime;</td><td> = </td>
+                <td>
+                  <input data-var="dx" type="range" min="-5" max="5" value="1" step="0.01">
+                  <input data-var="dx" type="textbox">
+                </td>
+              </tr>
+            </table>
+
+            <p><label>Running: <input id="running-checkbox" type="checkbox" checked></label></p>
+
+            <p><var>c</var>&sup2; &minus; 4<var>m</var><var>k</var> = <span data-var="disc"></span></p>
+
+            <p><span id="eqn"></span></p>
+            
+            <h3>Examples</h3>
+            <ul>
+              <li><a id="ex-undamped" href="#">Undamped</a></li>
+              <li><a id="ex-partial" href="#">Partially damped</a></li>
+              <li><a id="ex-critical" href="#">Critically damped</a></li>
+              <li><a id="ex-overdamped" href="#">Overdamped</a></li>
+              <li><a id="ex-nospring-undamped" href="#">No spring, undamped</a></li>
+              <li><a id="ex-nospring-damped" href="#">No spring, damped</a></li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+      <p style="color: #999">&copy;2020 Kyle Miller</p>
+    </div>
+  </body>
+</html>
